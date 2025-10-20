@@ -1,8 +1,11 @@
+/* 충돌 나서 app.css 좀 바꿨습니다 */
+/* #root 스타일 - 중앙 정렬 방지 및 max-width 설정 */
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  /* 텍스트 중앙 정렬 제거 */
+  text-align: unset;
 }
 
 .logo {

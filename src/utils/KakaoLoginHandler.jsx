@@ -28,7 +28,7 @@ export default function KakaoLoginHandler({ code }) {
           <div>{result}</div>
         </>
       ) : (
-        <div>카카오 인증 코드 처리 중...</div>
+        <div>카카오 인증 코드 처리 중</div>
       )}
     </div>
   );
