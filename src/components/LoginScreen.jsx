@@ -6,7 +6,7 @@ export default function LoginScreen() {
 
       {/* 로고 */}
       <img
-        src="/icons/logo.png"
+        src="/icons/logo.svg"
         alt="Logo"
         className="w-[2.5rem] h-[4.5rem] mb-[1.5rem] mt-[9rem]"
       />
@@ -56,12 +56,12 @@ export default function LoginScreen() {
         {/* 상단 구분선 */}
         <div className="w-full flex ml-[2.6rem] mt-[1.25rem]">
           <img
-            src="/icons/line.png"
+            src="/icons/line.svg"
             alt="line"
             className="w-[6.25rem] h-[0.0625rem]"
           />      
           <img
-            src="/icons/line.png"
+            src="/icons/line.svg"
             alt="line"
             className="w-[6.25rem] h-[0.0625rem] ml-[8.2rem]"
           />      
@@ -71,13 +71,13 @@ export default function LoginScreen() {
         {/* SNS 로그인 아이콘들 */}
         <div className="flex gap-[1.5rem] mb-[1rem]">
           <img
-            src="/icons/naver.png"
-            alt="Naver Login"
+            src="/icons/kakao.svg"
+            alt="Kakao Login"
             className="w-[2.5rem] h-[2.5rem]"
           />
           <img
-            src="/icons/kakao.png"
-            alt="Kakao Login"
+            src="/icons/naver.svg"
+            alt="Naver Login"
             className="w-[2.5rem] h-[2.5rem]"
           />
         </div>
