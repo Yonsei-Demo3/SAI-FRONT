@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginScreen from "./components/LoginScreen";
 import SignupScreen from "./components/SignupScreen";
+import MainScreen from "./components/MainScreen";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LoginScreen />} />
             <Route path="/signup" element={<SignupScreen />} />
+            <Route path="/main" element={<MainScreen />} />
           </Routes>
         </Router>
       </div>
