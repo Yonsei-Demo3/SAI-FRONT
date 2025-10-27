@@ -21,7 +21,7 @@ export default function LoginScreen() {
       <img
         src="/icons/logo.svg"
         alt="Logo"
-        className="w-[2.5rem] h-[4.5rem] mb-[1.5rem] mt-[9rem]"
+        className="w-[2.5rem] h-[4.5rem] mb-[1.5rem] mt-[6.5rem]"
       />
 
       <div className="w-[20.4rem] flex flex-col gap-[1rem]">
@@ -29,7 +29,7 @@ export default function LoginScreen() {
         <div className="relative">
           <div className="flex flex-col justify-center border border-[#D0D6DD] rounded-[0.5rem] h-[3.75rem] px-[1rem]">
             <label className="text-[0.625rem] text-[#9EA4AA] font-medium mb-[0.2rem]">
-              아이디 <span className="text-[#FA502E]">*</span>
+              아이디 
             </label>
             <input
               type="text"
@@ -45,7 +45,7 @@ export default function LoginScreen() {
         <div className="relative">
           <div className="flex flex-col justify-center border border-[#D0D6DD] rounded-[0.5rem] h-[3.75rem] px-[1rem]">
             <label className="text-[0.625rem] text-[#9EA4AA] font-medium mb-[0.2rem]">
-              비밀번호 <span className="text-[#FA502E]">*</span>
+              비밀번호 
             </label>
             <input
               type="password"
@@ -110,7 +110,7 @@ export default function LoginScreen() {
             className="w-[2.5rem] h-[2.5rem]"
           />
           <img
-            src="/icons/naver.svg"
+            src="/icons/Naver.svg"
             alt="Naver Login"
             className="w-[2.5rem] h-[2.5rem]"
           />
