@@ -6,7 +6,7 @@ export default function SignupScreen() {
 
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
+    user_id: "",
     password: "",
   });
 
@@ -54,9 +54,9 @@ export default function SignupScreen() {
               아이디 <span className="text-[#FA502E]">*</span>
             </label>
             <input
-              type="text"
-              name="username"
-              value={formData.username}
+              type="user_id"
+              name="user_id"
+              value={formData.user_id}
               onChange={handleChange}
               placeholder="아이디 입력"
               className="text-[1rem] text-[#000] placeholder-[#C2C6CA] focus:outline-none border-none"
