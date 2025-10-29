@@ -6,6 +6,25 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #ffffff
+  background-color: #ffffff;
+  font-family: 'Pretendard', sans-serif; /* 🔹 여기에 기본 폰트 지정 */
 }
 
+/* Pretendard 폰트 등록 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  src: url("/fonts/Pretendard-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  src: url("/fonts/Pretendard-Medium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  src: url("/fonts/Pretendard-Bold.otf") format("opentype");
+}
