@@ -1,7 +1,14 @@
 @import "tailwindcss";
+@import "pretendard/dist/web/static/pretendard.css";
+
+html {
+  font-family: "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -30,6 +37,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* Ensure Pretendard applies even if preflight sets a body font */
+  font-family: "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Helvetica Neue", Arial, sans-serif;
 }
 
 h1 {
