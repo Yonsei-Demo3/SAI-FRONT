@@ -15,11 +15,12 @@ export default function App() {
       style={{ height: `${height}px` }}
     >
       <div className="w-[23.44rem] h-[45.88rem] bg-white shadow-md overflow-hidden border border-gray-200">
+        {/* Font preview block: remove when not needed */}
         <Router>
           <Routes>
             {/* 기본 경로로 들어오면 /login으로 자동 이동 */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<LoginScreen />} />
+            <Route path="/" element={<Navigate to="/login" replace />} /> 
+            <Route path="/login" element={<LoginScreen />} /> 
             <Route path="/signup" element={<SignupScreen />} />
             <Route path="/main" element={<MainScreen />} />
           </Routes>
