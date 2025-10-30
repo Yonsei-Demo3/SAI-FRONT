@@ -1,8 +1,10 @@
 import React from "react";
+import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import LoginScreen from "./components/LoginScreen";
-import SignupScreen from "./components/SignupScreen";
-import MainScreen from "./components/MainScreen";
+// import LoginScreen from "./components/LoginScreen";
+// import SignupScreen from "./components/SignupScreen";
+// import MainScreen from "./components/MainScreen";
+import QuestionPostScreen from "./pages/QuestionPostScreen";
 
 export default function App() {
   // 🔹 브라우저 창 높이 가져오기
@@ -14,15 +16,17 @@ export default function App() {
       // 🔹 style로 직접 높이 지정
       style={{ height: `${height}px` }}
     >
-      <div className="w-[23.44rem] h-[45.88rem] bg-white shadow-md overflow-hidden border border-gray-200">
+      <div>
+      {/* <div className="w-[23.44rem] h-[45.88rem] bg-white shadow-md overflow-hidden border border-gray-200"> */}
         {/* Font preview block: remove when not needed */}
         <Router>
           <Routes>
             {/* 기본 경로로 들어오면 /login으로 자동 이동 */}
-            <Route path="/" element={<Navigate to="/login" replace />} /> 
+            {/* <Route path="/" element={<Navigate to="/login" replace />} /> 
             <Route path="/login" element={<LoginScreen />} /> 
             <Route path="/signup" element={<SignupScreen />} />
-            <Route path="/main" element={<MainScreen />} />
+            <Route path="/main" element={<MainScreen />} /> */}
+            <Route path="/question" element={<QuestionPostScreen />} />
           </Routes>
         </Router>
       </div>
