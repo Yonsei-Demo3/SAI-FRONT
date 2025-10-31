@@ -21,7 +21,7 @@ export default function LoginScreen() {
       <img
         src="/icons/logo.svg"
         alt="Logo"
-        className="w-[2.5rem] h-[4.5rem] mb-[1.5rem] mt-[6.5rem]"
+        className="w-[2.5rem] h-[4.5rem] mb-[1.5rem] mt-[7rem]"
       />
 
       <div className="w-[20.4rem] flex flex-col gap-[1rem]">
@@ -87,30 +87,31 @@ export default function LoginScreen() {
 
       {/* SNS 로그인 구분선 및 버튼 */}
       <div className="flex flex-col items-center w-full">
-        <div className="w-full flex ml-[2.6rem] mt-[1.25rem]">
+        <div className="w-full flex itmes-center justify-center mt-[1.25rem]">
           <img
             src="/icons/line.png"
             alt="line"
             className="w-[6.25rem] h-[0.0625rem]"
           />
+          <div className="text-[0.75rem] text-[#B5BBC1] ml-[1.31rem] mb-[1rem] mt-[-0.5rem]">
+          SNS 간편 로그인
+          </div>
           <img
             src="/icons/line.png"
             alt="line"
-            className="w-[6.25rem] h-[0.0625rem] ml-[8.2rem]"
+            className="w-[6.25rem] h-[0.0625rem] ml-[1.31rem]"
           />
         </div>
-        <div className="text-[0.75rem] text-[#B5BBC1] mb-[1rem] mt-[-0.5rem]">
-          SNS 간편 로그인
-        </div>
 
-        <div className="flex gap-[1.5rem] mb-[1rem]">
+
+        <div className="flex gap-[1.5rem]">
           <img
             src="/icons/kakao.svg"
             alt="Kakao Login"
             className="w-[2.5rem] h-[2.5rem]"
           />
           <img
-            src="/icons/Naver.svg"
+            src="/icons/naver.svg"
             alt="Naver Login"
             className="w-[2.5rem] h-[2.5rem]"
           />
