@@ -5,9 +5,6 @@ import SignupScreen from "./components/SignupScreen";
 import MainScreen from "./components/MainScreen";
 
 export default function App() {
-  // 🔹 브라우저 창 높이 가져오기
-  const height = window.innerHeight;
-
   return (
       <div className="flex justify-center items-center bg-white">
         <div className="min-w-[350px] max-w-[500px] w-full h-[100vh] bg-white shadow-md overflow-hidden border border-gray-200">
