@@ -4,7 +4,7 @@ import BottomNav from "./BottomNav";
 
 export default function MainScreen() {
   return (
-    <div className="flex flex-col items-center w-full min-h-screen bg-[#FAFAFA] font-[Pretendard] relative pb-20">
+    <div className="flex flex-col items-center w-full min-h-screen bg-[#FAFAFA] font-[Pretendard] pb-20">
       {/* 상단 네비게이션 */}
       <Navbar />
 

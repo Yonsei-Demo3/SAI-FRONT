@@ -4,16 +4,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const currentPath = location.pathname;
   const isActive = (path) => currentPath === path;
 
   return (
-    <div className="bg-[#FFFFFF] absolute mt-[42rem] left-0 w-full h-[4.5rem] gap-[1rem] shadow-[0_-4px_10px_rgba(0,0,0,0.08)] flex justify-around items-center z-50">
+    <div className="bg-[#FFFFFF] fixed bottom-[0rem] w-full left-0 right-0 h-[4.5rem] gap-[1rem] shadow-[0_-4px_10px_rgba(0,0,0,0.08)] flex justify-around items-center z-50">
       {/* 홈 */}
       <button
         onClick={() => navigate("/main")}
-        className={`flex flex-col items-center ml-[1rem] bg-transparent border-none focus:outline-none ${
+        className={`flex flex-col items-center bg-transparent border-none focus:outline-none ${
           isActive("/main") ? "text-[#000000]" : "text-[#B5BBC1]"
         }`}
       >
@@ -62,7 +61,7 @@ export default function BottomNav() {
               : "/icons/chat-inactive.svg"
           }
           alt="채팅"
-          className="w-3 h-5"
+          className="w-5 h-5"
         />
         <span className="text-[0.625rem] mt-1">채팅</span>
       </button>
