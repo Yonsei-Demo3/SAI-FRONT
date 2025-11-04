@@ -13,61 +13,61 @@ const nowKo = () =>
     hour12: true,
   }).format(new Date());
 
-// apiResponse 예시
+// // apiResponse 예시
 const apiResponse = {
     
     title : "기억 통제로 인간은 더 행복해질까? 어쩌면 더 불행해질지도 몰라",
     startAt : Date.now(),
     endAt : new Date('2025-11-29 10:00:00'),
     seed : [
-         {
-            id: uid(),
-            name: "임의의 닉네임",
-            text: "기억을 지울 수 있다면 정말 행복한 일일까요?",
-            time: "오후 7:51",
-            side: "left",
-            avatarBg: "bg-neutral-400",
-        },
-        {
-            id: uid(),
-            name: "멋있는 사자",
-            text:
-            "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
-            time: "오후 7:51",
-            side: "left",
-            avatarBg: "bg-orange-400",
-            bookmarked: true,
-        },
-        {
-            id: uid(),
-            text:
-            "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
-            time: "오후 7:51",
-            side: "right",
-        },
-        {
-            id: uid(),
-            name: "멋있는 사자",
-            text: "맞아요. 힘든 기억도 결국 우리가 살아가는 이유 중 하나죠.",
-            time: "오후 7:51",
-            side: "left",
-            avatarBg: "bg-orange-400",
-        },
-        {
-            id: uid(),
-            name: "멋있는 사자",
-            text: "이런것들이 모여서 우리는 앞으로 점점 더 나아질거에요.",
-            time: "오후 7:52",
-            side: "left",
-            avatarBg: "bg-orange-400",
-        },
-    {
-            id: uid(),
-            text:
-            "맞아요. 이렇게 대화하니 좋네요.",
-            time: "오후 7:53",
-            side: "right",
-        },
+        //  {
+            // id: uid(),
+    //         name: "임의의 닉네임",
+    //         text: "기억을 지울 수 있다면 정말 행복한 일일까요?",
+    //         time: "오후 7:51",
+    //         side: "left",
+    //         avatarBg: "bg-neutral-400",
+    //     },
+    //     {
+    //         id: uid(),
+    //         name: "멋있는 사자",
+    //         text:
+    //         "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
+    //         time: "오후 7:51",
+    //         side: "left",
+    //         avatarBg: "bg-orange-400",
+    //         bookmarked: true,
+    //     },
+    //     {
+    //         id: uid(),
+    //         text:
+    //         "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
+    //         time: "오후 7:51",
+    //         side: "right",
+    //     },
+    //     {
+    //         id: uid(),
+    //         name: "멋있는 사자",
+    //         text: "맞아요. 힘든 기억도 결국 우리가 살아가는 이유 중 하나죠.",
+    //         time: "오후 7:51",
+    //         side: "left",
+    //         avatarBg: "bg-orange-400",
+    //     },
+    //     {
+    //         id: uid(),
+    //         name: "멋있는 사자",
+    //         text: "이런것들이 모여서 우리는 앞으로 점점 더 나아질거에요.",
+    //         time: "오후 7:52",
+    //         side: "left",
+    //         avatarBg: "bg-orange-400",
+    //     },
+    // {
+    //         id: uid(),
+    //         text:
+    //         "맞아요. 이렇게 대화하니 좋네요.",
+    //         time: "오후 7:53",
+    //         side: "right",
+    //     },
     ]
 }
 
@@ -112,11 +112,10 @@ function ChatWindow() {
     if (!el) return;
 
     // 치명적인 경계값 문제 방지: 거의 동일한 높이 차이는 오버플로우로 보지 않음
-    const delta = el.scrollHeight - el.clientHeight;
+    const delta = el.scrollHeight  - el.clientHeight;
     const overflowNow = delta > 8; // 8px 이하 차이는 비오버플로우로 간주
-    const becameOverflow = overflowNow && !hasOverflowedRef.current;
 
-    if (becameOverflow || (overflowNow && stickToBottomRef.current)) {
+    if (overflowNow && stickToBottomRef.current) {
       el.scrollTo({ top: el.scrollHeight, behavior: didMountRef.current ? 'smooth' : 'auto' });
     } else if (!overflowNow) {
       // 아직 화면을 다 채우지 못했다면 항상 최상단에 고정
@@ -148,7 +147,7 @@ function ChatWindow() {
       </header>
 
       {/* 2) 가운데 행(parent)에 min-h-0 필수 */}
-  <main className="w-full px-3 min-h-0 lg:max-w-[760px] lg:mx-auto">
+  <main className="w-full px-3 min-h-0 lg:max-w-[760px] lg:mx-auto ">
         <div
           ref={scrollRef}
           onScroll={handleScroll}
