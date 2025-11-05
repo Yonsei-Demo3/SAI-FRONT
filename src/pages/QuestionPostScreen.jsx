@@ -14,16 +14,16 @@ function RegisterButton() {
 
 function Chip({ label, onRemove }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700">
+    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-[0.8rem] text-gray-700">
       {'#'}{label}
       {onRemove && (  
         <button
           type="button"
           aria-label={`${label} 태그 삭제`}
           onClick={onRemove}
-          className="rounded-full border-[0.1rem] bg-[#FFFFFF] hover:bg-gray-200 border-0"
+          className="inline-flex w-[0.5rem] h-[0.5rem] items-center justify-center rounded-full bg-white border border-[#CCD2D8]"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="w-[0.1rem] h-[0.1rem]" aria-hidden="true" />
         </button>
       )}
     </span>
@@ -87,9 +87,8 @@ export default function QuestionFormScreen() {
 
   function onSubmit(e) {
     e.preventDefault();
-    // 데모: 실제 제출 대신 콘솔 출력
     console.log({ contentFiles, question, desc, participants, tags });
-    alert("질문이 등록되었습니다! (데모)");
+    alert("질문이 등록되었습니다!");
   }
 
   const contentHint = useMemo(
@@ -101,7 +100,7 @@ export default function QuestionFormScreen() {
   );
 
   return (
-    <div className="mx-auto flex-col flex overflow-y-auto">
+    <div className="flex min-h-[0rem] mx-auto flex-col flex overflow-y-auto">
 
       <div className="w-full flex items-center justify-between p-[1rem] box-border">
 
@@ -136,14 +135,13 @@ export default function QuestionFormScreen() {
       <div className="flex flex-col justify-center">
         <FieldLabel>질문 작성하기</FieldLabel>
         <div className="w-full flex flex-col items-center justify-center">
-          <textarea
-              style={{ resize: "none" }}
-              fontFamily="Pretendard"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value.slice(0, MAX_QUESTION_LEN))}
-              placeholder={"지금 당신의 생각이 머무는 사이에는 어떤 질문이 있나요?"}
-              className="w-[20.4375rem] h-[8rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[1rem] placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
-          >
+      <textarea
+        style={{ resize: "none" }}
+        value={question}
+        onChange={(e) => setQuestion(e.target.value.slice(0, MAX_QUESTION_LEN))}
+        placeholder={"지금 당신의 생각이 머무는 사이에는 어떤 질문이 있나요?"}
+        className="w-[20.4375rem] h-[8rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[1rem] font-pre placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
+      >
           </textarea>
           <div className="w-[20.4375rem] p-[0.5rem]">
             <span className="text-[#CCD2D8] text-[0.8rem]">욕설, 비속어 사용 시 서비스 이용이 제한될 수 있습니다.</span>
@@ -156,13 +154,13 @@ export default function QuestionFormScreen() {
       <div className="flex flex-col justify-center">
         <FieldLabel optional>설명 입력하기</FieldLabel>
         <div className="w-full flex flex-col items-center justify-center">
-          <textarea
-              style={{ resize: "none" }}
-              value={desc}
-              onChange={(e) => setDesc(e.target.value)}
-              placeholder={"질문에 관해 자유롭게 설명을 덧붙여보세요."}
-              className="w-[20.4375rem] h-[8rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[1rem] placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
-          >
+      <textarea
+        style={{ resize: "none" }}
+        value={desc}
+        onChange={(e) => setDesc(e.target.value)}
+        placeholder={"질문에 관해 자유롭게 설명을 덧붙여보세요."}
+        className="w-[20.4375rem] h-[8rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[1rem] font-pre placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
+      >
           </textarea>
         </div>
       </div>
@@ -173,18 +171,11 @@ export default function QuestionFormScreen() {
             태그 추가하기
           </FieldLabel>
           <div className="flex flex-col items-center justify-center">
-            <div className="">
-              {tags.map((t, i) => (
-                <Chip key={t} label={t} onRemove={() => removeTag(i)} />
-              ))}
-            </div>
+
             <input
               type="text"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={onTagKeyDown}
               placeholder="예: #사랑 #기억 #관계"
-              className="w-[20.4375rem] h-[2rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[1rem] placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
+              className="w-[20.4375rem] h-[2rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[0.8rem] font-pre placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
             />
             <div className="w-[20.4375rem] p-[0.5rem]">
               <span className="text-[#CCD2D8] text-[0.8rem]">최대 {MAX_TAGS}개까지 선택할 수 있어요.</span>
@@ -200,18 +191,20 @@ export default function QuestionFormScreen() {
             <button
               type="button"
               onClick={() => setParticipants((n) => Math.max(1, n - 1))}
-              className="rounded-[12.5rem] border-0"
+              className="rounded-full w-[2rem] h-[2rem] border-0 flex items-center justify-center" 
               aria-label="인원 감소"
             >
-              <Minus className="h-5 w-5" />
+              <Minus className="h-5 w-5 mx-auto" />
             </button>
 
-            <div className="min-w-[3rem] text-center text-lg font-semibold">{participants}명</div>
+            <div className="min-w-[3rem] text-center text-lg font-semibold">
+              {participants}명
+            </div>
             
             <button
               type="button"
               onClick={() => setParticipants((n) => n + 1)}
-              className="rounded-[12.5rem] border-0"
+              className="rounded-full w-[2rem] h-[2rem] border-0 flex items-center justify-center" 
               aria-label="인원 증가"
             >
               <Plus className="h-5 w-5" />

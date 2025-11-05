@@ -10,6 +10,12 @@ html, body, #root {
   font-family: 'Pretendard', sans-serif; /* 🔹 여기에 기본 폰트 지정 */
 }
 
+/* Ensure form controls inherit font from body/html */
+button, input, select, textarea {
+  font: inherit;
+  font-family: inherit;
+}
+
 /* Pretendard 폰트 등록 */
 @font-face {
   font-family: 'Pretendard';
