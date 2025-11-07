@@ -30,7 +30,7 @@ export default function BottomNav() {
 
       {/* 검색 */}
       <button
-        onClick={() => navigate("/search")}
+        onClick={() => navigate("/category-search")}
         className={`flex flex-col items-center bg-transparent border-none focus:outline-none ${
           isActive("/search") ? "text-[#000000]" : "text-[#B5BBC1]"
         }`}
