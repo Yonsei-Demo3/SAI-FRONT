@@ -155,7 +155,7 @@ export default function ContentRegisterPage({ onRegister }) {
 <div className="pr-[1.5rem] pl-[1.5rem] pb-[3rem]">
         <button
           onClick={onRegister}
-          className="w-full h-[2.5rem] rounded-[0.5rem] border-[0rem] bg-[#FA502E] flex items-center justify-center text-[#FFFFFF] text-[1rem]"
+          className="w-full font-bold h-[2.5rem] rounded-[0.5rem] border-[0rem] bg-[#FA502E] flex items-center justify-center text-[#FFFFFF] text-[1rem]"
         >
           콘텐츠 등록하기
         </button>
