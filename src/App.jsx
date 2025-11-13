@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginScreen from "./components/LoginScreen";
 import SignupScreen from "./components/SignupScreen";
 import MainScreen from "./components/MainScreen";
+import SearchScreen from "./components/SearchScreen";
+import SearchResult from "./components/SearchResult";
+import CategorySearchScreen from "./components/CategorySearchScreen";
 
 export default function App() {
   return (
@@ -15,6 +18,9 @@ export default function App() {
             <Route path="/login" element={<LoginScreen />} /> 
             <Route path="/signup" element={<SignupScreen />} />
             <Route path="/main" element={<MainScreen />} />
+            <Route path="/search" element={<SearchScreen />} />
+            <Route path="/category-search" element={<CategorySearchScreen/>}/>
+            <Route path="/search-result" element={<SearchResult />} />
           </Routes>
         </Router>
       </div>

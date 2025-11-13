@@ -1,23 +1,30 @@
+/* 충돌 나서 app.css 좀 바꿨습니다 */
+/* #root 스타일 - 중앙 정렬 방지 및 max-width 설정 */
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  /* 텍스트 중앙 정렬 제거 */
+  text-align: unset;
 }
 
+/* 로고 스타일 - drop-shadow 추가 */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+/* 로고 회전 애니메이션 */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -27,16 +34,72 @@
   }
 }
 
+/* 애니메이션을 위한 media 쿼리 */
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* 카드 스타일 */
 .card {
   padding: 2em;
 }
 
+/* 링크 스타일 - 하이퍼링크 기본 색상 및 밑줄 제거 */
+a {
+  text-decoration: none; /* 밑줄 제거 */
+  color: #B5BBC1; /* 기본 색상 */
+}
+
+a:hover {
+  color: #FA502E; /* hover 시 색상 변경 */
+}
+
+/* 버튼 스타일 - 테두리 없애고 글씨 색 흰색으로 설정 */
+button {
+  border: none; /* 테두리 제거 */
+  background: #FA502E; /* 배경색 */
+  color: white; /* 텍스트 색상 */
+  padding: 1rem; /* 적절한 패딩 */
+  cursor: pointer; /* 마우스 커서 */
+  border-radius: 8px; /* 모서리 둥글게 */
+  transition: opacity 0.3s ease;
+}
+
+button:hover {
+  opacity: 0.9; /* hover 시 효과 */
+}
+
+/* 텍스트 관련 색상 */
 .read-the-docs {
   color: #888;
+}
+
+/* 입력 폼 스타일 */
+input {
+  border: 1px solid #E0E0E0;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  box-sizing: border-box; /* padding 포함하여 크기 맞추기 */
+}
+
+input:focus {
+  outline: none;
+  border: 2px solid #FA502E; /* 포커스 시 테두리 색 */
+}
+
+input::placeholder {
+  color: #B5BBC1; /* placeholder 텍스트 색상 */
+}
+
+/* 실선 구분선 스타일 */
+.line-divider {
+  width: 6.25rem;
+  height: 0.0625rem;
+  background-color: #E0E0E0;
+  margin: 1rem 0;
 }
