@@ -1,4 +1,5 @@
 import React from "react";
+import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import ContentSearchResultPage from "./pages/contentSearchResultPage";
 import ContentSearchPage from "./pages/contentSearchPage";
@@ -10,6 +11,7 @@ import MainScreen from "./components/MainScreen";
 import SearchScreen from "./components/SearchScreen";
 import SearchResult from "./components/SearchResult";
 import CategorySearchScreen from "./components/CategorySearchScreen";
+import QuestionPostScreen from "./pages/QuestionPostScreen";
 
 export default function App() {
   
@@ -32,6 +34,7 @@ export default function App() {
             <Route path="/content/search" element={<ContentSearchPage />} />
             <Route path="/content/search/result" element={<ContentSearchResultPage />} />
             <Route path="/content/register" element={<ContentRegisterPage />} />
+            <Route path="/question" element={<QuestionPostScreen />} />
           </Routes>
         </Router>
      </div>
