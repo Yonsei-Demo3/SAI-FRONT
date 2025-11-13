@@ -45,7 +45,7 @@ export default function QuestionStrip({ title = "" }) {
         
         <div
           id="q-title"
-          className={`flex-1 text-[15px] text-neutral-800 ${expanded ? "whitespace-normal break-words" : "truncate"}`}
+          className={`flex-1 text-[0.875rem] pl-[0.75rem] ${expanded ? "whitespace-normal break-words" : "truncate"}`}
         >
           {expanded || title.length < 30 ? title : title.substring(0, 30) + "... "}
         </div>
@@ -56,7 +56,7 @@ export default function QuestionStrip({ title = "" }) {
           aria-expanded={expanded}
           aria-controls="q-title"
           onClick={() => setExpanded((v) => !v)}
-          className="p-2 text-neutral-600"
+          className="border-none"
           title={label}
         >
           {<Chevron expanded={expanded} />}

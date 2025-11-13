@@ -20,54 +20,54 @@ const apiResponse = {
     startAt : Date.now(),
     endAt : new Date('2025-11-29 10:00:00'),
     seed : [
-    //      {
-    //         id: uid(),
-    //         name: "임의의 닉네임",
-    //         text: "기억을 지울 수 있다면 정말 행복한 일일까요?",
-    //         time: "오후 7:51",
-    //         side: "left",
-    //         avatarBg: "bg-neutral-400",
-    //     },
-    //     {
-    //         id: uid(),
-    //         name: "멋있는 사자",
-    //         text:
-    //         "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
-    //         time: "오후 7:51",
-    //         side: "left",
-    //         avatarBg: "bg-orange-400",
-    //         bookmarked: true,
-    //     },
-    //     {
-    //         id: uid(),
-    //         text:
-    //         "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
-    //         time: "오후 7:51",
-    //         side: "right",
-    //     },
-    //     {
-    //         id: uid(),
-    //         name: "멋있는 사자",
-    //         text: "맞아요. 힘든 기억도 결국 우리가 살아가는 이유 중 하나죠.",
-    //         time: "오후 7:51",
-    //         side: "left",
-    //         avatarBg: "bg-orange-400",
-    //     },
-    //     {
-    //         id: uid(),
-    //         name: "멋있는 사자",
-    //         text: "이런것들이 모여서 우리는 앞으로 점점 더 나아질거에요.",
-    //         time: "오후 7:52",
-    //         side: "left",
-    //         avatarBg: "bg-orange-400",
-    //     },
-    // {
-    //         id: uid(),
-    //         text:
-    //         "맞아요. 이렇게 대화하니 좋네요.",
-    //         time: "오후 7:53",
-    //         side: "right",
-    //     },
+         {
+            id: uid(),
+            name: "임의의 닉네임",
+            text: "기억을 지울 수 있다면 정말 행복한 일일까요?",
+            time: "오후 7:51",
+            side: "left",
+            avatarBg: "bg-neutral-400",
+        },
+        {
+            id: uid(),
+            name: "멋있는 사자",
+            text:
+            "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
+            time: "오후 7:51",
+            side: "left",
+            avatarBg: "bg-orange-400",
+            bookmarked: true,
+        },
+        {
+            id: uid(),
+            text:
+            "솔직히 말도 안 된다고 생각해요. 아픈 기억도 결국 제 일부잖아요. 그걸 없애면 제가 아닌 것 같을 것 같아요.",
+            time: "오후 7:51",
+            side: "right",
+        },
+        {
+            id: uid(),
+            name: "멋있는 사자",
+            text: "맞아요. 힘든 기억도 결국 우리가 살아가는 이유 중 하나죠.",
+            time: "오후 7:51",
+            side: "left",
+            avatarBg: "bg-orange-400",
+        },
+        {
+            id: uid(),
+            name: "멋있는 사자",
+            text: "이런것들이 모여서 우리는 앞으로 점점 더 나아질거에요.",
+            time: "오후 7:52",
+            side: "left",
+            avatarBg: "bg-orange-400",
+        },
+    {
+            id: uid(),
+            text:
+            "맞아요. 이렇게 대화하니 좋네요.",
+            time: "오후 7:53",
+            side: "right",
+        },
     ]
 }
 
@@ -142,7 +142,6 @@ function ChatWindow() {
     // 1) 바깥을 화면 높이에 맞춰 고정 + 바깥 스크롤 막기
     <div className="h-screen w-full bg-white grid grid-rows-[auto,1fr,auto]">
       
-      
       {/* 3) sticky는 선택. 제거해도 가운데만 스크롤됩니다 */}
       <header className="bg-white">
         <TopBar startAt={apiResponse.startAt} endAt={apiResponse.endAt} onExpire={() => console.log("타이머 종료")} />
@@ -150,7 +149,7 @@ function ChatWindow() {
       </header>
 
       {/* 2) 가운데 행(parent)에 min-h-0 필수 */}
-  <main className="w-full px-3 min-h-0 lg:max-w-[760px] lg:mx-auto ">
+     <main className="w-full px-3 min-h-0 lg:max-w-[760px] lg:mx-auto ">
         <div
           ref={scrollRef}
           onScroll={handleScroll}

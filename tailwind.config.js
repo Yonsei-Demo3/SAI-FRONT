@@ -1,24 +1,11 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    fontFamily: {
-      sans: [
-        'Pretendard',
-        'ui-sans-serif',
-        'system-ui',
-        '-apple-system',
-        'Segoe UI',
-        'Roboto',
-        'Noto Sans KR',
-        'Apple SD Gothic Neo',
-        'Malgun Gothic',
-        'Helvetica Neue',
-        'Arial',
-        'sans-serif',
-      ],
+    extend: {
+      fontFamily: {
+        pre: ["Pretendard", "sans-serif"], // 🔹 Tailwind에서 font-pre로 쓸 수 있음
+      },
     },
-    extend: {},
   },
   plugins: [],
 };

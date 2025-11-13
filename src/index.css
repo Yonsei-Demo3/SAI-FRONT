@@ -1,61 +1,37 @@
-@import "tailwindcss";
-@import "pretendard/dist/web/static/pretendard.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html {
-  font-family: "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-:root {
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
+html, body, #root {
+  height: 100%;
   margin: 0;
-  /* Remove Vite template centering so content starts at the top */
-  /* display: flex; */
-  /* place-items: center; */
-  min-width: 320px;
-  min-height: 100vh;
-  /* Ensure Pretendard applies even if preflight sets a body font */
-  font-family: "Pretendard", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Helvetica Neue", Arial, sans-serif;
+  padding: 0;
+  background-color: #ffffff;
+  font-family: 'Pretendard', sans-serif; /* 🔹 여기에 기본 폰트 지정 */
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Pretendard 폰트 등록 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  src: url("/fonts/Pretendard-Regular.otf") format("opentype");
 }
 
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  src: url("/fonts/Pretendard-Medium.otf") format("opentype");
 }
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  src: url("/fonts/Pretendard-Bold.otf") format("opentype");
+}
+
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
