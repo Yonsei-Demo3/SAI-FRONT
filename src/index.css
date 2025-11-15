@@ -45,3 +45,12 @@ select {
   font-size: 16px !important;
 }
 
+/* 스크롤바 숨기기 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;      /* Firefox */
+}

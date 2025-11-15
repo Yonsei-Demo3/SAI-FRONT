@@ -39,22 +39,23 @@ export default function SearchResult() {
       {/* ✅ 전체 영역 - 검색창 고정, 밑은 스크롤 */}
       <div className="flex-1 flex flex-col overflow-hidden w-full max-w-[500px] mx-auto">
         {/* 🔍 검색창 (고정) */}
-        <div className="px-[2.5rem] mt-[1.38rem] bg-white z-30">
-          <div className="relative flex items-center bg-[#F2F4F8] rounded-[0.75rem] h-[2.5rem] px-3">
+        <div className="px-[1.5rem] ml-[0.5rem] mt-[1.38rem] bg-white z-30">
+          <div className="relative flex items-center bg-[#F2F4F8] rounded-[0.75rem] h-[2.5rem] w-[20.435rem] px-3">
             <img
               src="/icons/search.svg"
               alt="검색"
-              className="w-[1.5rem] h-[1.5rem] ml-[0.94rem] opacity-60"
+              className="w-[1.5rem] h-[1.5rem] ml-[0.44rem] opacity-60"
             />
             <input
               type="text"
               placeholder="검색어를 입력하세요"
               value={query} // ✅ 사용자가 입력한 검색어 표시
-              readOnly // ✅ 여기선 수정 불가능 (필요하면 제거 가능)
               className="bg-transparent flex-1 ml-[0.25rem] text-[1rem] placeholder-[#9CA3AF] text-[#333] outline-none border-none"
             />
           </div>
         </div>
+        
+        <div className="w-ful h-[0.5rem] bg-[#F2F4F8] mt-[0.62rem]"></div>
 
         {/* ✅ 스크롤 가능한 결과 영역 */}
         <div
@@ -168,7 +169,7 @@ export default function SearchResult() {
                   참여하기
                 </button>
               </div>
-              <div className="w-[23.44rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]"></div>
+              <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]"></div>
             </div>
           ))}
         </div>

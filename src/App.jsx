@@ -8,7 +8,7 @@ import ChatPage from "./pages/ChatPage";
 import LoginScreen from "./pages/LoginScreen";
 import SignupScreen from "./pages/SignupScreen";
 import MainScreen from "./pages/MainScreen";
-import SearchScreen from "./pages/SearchScreen";
+import SearchScreen from "./pages/search/SearchScreen";
 import SearchResult from "./pages/search/SearchResult";
 import CategorySearchScreen from "./pages/search/CategorySearchScreen";
 import Notification from "./components/Notification";
@@ -22,7 +22,7 @@ export default function App() {
   return (
     <NotificationProvider> {/* ✅ 전역 알림 상태 감싸기 */}
       <div className="flex justify-center items-center bg-white">
-        <div className="min-w-[350px] max-w-[500px] w-full h-[100vh] bg-white shadow-md overflow-hidden border border-gray-200">
+        <div className="min-w-[350px] max-w-[500px] w-full h-[100vh] bg-white shadow-md border border-gray-200">
           <Router>
             <Routes>
               {/* 기본 경로로 들어오면 /login으로 자동 이동 */}

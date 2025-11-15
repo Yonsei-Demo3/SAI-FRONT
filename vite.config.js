@@ -10,5 +10,6 @@ export default defineConfig({
         plugins: [['babel-plugin-react-compiler']],
       },
     }),
+    tailwindcss(),  // ⭐ 반드시 추가해야 함
   ],
 })

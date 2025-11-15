@@ -9,7 +9,7 @@ export default function Navbar() {
   return (
     <div className="flex flex-col w-full bg-white select-none">
       {/* 상단 로고 + 알림 */}
-      <div className="flex items-center justify-between px-5 py-3 ml-[1.5rem] mt-[1.5rem]">
+      <div className="flex items-center justify-between py-3 ml-[1.5rem] mt-[1.5rem]">
         {/* 왼쪽 로고 */}
         <div
           className="flex items-center gap-1.5 cursor-pointer"
@@ -21,8 +21,8 @@ export default function Navbar() {
             className="w-[1.5rem] h-[1.75rem] select-none"
             draggable="false"
           />
-          <span className="text-[#FA502E] ml-[0.2rem] font-bold text-[1.05rem] leading-none">
-            <strong>SAI</strong>
+          <span className="text-[#FA502E] font-bold text-[1.2rem] leading-none">
+            SAI
           </span>
         </div>
 
@@ -34,13 +34,13 @@ export default function Navbar() {
           <img
             src="/icons/bell.svg"
             alt="알림"
-            className="w-[1.11rem] h-[1.3rem] mr-[1.5rem] select-none"
+            className="w-[1.5rem] h-[1.5rem] mr-[1.5rem] select-none"
             draggable="false"
           />
 
           {/* 🔴 알림 개수 표시 */}
           {unreadCount > 0 && (
-            <span className="absolute top-[-0.25rem] right-[1.3rem] bg-[#FA502E] text-[#FFFFFF] text-[0.625rem] font-semibold px-[0.35rem] py-[0.1rem] rounded-full">
+            <span className="absolute top-[-0.25rem] right-[1.3rem] bg-[#FA502E] text-[#FFFFFF] text-[0.625rem] font-semibold px-[0.35rem] py-[0.05rem] rounded-full">
               {unreadCount}
             </span>
           )}
