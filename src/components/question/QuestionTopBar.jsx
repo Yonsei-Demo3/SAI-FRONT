@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function QuestionTopBar({ title }){
+export default function QuestionTopBar({ title,   onSubmit, canSubmit }) {
   return (
   
   <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pt-[1.5rem] pb-[1rem] box-border shadow-[0_4px_5px_rgba(0,0,0,0.04)]">
@@ -11,7 +11,16 @@ export default function QuestionTopBar({ title }){
       </svg>
     </button>
 
-    <button className="h-[2rem] w-[3.5625rem] rounded-[0.5rem] bg-[#FA502E] border-none">
+    <button
+      type="button"
+      onClick={onSubmit}
+      disabled={!canSubmit}   
+      className={`h-[2rem] w-[3.5625rem] border-none rounded-[0.5rem] text-center transition-colors
+        ${canSubmit
+          ? "bg-[#FA502E] cursor-pointer"
+          : "bg-[#CCD2D8] cursor-not-allowed"
+        }`}
+    >
       <span className="text-[#FFFFFF] text-[0.875rem] font-medium">
         등록
       </span>
