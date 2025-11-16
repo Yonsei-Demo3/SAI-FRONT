@@ -72,7 +72,7 @@ const apiResponse = {
 }
 
 
-function ChatWindow() {
+export default function ChatPage() {
   const [messages, setMessages] = useState(apiResponse.seed);
   const [side, setSide] = useState("right");
   const scrollRef = useRef(null);
@@ -139,37 +139,52 @@ function ChatWindow() {
 
   return (
 
-    // 1) 바깥을 화면 높이에 맞춰 고정 + 바깥 스크롤 막기
-    <div className="h-screen w-full bg-white grid grid-rows-[auto,1fr,auto]">
+    <div className="flex flex-col h-screen w-full bg-white">
       
-      {/* 3) sticky는 선택. 제거해도 가운데만 스크롤됩니다 */}
       <header className="bg-white">
         <TopBar startAt={apiResponse.startAt} endAt={apiResponse.endAt} onExpire={() => console.log("타이머 종료")} />
         <QuestionStrip title={apiResponse.title} />
       </header>
 
-      {/* 2) 가운데 행(parent)에 min-h-0 필수 */}
-     <main className="w-full px-3 min-h-0 lg:max-w-[760px] lg:mx-auto ">
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="h-full overflow-y-auto pt-4 pb-0 overscroll-contain flex flex-col items-stretch"
-        >
-          <div className="flex w-full max-w-[680px] flex-col justify-start items-stretch gap-5 lg:mx-auto">
-            {messages.map((m) => (
-              <ChatBubble key={m.id} msg={m} onToggleBookmark={toggleBookmark} />
-            ))}
+
+    <main className="flex-1 min-h-0 w-full flex flex-col pt-[1rem]">
+
+
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="h-full overflow-y-auto flex flex-col items-stretch"
+          >
+            <div className="flex justify-center items-center pl-[1.5rem] pr-[1.5rem] pb-[0.5rem]">
+              <div className="w-full flex justify-center items-center bg-[#F2F4F8] pt-[0.63rem] pb-[0.63rem] pl-[0.5rem] pr-[0.5rem]">
+                <span className="text-[0.75rem] text-[#191D1F]">
+                  {apiResponse.title}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-center items-center pt-[0.1rem] pb-[1rem]">
+              <span className="text-[#3B3D40] text-[0.625rem] text-center">
+                질문에 대한 대화가 시작되었습니다.<br></br>
+                지금부터 42분 동안 집중해서 대화를 나눠보세요.
+              </span>
+            </div>
+            
+            <div className="flex w-full flex-col justify-start items-stretch">
+              {messages.map((m) => (
+                <ChatBubble key={m.id} msg={m} onToggleBookmark={toggleBookmark} />
+              ))}
+            </div>
           </div>
         </div>
+
       </main>
 
-      <footer className="bg-white">
+      <footer className="bg-white justify-center items-center">
         <ChatInput onSend={handleSend} side={side} />
       </footer>
     </div>
   );
-}
-
-export default function ChatPage() {
-  return <ChatWindow />;
 }

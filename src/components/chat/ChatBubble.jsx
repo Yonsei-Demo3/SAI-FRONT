@@ -19,9 +19,27 @@ export default function ChatBubble({ msg, onToggleBookmark }) {
   return (
     
     <div className={`w-full flex pl-[0.625rem] pr-[0.625rem] pt-[0.5rem] pb-[0.5rem] ${isLeft ? "justify-start" : "justify-end"}`}>
+
       {isLeft && (
         <div className="flex flex-col items-center">
           <Avatar initials={msg.name?.slice(0, 1)} bg={msg.avatarBg} />
+        </div>
+      )}
+
+      {/* 내 대화 북마크 */}
+      {!isLeft && (
+        <div className="self-end mb-[1rem] mr-[0.5rem]">
+          <button
+            onClick={() => onToggleBookmark?.(msg.id)}
+            className={`border-none bg-[#FFFFFF] ${
+              msg.bookmarked ? "text-[#FA502E]" : "text-[#DEE2E6]"
+            }`}
+            aria-label="bookmark"
+            title="북마크"
+            aria-pressed={!!msg.bookmarked}
+          >
+            <BookmarkIcon filled={msg.bookmarked} />
+          </button>
         </div>
       )}
 
@@ -43,39 +61,47 @@ export default function ChatBubble({ msg, onToggleBookmark }) {
           <div className={`${isLeft ? "pl-[0.5rem]" : "pr-[0.5rem]"}`}>
             <div
               className={
-                `relative max-w-[15rem] rounded-[1rem] pl-[1.25rem] pr-[1.25rem] pt-[0.875rem] pb-[0.875rem] text-[16px] ` +
+                `relative max-w-[15rem] rounded-[1rem] pl-[1.25rem] pr-[1.25rem] pt-[0.875rem] pb-[0.875rem] ` +
                 (isLeft
                   ? "border border-[#DEE2E6] bg-[#FFFFFF]"
                   : "bg-[#FA502E]")
                 }
                 >
-              <span className={`${isLeft ? "text-[#191D1F]" : "text-[#FFFFFF]"}`}>
+              <span className={`text-[0.875rem] ${isLeft ? "text-[#191D1F]" : "text-[#FFFFFF]"}`}>
                 {msg.text}
               </span>
             </div>
           </div>
+        </div>
 
-          {/* side actions */}
-          <div className={`${isLeft ? "right-2" : "left-2"} flex items-center gap-2`}>
-            <button
-              onClick={() => onToggleBookmark?.(msg.id)}
-              className={`border-none bg-[#FFFFFF] ${msg.bookmarked ? "text-[#FA502E]" : "text-[#DEE2E6]"}`}
-              aria-label="bookmark"
-              title="북마크"
-              aria-pressed={!!msg.bookmarked}
-              >
-              <BookmarkIcon filled={msg.bookmarked} />
-            </button>
-          </div> 
-        </div>
-        
-        <div className="pl-[0.5rem] text-[0.625rem] text-[#B5BBC1]">
-          {msg.time}
-        </div>
+        {isLeft && (
+          <div className="pl-[0.5rem] text-[0.625rem] text-[#B5BBC1]">
+            {msg.time}
+          </div>
+        )}
+        {!isLeft && (
+          <div className="flex justify-end pr-[0.5rem] text-[0.625rem] text-[#B5BBC1]">
+            {msg.time}
+          </div>
+        )}
       </div>
 
-
-      {/* {!isLeft && <div className="ml-2 h-11 w- shrink-0" />} */}
+      {/* 상대 대화 북마크 */}
+      {isLeft && (
+        <div className="self-end mb-[1rem] ml-[0.5rem]">
+          <button
+            onClick={() => onToggleBookmark?.(msg.id)}
+            className={`border-none bg-[#FFFFFF] ${
+              msg.bookmarked ? "text-[#FA502E]" : "text-[#DEE2E6]"
+            }`}
+            aria-label="bookmark"
+            title="북마크"
+            aria-pressed={!!msg.bookmarked}
+          >
+            <BookmarkIcon filled={msg.bookmarked} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,10 +3,10 @@ import TimerBanner from "./TimerBanner";
 
 export default function TopBar({ startAt, endAt, onExpire }) {
   return (
-    <div className="top-0 z-20 bg-white">
-      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pb-[1rem] pt-[1.5rem] box-border">
+    <div>
+      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pb-[1rem] pt-[1rem]">
 
-        <button aria-label="뒤로가기" className="rounded-full border-none outline-none bg-[#FFFFFF]">
+        <button aria-label="뒤로가기" className="border-none outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="0 0 10 16" fill="none">
             <path fillRule="evenodd" clipRule="evenodd" d="M1.15017 8.8295L7.75 15.4293L9.39967 13.7797L3.62467 8.00467L9.39967 2.22967L7.75 0.58L1.15017 7.17983C0.931451 7.39862 0.808583 7.69531 0.808583 8.00467C0.808583 8.31402 0.931451 8.61072 1.15017 8.8295Z" fill="#191D1F"/>
           </svg>
