@@ -16,10 +16,9 @@ import { NotificationProvider } from "./components/NotificationContext";
 import QuestionPostScreen from "./pages/QuestionPostScreen";
 import MyPageScreen from "./pages/mypage/MyPageScreen";
 import MyPageChats from "./pages/mypage/MyPageChats";
-import MyPageQuestions from "./pages/mypage/MyPageQuestions";
-import MyPageSaved from "./pages/mypage/MyPageSaved";
 import MyPageScrap from "./pages/mypage/MyPageScrap";
 import ConversationDetailScreen from "./pages/mypage/ConversationDetailScreen";
+import DetailScreen from "./pages/search/DetailScreen";
 
 export default function App() {
   
@@ -39,6 +38,7 @@ export default function App() {
               <Route path="/search" element={<SearchScreen />} />
               <Route path="/category-search" element={<CategorySearchScreen/>}/>
               <Route path="/search-result" element={<SearchResult />} />
+              <Route path="/detail" element={<DetailScreen />} />              
               <Route path="/notification" element={<Notification />} />
               <Route path="/chat" element={<ChatPage />} />
               <Route path="/content/search" element={<ContentSearchPage />} />
@@ -46,12 +46,9 @@ export default function App() {
               <Route path="/content/register" element={<ContentRegisterPage />} />
               <Route path="/question" element={<QuestionPostScreen />} />
               <Route path="/mypage" element={<MyPageScreen />} />
-              <Route path="/mypage/questions" element={<MyPageQuestions />} />
               <Route path="/mypage/chats" element={<MyPageChats />} />
-              <Route path="/mypage/saved" element={<MyPageSaved />} />
               <Route path="/mypage/scrap" element={<MyPageScrap />} />
               <Route path="mypage/chat/:id" element={<ConversationDetailScreen />} />
-
             </Routes>
           </Router>
         </div>

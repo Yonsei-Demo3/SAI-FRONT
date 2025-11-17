@@ -41,12 +41,10 @@ export default function MyPageChats() {
       </div>
 
       {/* 상단 탭 */}
-      <div className="flex justify-around mt-[1.5rem] text-[1.125rem] font-semibold">
-        <button onClick={() => navigate("/mypage/questions")}>질문</button>
+      <div className="flex justify-start ml-[1.5rem] gap-[2.25rem] mt-[1.5rem] text-[1.125rem] font-semibold">
         <button className="font-semibold text-[#FA502E] border-b-2 border-[#FA502E] pb-1">
           대화
         </button>
-        <button onClick={() => navigate("/mypage/saved")}>저장</button>
         <button onClick={() => navigate("/mypage/scrap")}>스크랩</button>
       </div>
 

@@ -7,7 +7,7 @@ export default function Navbar() {
   const { unreadCount } = useNotification();
 
   return (
-    <div className="flex flex-col w-full bg-white select-none">
+    <div className="flex flex-col w-full h-[5rem] bg-white select-none">
       {/* 상단 로고 + 알림 */}
       <div className="flex items-center justify-between py-3 ml-[1.5rem] mt-[1.5rem]">
         {/* 왼쪽 로고 */}

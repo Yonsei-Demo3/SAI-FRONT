@@ -143,15 +143,21 @@ export default function SearchResult() {
             </button>
 
             {openSort && (
-              <div className="absolute right-0 mt-2 w-[6rem] bg-white border rounded-xl shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-[6rem] bg-white rounded-xl shadow-lg z-50">
                 <button
-                  className="w-full text-left px-3 py-2 text-[0.9rem]"
+                  className="w-full text-left px-3 py-2 text-[0.9rem] text-[#B5BBC1]"
+                  onClick={() => { setSortType("가나다순"); setOpenSort(false); }}
+                >
+                  가나다순
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-[0.9rem] text-[#B5BBC1]"
                   onClick={() => { setSortType("인기순"); setOpenSort(false); }}
                 >
                   인기순
                 </button>
                 <button
-                  className="w-full text-left px-3 py-2 text-[0.9rem]"
+                  className="w-full text-left px-3 py-2 text-[0.9rem] text-[#B5BBC1]"
                   onClick={() => { setSortType("최신순"); setOpenSort(false); }}
                 >
                   최신순
@@ -168,7 +174,11 @@ export default function SearchResult() {
         {/* ------------------------------- */}
         <div className="overflow-y-auto flex-1 px-[2.5rem] mt-[0.5rem] pb-[8rem] scrollbar-hide">
           {results.map((item) => (
-            <div key={item.id} className="pb-[1.25rem] mb-[1.25rem]">
+            <div 
+              key={item.id} 
+              className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
+              onClick={() => navigate("/detail", {state: {item} })}
+            >
 
               <img src="/icons/quote.svg" className="w-[1rem] h-[1rem] opacity-70" />
 

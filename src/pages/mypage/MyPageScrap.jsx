@@ -29,10 +29,8 @@ export default function MyPageScrap() {
       </div>
 
       {/* 탭 */}
-      <div className="flex justify-around mt-[1.5rem] text-[1.125rem] font-semibold">
-        <button onClick={() => navigate("/mypage/questions")}>질문</button>
+      <div className="flex justify-start ml-[1.5rem] gap-[2.25rem] mt-[1.5rem] text-[1.125rem] font-semibold">
         <button onClick={() => navigate("/mypage/chats")}>대화</button>
-        <button onClick={() => navigate("/mypage/saved")}>저장</button>
         <button className="text-[#FA502E] border-b-2 border-[#FA502E] pb-1">
           스크랩
         </button>

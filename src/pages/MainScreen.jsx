@@ -19,9 +19,9 @@ export default function MainScreen() {
     <div className="flex flex-col w-full h-full bg-[#FAFAFA] font-[Pretendard]">
       <div className="flex-shrink-0">
         <Navbar />
-
-        {/* 🔶 하단 탭 메뉴 */}
-        <div className="flex justify-start w-full bg-white mt-[1rem] gap-x-[2.25rem] px-[1.5rem]">
+        
+        {/* 🔶 탭 메뉴 */}
+        <div className="flex justify-center w-full bg-white gap-x-[2.25rem]">
           {tabs.map((tab) => {
             const active = location.pathname === tab.path;
 
@@ -102,7 +102,7 @@ export default function MainScreen() {
           <div className="flex gap-4 w-max pr-6">
 
             {/* 카드 1 */}
-            <div className="w-[20.4375rem] h-[15rem] ml-[1.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[0.25rem]">
+            <div className="w-[20.4375rem] h-[15rem] ml-[1.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 mx-[1.5rem] my-[1rem]">
               {/* 따옴표 + 문장(오른쪽 따옴표는 마지막 줄 끝) */}
               <div className="relative w-full flex items-start justify-center">
 
@@ -110,7 +110,7 @@ export default function MainScreen() {
                 <img
                   src="/icons/quote.svg"
                   alt="quote"
-                  className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] ml-[-0.25rem] flex-shrink-0 mr-2"
+                  className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] ml-[-1rem] flex-shrink-0 mr-2"
                 />
 
                 {/* 문장 + 오른쪽 따옴표 absolute */}
@@ -152,7 +152,7 @@ export default function MainScreen() {
             </div>
 
             {/* 카드 2 (복사본) */}
-            <div className="w-[20.4375rem] h-[15rem] ml-[-0.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[0.25rem]">
+            <div className="w-[20.4375rem] h-[15rem] ml-[-1rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]">
               {/* 따옴표 + 문장(오른쪽 따옴표는 마지막 줄 끝) */}
               <div className="relative w-full flex items-start justify-center">
 
@@ -222,7 +222,7 @@ export default function MainScreen() {
 
         <div className="w-full mt-4 overflow-x-auto overflow-y-visible no-scrollbar relative z-10" style={{ overflowY: "visible" }}>
           <div className="flex gap-4 w-max">
-            <div className="w-[20.4375rem] h-[17.1875rem] ml-[1.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[0.25rem]">
+            <div className="w-[20.4375rem] h-[17.1875rem] ml-[1.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]">
                   <div className="relative w-full flex items-start">
 
                     <div className="mt-[0.5rem] ml-[0.25rem] leading-[1.5]">
@@ -254,7 +254,7 @@ export default function MainScreen() {
                 </div>
 
                 {/* 2번 카드 */}
-                <div className="w-[20.4375rem] h-[17.1875rem] ml-[-0.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[0.25rem]">
+                <div className="w-[20.4375rem] h-[17.1875rem] ml-[-0.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]">
                   <div className="relative w-full flex items-start">
 
                     <div className="mt-[0.5rem] ml-[0.25rem] leading-[1.5]">

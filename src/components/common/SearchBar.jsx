@@ -11,7 +11,7 @@ export default function SearchBar({
   noPadding
 }) {
   return (
-    <div className={`${noPadding ? "" : "px-[1.5rem]"} w-full mt-[1.38rem] bg-white`}>
+    <div className={`${noPadding ? "" : "px-[1.5rem]"} w-full mt-[0.38rem] bg-white`}>
       <div className="relative flex items-center bg-[#F2F4F8] rounded-[0.75rem] min-h-[2.5rem] px-3 w-full">
 
         {/* 🔍 검색 아이콘 */}
