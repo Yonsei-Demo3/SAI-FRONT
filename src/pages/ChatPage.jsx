@@ -87,14 +87,6 @@ export default function ChatPage() {
     return el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
   };
 
-  // 최초 마운트 시 현재 상태 측정
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    hasOverflowedRef.current = el.scrollHeight > el.clientHeight + 1;
-    stickToBottomRef.current = isNearBottom(el);
-  }, []);
-
   // 스크롤 핸들러: 사용자 위치 추적
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -103,27 +95,32 @@ export default function ChatPage() {
     hasOverflowedRef.current = el.scrollHeight > el.clientHeight + 1;
   };
 
-  // 메시지 추가 시 동작 규칙
-  // - 아직 오버플로우가 아니면(화면을 다 채우지 않으면) 스크롤하지 않음: 상단부터 차곡차곡
-  // - 처음으로 오버플로우가 발생하는 순간엔 하단으로 한 번 이동하여 최신이 아래에 보이게
-  // - 이후에는 사용자가 하단 근처일 때만 하단 고정(스무스), 위로 올려 본 상태면 스크롤 유지
+  // 메시지 추가 시 동작 규칙 및 화면 제어 로직
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    // 치명적인 경계값 문제 방지: 거의 동일한 높이 차이는 오버플로우로 보지 않음
-    const delta = el.scrollHeight  - el.clientHeight;
-    const overflowNow = delta > 8; // 8px 이하 차이는 비오버플로우로 간주
+    if (!didMountRef.current) {
+      el.scrollTop = el.scrollHeight;        
+      hasOverflowedRef.current = el.scrollHeight > el.clientHeight + 1;
+      stickToBottomRef.current = true;       
+      didMountRef.current = true;
+      return;
+    }
+
+    const delta = el.scrollHeight - el.clientHeight;
+    const overflowNow = delta > 8; 
 
     if (overflowNow && stickToBottomRef.current) {
-      el.scrollTo({ top: el.scrollHeight, behavior: didMountRef.current ? 'smooth' : 'auto' });
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: "smooth",
+      });
     } else if (!overflowNow) {
-      // 아직 화면을 다 채우지 못했다면 항상 최상단에 고정
       el.scrollTop = 0;
     }
 
     hasOverflowedRef.current = overflowNow;
-    didMountRef.current = true;
   }, [messages.length]);
 
   const toggleBookmark = (id) => {
@@ -147,7 +144,7 @@ export default function ChatPage() {
       </header>
 
 
-    <main className="flex-1 min-h-0 w-full flex flex-col pt-[1rem]">
+    <main className="flex-1 min-h-0 w-full flex flex-col pt-[3.5625rem]">
 
 
         <div className="flex-1 min-h-0 overflow-y-auto">

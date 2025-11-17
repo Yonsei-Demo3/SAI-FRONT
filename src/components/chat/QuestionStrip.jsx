@@ -6,8 +6,10 @@ export default function QuestionStrip({ title = "" }) {
   const label = expanded ? "접기" : "더 보기";
   return (
     
-    
-    <div className="bg-[#FFEEEA] min-h-[2.25rem] flex items-start justify-center pl-[1rem] pr-[1rem] pt-[0.625rem] pb-[0.625rem]">
+    <div className={
+          "bg-[#FFEEEA] min-h-[2.5625rem] flex items-start justify-center pl-[1rem] pr-[1rem] pt-[0.625rem] pb-[0.625rem] fixed left-0 right-0 z-20" 
+          // (expanded ? "fixed left-0 right-0 z-20" : "relative")
+        }>
       
       <div className="flex self-start items-center justify-center w-[2.0625rem] h-[1.3125rem] rounded-[0.25rem] bg-[#FA502E]">
         <span className="text-[#FFFFFF] text-[0.75rem] font-bold text-center">
@@ -16,7 +18,7 @@ export default function QuestionStrip({ title = "" }) {
       </div>
 
       <div
-        className={`fjxed flex-1 text-[0.875rem] pl-[0.75rem] ${
+        className={`flex-1 text-[0.875rem] pl-[0.75rem] ${
           expanded ? "whitespace-normal break-words" : "truncate"
         }`}
       >
