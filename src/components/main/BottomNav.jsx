@@ -23,7 +23,7 @@ export default function BottomNav() {
               : "/icons/home-inactive.svg"
           }
           alt="홈"
-          className="w-5 h-5"
+          className="w-[1.5rem] h-[1.5rem] ml-[0.1rem]"
         />
         <span className="text-[0.625rem] mt-1 font-medium">홈</span>
       </button>
@@ -31,7 +31,7 @@ export default function BottomNav() {
       {/* 검색 */}
       <button
         onClick={() => navigate("/category-search")}
-        className={`flex flex-col items-center bg-transparent border-none focus:outline-none ${
+        className={`flex flex-col items-center ml-[-0.5rem] bg-transparent border-none focus:outline-none ${
           isActive("/category-search") ? "text-[#000000]" : "text-[#B5BBC1]"
         }`}
       >
@@ -42,7 +42,7 @@ export default function BottomNav() {
               : "/icons/search-inactive.svg"
           }
           alt="검색"
-          className="w-5 h-5"
+          className="w-[1.5rem] h-[1.5rem]"
         />
         <span className="text-[0.625rem] mt-1">검색</span>
       </button>
@@ -61,7 +61,7 @@ export default function BottomNav() {
               : "/icons/chat-inactive.svg"
           }
           alt="채팅"
-          className="w-5 h-5"
+          className="w-[1.5rem] h-[1.5rem]"
         />
         <span className="text-[0.625rem] mt-1">채팅</span>
       </button>
@@ -80,7 +80,7 @@ export default function BottomNav() {
               : "/icons/mypage-inactive.svg"
           }
           alt="마이페이지"
-          className="w-5 h-5"
+          className="w-[1.5rem] h-[1.5rem]"
         />
         <span className="text-[0.625rem] mt-1">마이페이지</span>
       </button>
