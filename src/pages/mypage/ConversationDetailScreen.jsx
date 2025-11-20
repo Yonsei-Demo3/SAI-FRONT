@@ -22,14 +22,16 @@ export default function ConversationDetailScreen() {
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
 
       {/* 상단 네비 */}
-      <div className="px-[1.5rem] mt-[1.5rem] flex justify-between items-center">
+      <div className="px-[1.5rem] mt-[1rem] flex justify-between items-center">
+        <div className="flex gap-x-[1rem]">
         <button onClick={() => navigate(-1)}>
           <img src="/icons/arrow-left.svg" className="w-[0.6rem]" />
         </button>
 
         <p className="text-[1.2rem] font-bold">대화</p>
+        </div>
 
-        <button className="bg-[#FA502E] text-white px-4 py-2 rounded-lg text-[0.9rem] font-semibold">
+        <button className="bg-[#FA502E] text-white px-[1rem] py-[0.34rem] rounded-lg text-[0.875rem] font-semibold">
           대화 정보 →
         </button>
       </div>
@@ -37,7 +39,7 @@ export default function ConversationDetailScreen() {
       {/* 대표 이미지 */}
       <div className="w-full flex justify-center mt-[1.5rem]">
         <img
-          src="/icons/sample1.svg"
+          src="/icons/book1.svg"
           className="w-[12rem] h-[12rem] rounded-xl shadow-md"
         />
       </div>
@@ -78,11 +80,15 @@ export default function ConversationDetailScreen() {
           <div>
             {/* Q1 */}
             <div className="flex mb-[2rem]">
-              <div className="mr-[1rem]">
-                <div className="text-[#FA502E] font-bold text-[1.1rem]">Q1</div>
-                <div className="w-[1px] bg-[#FA502E] h-[3.5rem] ml-[0.5rem]"></div>
-              </div>
+              <div className="flex flex-col items-center mr-[1rem]">
+                <div className="text-[#FA502E] border rounded-[0.5rem] px-[0.5rem] font-bold text-[0.875rem]">Q1</div>
+                <div className="flex-1 relative">
+                      <div className="w-[0.0625rem] bg-[#FA502E] h-full"></div>
 
+                      {/* 점 (맨 아래) */}
+                      <div className="w-[0.35rem] h-[0.35rem] bg-[#FA502E] rounded-full absolute left-1/2 -translate-x-1/2 bottom-[-0.2rem]"></div>
+                  </div>              
+                </div>
               <p className="text-[1rem] leading-[1.6rem] text-black">
                 이 작품의 제목이 ‘바깥은 여름’인 이유에 대한 생각을 자유롭게 나눠보아요.
               </p>
@@ -90,10 +96,15 @@ export default function ConversationDetailScreen() {
 
             {/* Q2 */}
             <div className="flex mb-[2rem]">
-              <div className="mr-[1rem]">
-                <div className="text-[#FA502E] font-bold text-[1.1rem]">Q2</div>
-                <div className="w-[1px] bg-[#FA502E] h-[3.5rem] ml-[0.5rem]"></div>
-              </div>
+              <div className="flex flex-col items-center mr-[1rem]">
+                <div className="text-[#FA502E] border rounded-[0.5rem] px-[0.5rem] font-bold text-[0.875rem]">Q2</div>
+                <div className="flex-1 relative">
+                      <div className="w-[0.0625rem] bg-[#FA502E] h-full"></div>
+
+                      {/* 점 (맨 아래) */}
+                      <div className="w-[0.35rem] h-[0.35rem] bg-[#FA502E] rounded-full absolute left-1/2 -translate-x-1/2 bottom-[-0.2rem]"></div>
+                  </div>  
+                </div>
 
               <p className="text-[1rem] leading-[1.6rem] text-black">
                 이 작품의 제목이 ‘바깥은 여름’인 이유에 대한 생각을 자유롭게 나눠보아요.
@@ -104,10 +115,15 @@ export default function ConversationDetailScreen() {
 
             {/* Q3 */}
             <div className="flex mb-[2rem]">
-              <div className="mr-[1rem]">
-                <div className="text-[#FA502E] font-bold text-[1.1rem]">Q3</div>
-                <div className="w-[1px] bg-[#FA502E] h-[3.5rem] ml-[0.5rem]"></div>
-              </div>
+              <div className="flex flex-col items-center mr-[1rem]">
+                <div className="text-[#FA502E] border rounded-[0.5rem] px-[0.5rem] font-bold text-[0.875rem]">Q3</div>
+                <div className="flex-1 relative">
+                      <div className="w-[0.0625rem] bg-[#FA502E] h-full"></div>
+
+                      {/* 점 (맨 아래) */}
+                      <div className="w-[0.35rem] h-[0.35rem] bg-[#FA502E] rounded-full absolute left-1/2 -translate-x-1/2 bottom-[-0.2rem]"></div>
+                  </div>  
+                </div>
 
               <p className="text-[1rem] leading-[1.6rem] text-black">
                 이 작품의 제목이 ‘바깥은 여름’인 이유에 대한 생각을 자유롭게 나눠보아요.
@@ -124,28 +140,39 @@ export default function ConversationDetailScreen() {
             {savedChats.map((chat) => (
               <div
                 key={chat.id}
-                className="bg-white border border-[#E5E7EB] rounded-[1rem] p-4 mb-[1.5rem]"
+                className="bg-white border border-[#E5E7EB] rounded-[1rem] p-[1.25rem] mb-[1.5rem]"
               >
-                <p className="text-[0.875rem] text-[#6B7280] mb-[0.5rem]">
-                  질문 ⎯ {chat.question}
+              <div className="text-[0.75rem] flex items-start">
+                <p className="mr-2 text-[#3B3D40] whitespace-nowrap">질문</p>
+                <p className="text-[#191D1F] mt-[-0.15rem] leading-[1.4rem] break-keep">{chat.question}</p>
+              </div>
+
+               {/* 따옴표 + 문장(오른쪽 따옴표는 마지막 줄 끝) */}
+              <div className="relative w-full flex items-start justify-center">
+
+                {/* 왼쪽 따옴표 */}
+                <img
+                  src="/icons/quote-pink-down.svg"
+                  className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] ml-[-1rem] flex-shrink-0 mr-2"
+                />
+
+                {/* 문장 + 오른쪽 따옴표 absolute */}
+                <div className="relative max-w-[14rem] text-center mt-[0.5rem] leading-[1.5]">
+                <p className="text-[1rem] text-[#444] leading-[1.5rem]">
+                  {chat.answer}
                 </p>
 
-                <div className="p-4">
-                  <img src="/icons/quote.svg" className="w-[1.2rem] opacity-70 mb-2" />
-
-                  <p className="text-[1rem] leading-[1.6rem] text-[#333] whitespace-pre-line">
-                    {chat.answer}
-                  </p>
-
+                  {/* 오른쪽 따옴표 → 마지막 줄 끝에 자동 정렬 */}
                   <img
-                    src="/icons/quote-down.svg"
-                    className="w-[1.2rem] opacity-70 mt-2 ml-auto"
+                    src="/icons/quote-pink.svg"
+                    alt="quote close"
+                    className="w-[1rem] h-[1rem] opacity-70 absolute right-[-1.5rem] bottom-0 translate-y-[20%]"
                   />
-
-                  <p className="text-[#6B7280] text-[0.75rem] text-right mt-2">
-                    {chat.date}
-                  </p>
                 </div>
+              </div>
+              <p className="text-right text-[0.75rem] text-[#6B7280] mt-[0.75rem]">
+                  {chat.date}
+                </p>
               </div>
             ))}
           </div>
