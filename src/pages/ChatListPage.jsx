@@ -120,7 +120,7 @@ export default function ChatListPage() {
                 
                 <div className="flex items-center gap-[0.5rem]">
 
-                  <span className="text-[0.875rem] text-[#3B3D40]">
+                  <span className="text-[0.875rem] text-[#3B3D40] line-clamp-1">
                     {item.title}
                   </span>
 
@@ -151,7 +151,7 @@ export default function ChatListPage() {
                 )}
 
                 {tab === "past" && (
-                  <p className="text-[0.75rem] text-[#B5BBC1]">
+                  <p className="text-[0.75rem] text-[#B5BBC1] line-clamp-1">
                     {item.question}
                   </p>
                 )}

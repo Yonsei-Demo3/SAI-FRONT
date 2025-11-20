@@ -9,15 +9,9 @@ export default function TopBar({ startAt, endAt, onExpire }) {
   const [searchText, setSearchText] = useState(""); 
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (searchOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [searchOpen]);
-
   return (
-    <div>
-      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pb-[1rem] pt-[1rem]">
+    <div className="fixed-0">
+      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pb-[1.25rem] pt-[1.25rem]">
 
         <button aria-label="뒤로가기" className="border-none outline-none" onClick={() => navigate(-1)}>
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="16" viewBox="0 0 10 16" fill="none">

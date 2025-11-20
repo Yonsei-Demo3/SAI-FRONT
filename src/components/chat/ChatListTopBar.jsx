@@ -7,7 +7,7 @@ export default function ChatListTopBar({ title, isbutton }){
 
   return (
     <div className="top-0 z-20 bg-white shadow-[0_4px_5px_rgba(0,0,0,0.04)]">
-      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pb-[1rem] pt-[1.5rem] box-border gap-[0.75rem]">
+      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pb-[1.25rem] pt-[1.25rem] box-border gap-[0.75rem]">
         <span className="text-[1.1875rem] font-bold">
           {title}
         </span>
