@@ -8,7 +8,7 @@ export default function QuestionTopBar({ title,   onSubmit, canSubmit }) {
   
 
   return (  
-  <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pt-[1.5rem] pb-[1rem] box-border shadow-[0_4px_5px_rgba(0,0,0,0.04)]">
+  <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pt-[1.25rem] pb-[1.25rem] box-border shadow-[0_4px_5px_rgba(0,0,0,0.04)]">
 
     <button type="button" className="bg-[#FFFFFF] border-0" onClick={() => navigate(-1)}>
       <svg xmlns="http://www.w3.org/2000/svg" width="9" height="15" viewBox="0 0 9 15" fill="none">
