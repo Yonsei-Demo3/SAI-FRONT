@@ -85,6 +85,8 @@ export default function ChatPage() {
   const [searchResults, setSearchResults] = useState([]); // 검색된 메시지 id 리스트
   const [searchIndex, setSearchIndex] = useState(0); // 현재 선택된 검색 결과 index
 
+  const [previewImage, setPreviewImage] = useState(null);
+
   // 하단 근처 판정 유틸
   const isNearBottom = (el) => {
     const threshold = 24; // px 여유
@@ -131,12 +133,6 @@ export default function ChatPage() {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, bookmarked: !m.bookmarked } : m)));
   };
 
-  // const handleSend = (text, s) => {
-  //   setMessages((prev) => [
-  //     ...prev,
-  //     { id: uid(), text, side: s, time: nowKo() },
-  //   ]);
-  // };
 
   const handleSend = (content, s, type) => {
     if (type === "image") {
@@ -150,8 +146,19 @@ export default function ChatPage() {
           time: nowKo(),
         },
       ]);
-    } else {
+    } else if (type === "file") {
       setMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          files: content,       // File[] 또는 파일 정보 배열
+          type: "file",
+          side: s,
+          time: nowKo(),
+        },
+      ]);
+    } else {
+            setMessages((prev) => [
         ...prev,
         {
           id: uid(),
@@ -164,6 +171,30 @@ export default function ChatPage() {
     }
   };
 
+  // 이미지 클릭 → 모달 열기
+  const handleImageClick = (src) => {
+    setPreviewImage(src);
+  };
+
+  // 모달 닫기
+  const closeImageModal = () => {
+    setPreviewImage(null);
+  };
+
+  // 파일 클릭 → 다운로드
+  const handleFileClick = (file) => {
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name || "download";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
 
     <div className="flex flex-col h-screen w-full bg-white">
@@ -174,8 +205,8 @@ export default function ChatPage() {
           endAt={apiResponse.endAt} 
           onExpire={() => console.log("타이머 종료")} 
           onSearchChange={setSearchText}
+          title={apiResponse.title}
         />
-        <QuestionStrip title={apiResponse.title} />
       </header>
 
 
@@ -206,13 +237,31 @@ export default function ChatPage() {
             
             <div className="flex w-full flex-col justify-start items-stretch">
               {messages.map((m) => (
-                <ChatBubble key={m.id} msg={m} onToggleBookmark={toggleBookmark} highlightWord={searchText} />
+                <ChatBubble key={m.id} msg={m} onToggleBookmark={toggleBookmark} onImageClick={handleImageClick} onFileClick={handleFileClick} highlightWord={searchText} />
               ))}
             </div>
           </div>
         </div>
 
       </main>
+
+       {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          onClick={closeImageModal}
+        >
+          <div
+            className="max-w-[90vw] max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <img
+              src={previewImage}
+              alt="preview"
+              className="max-w-full max-h-[90vh] rounded-lg"
+            />
+          </div>
+        </div>
+      )}
 
       <footer className="bg-white justify-center items-center">
         <ChatInput onSend={handleSend} side={side} />

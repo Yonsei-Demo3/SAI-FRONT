@@ -6,9 +6,10 @@ export default function ChatInput({ onSend, side = "right" }) {
 
   const [previewImages, setPreviewImages] = useState([]); // 미리보기 이미지 list
   const [showPreview, setShowPreview] = useState(false);
-
+  
   const cameraInputRef = React.useRef(null);
   const albumInputRef = React.useRef(null);
+  const fileInputRef = React.useRef(null);  
 
   const sendText = () => {
     const t = text.trim();
@@ -37,11 +38,27 @@ export default function ChatInput({ onSend, side = "right" }) {
     setShowPreview(true);
   };
 
+  // 파일 선택 처리
+  const handleFile = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    // 부모에 File[] 전달
+    onSend(files, side, "file");
+
+    // 같은 파일 다시 선택 가능하도록 초기화
+    e.target.value = "";
+
+    // 시트 닫기
+    setOpen(false);
+  };
+
   // 미리보기 → 전송
   const sendImages = () => {
     onSend(previewImages, side, "image");
     setPreviewImages([]);
     setShowPreview(false);
+    setOpen(false);
   };
 
   // 미리보기 → 취소
@@ -69,6 +86,15 @@ export default function ChatInput({ onSend, side = "right" }) {
          style={{ display: "none" }}
          onChange={handleAlbum}
        />
+
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          onChange={handleFile}
+          multiple // 여러 파일 전송을 허용
+        />
+
     <div className="flex items-center border-none border-none pt-[1rem] pl-[1.5rem] pr-[1.5rem] pb-[1rem] shadow-[0_-3px_4px_rgba(0,0,0,0.08)]">
       
 
@@ -119,9 +145,9 @@ export default function ChatInput({ onSend, side = "right" }) {
                   onClick={() => cameraInputRef.current.click()}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="27" height="24" viewBox="0 0 27 24" fill="none">
-                    <path d="M24 4H20.552L16.9427 0.390667C16.6927 0.140601 16.3536 7.55165e-05 16 0H10.6667C10.3131 7.55165e-05 9.97399 0.140601 9.724 0.390667L6.11467 4H2.66667C1.196 4 0 5.196 0 6.66667V21.3333C0 22.804 1.196 24 2.66667 24H24C25.4707 24 26.6667 22.804 26.6667 21.3333V6.66667C26.6667 5.196 25.4707 4 24 4ZM13.3333 20C9.72 20 6.66667 16.9467 6.66667 13.3333C6.66667 9.72 9.72 6.66667 13.3333 6.66667C16.9467 6.66667 20 9.72 20 13.3333C20 16.9467 16.9467 20 13.3333 20Z" fill="#FF7053">
-                    </path>
-                  </svg>                  
+                    <path d="M13.3333 9.33333C11.1653 9.33333 9.33333 11.1653 9.33333 13.3333C9.33333 15.5013 11.1653 17.3333 13.3333 17.3333C15.5013 17.3333 17.3333 15.5013 17.3333 13.3333C17.3333 11.1653 15.5013 9.33333 13.3333 9.33333Z" fill="#FF7053"/>
+                    <path d="M24 4H20.552L16.9427 0.390667C16.6927 0.140601 16.3536 7.55165e-05 16 0H10.6667C10.3131 7.55165e-05 9.97399 0.140601 9.724 0.390667L6.11467 4H2.66667C1.196 4 0 5.196 0 6.66667V21.3333C0 22.804 1.196 24 2.66667 24H24C25.4707 24 26.6667 22.804 26.6667 21.3333V6.66667C26.6667 5.196 25.4707 4 24 4ZM13.3333 20C9.72 20 6.66667 16.9467 6.66667 13.3333C6.66667 9.72 9.72 6.66667 13.3333 6.66667C16.9467 6.66667 20 9.72 20 13.3333C20 16.9467 16.9467 20 13.3333 20Z" fill="#FF7053"/>
+                  </svg>               
                 </button>
                 <span className="text-[#3B3D40] text-[0.75rem]">
                   카메라
@@ -147,6 +173,7 @@ export default function ChatInput({ onSend, side = "right" }) {
                 <button
                   type="file"
                   className="flex justify-center items-center bg-[#F2F4F8] w-[3rem] h-[3rem] rounded-full"
+                  onClick={() => fileInputRef.current?.click()} 
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="27" viewBox="0 0 22 27" fill="none">
                     <path d="M10.6667 0V8.66667C10.6667 9.16384 10.8519 9.64319 11.1862 10.0112C11.5204 10.3793 11.9798 10.6096 12.4747 10.6573L12.6667 10.6667H21.3333V24C21.3335 24.6728 21.0795 25.3208 20.622 25.8141C20.1645 26.3074 19.5375 26.6095 18.8667 26.66L18.6667 26.6667H2.66667C1.9939 26.6669 1.34591 26.4128 0.852603 25.9553C0.359294 25.4979 0.0571246 24.8709 0.00666695 24.2L1.33691e-07 24V2.66667C-0.000212772 1.9939 0.253875 1.34591 0.711329 0.852603C1.16878 0.359294 1.79579 0.0571244 2.46667 0.00666682L2.66667 0H10.6667ZM13.3333 0.0573333C13.7645 0.148866 14.1663 0.345852 14.5027 0.630667L14.6667 0.781333L20.552 6.66667C20.8644 6.97882 21.0944 7.36367 21.2213 7.78667L21.2747 8H13.3333V0.0573333Z" fill="#FF7053"/>
@@ -162,8 +189,9 @@ export default function ChatInput({ onSend, side = "right" }) {
                   type="save"
                   className="flex justify-center items-center bg-[#F2F4F8] w-[3rem] h-[3rem] rounded-full"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" viewBox="0 0 20 25" fill="none">
-                    <path d="M1 23.6667V1H18.3333V23.6667L9.66667 19.4847L1 23.6667Z" fill="#FF7053" stroke="#FF7053" stroke-width="2" stroke-linejoin="round"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="29" viewBox="0 0 24 29" fill="none">
+                    <path d="M5 27.6667V5H22.3333V27.6667L13.6667 23.4847L5 27.6667Z" fill="#FF7053"/>
+                    <path d="M18.3333 5V1H1V23.6667L5 21.6667M5 27.6667V5H22.3333V27.6667L13.6667 23.4847L5 27.6667Z" stroke="#FF7053" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </button>
                 <span className="text-[#3B3D40] text-[0.75rem]">
