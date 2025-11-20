@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TimerBanner from "./TimerBanner";
+import QuestionStrip from "./QuestionStrip";
 
-export default function TopBar({ startAt, endAt, onExpire }) {
+export default function TopBar({ startAt, endAt, onExpire, title}) {
   
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false); 
@@ -29,7 +30,7 @@ export default function TopBar({ startAt, endAt, onExpire }) {
                 setSearchText(e.target.value);
                 props.onSearchChange(e.target.value);
               }}              
-              className="w-full rounded-[0.38rem] bg-[#F2F4F8] border-none outline-none text-[0.875rem] pl-[0.75rem] pr-[0.75rem]"
+              className="w-full rounded-[0.375rem] bg-[#F2F4F8] border-none outline-none text-[0.8rem] pt-[0.1rem] pb-[0.1rem] pl-[0.75rem] pr-[0.75rem]"
             />
           </div>
         )}
@@ -48,6 +49,7 @@ export default function TopBar({ startAt, endAt, onExpire }) {
         </div>
       </div>
       <TimerBanner startAt={startAt} endAt={endAt} onExpire={onExpire} />
+      <QuestionStrip title={title} />
     </div>
   );
 }
