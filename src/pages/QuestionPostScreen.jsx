@@ -30,11 +30,16 @@ export default function QuestionFormScreen() {
   const [participants, setParticipants] = useState(2);
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
+  const [startOption, setStartOption] = useState(""); 
+  const MIN_PARTICIPANTS = 2;
+  const MAX_PARTICIPANTS = 8;
+  const canDecrement = participants > MIN_PARTICIPANTS;
+  const canIncrement = participants < MAX_PARTICIPANTS;
 
   const remaining = MAX_QUESTION_LEN - question.length;
+  
   const canSubmit =
-    question.trim().length > 0 &&
-    participants > 1;
+    question.trim().length > 0 && startOption !== "";
 
 
   function handleDrop(ev) {
@@ -65,7 +70,7 @@ export default function QuestionFormScreen() {
   function onSubmit(e) {
     e.preventDefault();
     console.log({ contentFiles, question, desc, participants, tags });
-    alert("질문이 등록되었습니다!");
+    alert("질문이 등록되었습니다");
   }
 
   const contentHint = useMemo(
@@ -119,6 +124,91 @@ export default function QuestionFormScreen() {
           </div>
         </div>
 
+        <div className="flex flex-col justify-center pb-[1.5rem]">
+          <FieldLabel>참여 인원 설정</FieldLabel>
+
+          <div className="flex items-center  pl-[1.5rem]">
+            <button
+              type="button"
+              onClick={() => {
+                if (!canDecrement) return;
+                setParticipants((n) => Math.max(MIN_PARTICIPANTS, n - 1));
+              }}
+              className={`rounded-full w-[1.5rem] h-[1.5rem] border-none flex items-center justify-center
+                      ${
+                        canDecrement
+                          ? "bg-[#3B3D40] cursor-pointer"   
+                          : "bg-[#E7EBEF] cursor-not-allowed" 
+                      }
+                    `}              
+              aria-label="인원 감소"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="2" viewBox="0 0 16 2" fill="none">
+                <path d="M1 1H15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <div className="min-w-[3rem] text-[1rem] text-center">
+              {participants}명
+            </div>
+            
+            <button
+              type="button"
+              onClick={ () => {
+                if (!canIncrement) return;
+                setParticipants((n) => n + 1)}
+              }
+                            className={`rounded-full w-[1.5rem] h-[1.5rem] border-none flex items-center justify-center
+                      ${
+                        canIncrement
+                          ? "bg-[#3B3D40] cursor-pointer"   
+                          : "bg-[#E7EBEF] cursor-not-allowed" 
+                      }
+                    `}   
+              aria-label="인원 증가"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M12.5 5.83333H7.5V0.833333C7.5 0.61232 7.4122 0.400358 7.25592 0.244078C7.09964 0.0877975 6.88768 0 6.66667 0C6.44565 0 6.23369 0.0877975 6.07741 0.244078C5.92113 0.400358 5.83333 0.61232 5.83333 0.833333V5.83333H0.833333C0.61232 5.83333 0.400358 5.92113 0.244078 6.07741C0.0877975 6.23369 0 6.44565 0 6.66667C0 6.88768 0.0877975 7.09964 0.244078 7.25592C0.400358 7.4122 0.61232 7.5 0.833333 7.5H5.83333V12.5C5.83333 12.721 5.92113 12.933 6.07741 13.0893C6.23369 13.2455 6.44565 13.3333 6.66667 13.3333C6.88768 13.3333 7.09964 13.2455 7.25592 13.0893C7.4122 12.933 7.5 12.721 7.5 12.5V7.5H12.5C12.721 7.5 12.933 7.4122 13.0893 7.25592C13.2455 7.09964 13.3333 6.88768 13.3333 6.66667C13.3333 6.44565 13.2455 6.23369 13.0893 6.07741C12.933 5.92113 12.721 5.83333 12.5 5.83333Z" fill="white"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col justify-center pb-[1.5rem]">
+          <FieldLabel>대화 시작 시점</FieldLabel>
+          <div className="flex flex-col items-start justify-center pl-[1.5rem] pr-[1.5rem] gap-[0.75rem]">
+              <button
+                type="button"
+                onClick={() => setStartOption("readyOnly")}
+                className={`border-none rounded-[0.25rem] box-border pl-[0.625rem] pr-[0.625rem] pt-[0.25rem] pb-[0.25rem]
+                ${
+                  startOption === "readyOnly"   
+                    ? "bg-[#82A633]"
+                    : "bg-[#F2F4F8]"
+                }`}
+              >
+                <span className={`text-[0.875rem] ${startOption === "readyOnly" ? "text-white" : ""}`}>
+                  준비된 인원끼리 바로 시작
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setStartOption("allReady")}
+                className={`border-none rounded-[0.25rem] box-border pl-[0.625rem] pr-[0.625rem] pt-[0.25rem] pb-[0.25rem]
+                ${
+                  startOption === "allReady"   
+                    ? "bg-[#82A633]"
+                    : "bg-[#F2F4F8]"
+                }`}
+              >
+                <span className={`text-[0.875rem] ${startOption === "allReady" ? "text-white" : ""}`}>
+                  모든 인원이 준비되면 시작
+                </span>
+              </button>
+
+          </div>
+        </div>
+
         
         <div className="flex flex-col justify-center pb-[1.5rem]">
           <FieldLabel optional>설명 입력하기</FieldLabel>
@@ -150,39 +240,6 @@ export default function QuestionFormScreen() {
             </div>
           </div>
         </div>
-
-          
-          <div>
-            <FieldLabel>참여 인원 설정</FieldLabel>
-
-            <div className="flex items-center  pl-[1.5rem]">
-              <button
-                type="button"
-                onClick={() => setParticipants((n) => Math.max(1, n - 1))}
-                className="rounded-full w-[1.5rem] h-[1.5rem] border-none flex items-center justify-center bg-[#E7EBEF]" 
-                aria-label="인원 감소"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="2" viewBox="0 0 16 2" fill="none">
-                  <path d="M1 1H15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
-
-              <div className="min-w-[3rem] text-[1rem] text-center">
-                {participants}명
-              </div>
-              
-              <button
-                type="button"
-                onClick={() => setParticipants((n) => n + 1)}
-                className="rounded-full w-[1.5rem] h-[1.5rem] border-none flex items-center justify-center bg-[#E7EBEF]" 
-                aria-label="인원 증가"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M12.5 5.83333H7.5V0.833333C7.5 0.61232 7.4122 0.400358 7.25592 0.244078C7.09964 0.0877975 6.88768 0 6.66667 0C6.44565 0 6.23369 0.0877975 6.07741 0.244078C5.92113 0.400358 5.83333 0.61232 5.83333 0.833333V5.83333H0.833333C0.61232 5.83333 0.400358 5.92113 0.244078 6.07741C0.0877975 6.23369 0 6.44565 0 6.66667C0 6.88768 0.0877975 7.09964 0.244078 7.25592C0.400358 7.4122 0.61232 7.5 0.833333 7.5H5.83333V12.5C5.83333 12.721 5.92113 12.933 6.07741 13.0893C6.23369 13.2455 6.44565 13.3333 6.66667 13.3333C6.88768 13.3333 7.09964 13.2455 7.25592 13.0893C7.4122 12.933 7.5 12.721 7.5 12.5V7.5H12.5C12.721 7.5 12.933 7.4122 13.0893 7.25592C13.2455 7.09964 13.3333 6.88768 13.3333 6.66667C13.3333 6.44565 13.2455 6.23369 13.0893 6.07741C12.933 5.92113 12.721 5.83333 12.5 5.83333Z" fill="white"/>
-                </svg>
-              </button>
-            </div>
-          </div>
       </div>
 
 
