@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { createQuestion } from "../api/questionService.js";
 import QuestionTopBar from "../components/question/QuestionTopBar.jsx";
 const MAX_QUESTION_LEN = 100;
 const MAX_TAGS = 5;
@@ -24,62 +25,53 @@ function FieldLabel({ icon, children, optional = false }) {
 
 export default function QuestionFormScreen() {
 
-  const [contentFiles, setContentFiles] = useState([]);
   const [question, setQuestion] = useState("");
   const [desc, setDesc] = useState("");
   const [participants, setParticipants] = useState(2);
-  const [tags, setTags] = useState([]);
-  const [tagInput, setTagInput] = useState("");
   const [startOption, setStartOption] = useState(""); 
   const MIN_PARTICIPANTS = 2;
   const MAX_PARTICIPANTS = 8;
   const canDecrement = participants > MIN_PARTICIPANTS;
   const canIncrement = participants < MAX_PARTICIPANTS;
-
-  const remaining = MAX_QUESTION_LEN - question.length;
   
   const canSubmit =
     question.trim().length > 0 && startOption !== "";
 
 
-  function handleDrop(ev) {
-    ev.preventDefault();
-    const files = Array.from(ev.dataTransfer.files || []);
-    if (files.length) setContentFiles((prev) => [...prev, ...files]);
-  }
+  // function onSubmit(e) {
+  //   e.preventDefault();
+  //   console.log({  question, desc, participants, tags });
+  //   alert("질문이 등록되었습니다");
+  // }
 
-  function onTagKeyDown(e) {
-    if (e.key === "Enter" || e.key === "," || e.key === " ") {
-      e.preventDefault();
-      const raw = tagInput.trim().replace(/^#/g, "");
-      if (!raw) return;
-      if (tags.includes(raw)) return;
-      if (tags.length >= MAX_TAGS) return;
-      setTags((t) => [...t, raw]);
-      setTagInput("");
-    }
-    if (e.key === "Backspace" && !tagInput && tags.length) {
-      setTags((t) => t.slice(0, -1));
-    }
-  }
 
-  function removeTag(idx) {
-    setTags((t) => t.filter((_, i) => i !== idx));
-  }
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
+
     e.preventDefault();
-    console.log({ contentFiles, question, desc, participants, tags });
-    alert("질문이 등록되었습니다");
+
+    const payload = {
+      title,
+      description,
+      maxParticipants,
+      contentId,
+      tags: []
+    };
+
+    try {
+      const response = await createQuestion(payload);
+
+      console.log("서버 응답:", response.data);
+      alert("질문이 등록되었습니다");
+
+      // 등록 후 페이지 이동 필요하면 여기에 추가
+      // window.location.href = "/questions";
+    } catch (error) {
+      console.error("등록 실패:", error);
+      alert("질문 등록에 실패했습니다.");
+    }
   }
 
-  const contentHint = useMemo(
-    () =>
-      contentFiles.length
-        ? `${contentFiles.length}개 첨부됨`
-        : "콘텐츠를 추가하여 그 안에서 떠오른 질문을 기록해보세요.",
-    [contentFiles]
-  );
 
   return (
     <div className="flex h-screen w-full flex-col bg-white">
