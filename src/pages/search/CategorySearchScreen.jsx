@@ -12,14 +12,20 @@ export default function CategorySearchScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 인기 검색어 데이터 받아오기
-    axios.get("http://3.36.131.35:8080/api/v1/search/popular?size=10")
-      .then(response => {
-        setPopularKeywords(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching popular keywords:", error);
-      });
+    // 토큰을 헤더에 포함시켜 인기 검색어 데이터를 받아오기
+    const token = "eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzNzAxODQ2LCJleHAiOjE3OTUyMzc4NDYsImF1ZCI6IndlYiIsImlzcyI6Im15LWJhY2tlbmQtYXBpIn0.AzIeDBqcvfDapbj79tEa0q8Ta3RQQDVy-Urtn2qUqbo"; // 제공된 토큰
+
+    axios.get("http://3.36.131.35:8080/api/v1/search/popular", {
+      headers: {
+        "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
+      }
+    })
+    .then(response => {
+      setPopularKeywords(response.data);
+    })
+    .catch(error => {
+      console.error("Error fetching popular keywords:", error);
+    });
   }, []);
 
   const categories = {

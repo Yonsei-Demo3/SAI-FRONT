@@ -23,9 +23,9 @@ export default function SearchResult() {
   const [openSort, setOpenSort] = useState(false);
   const [sortType, setSortType] = useState("인기순");
 
-  // 검색 결과를 가져오는 함수 (API 호출)
+  // 토큰을 헤더에 포함하여 요청 보내기 위한 함수
   const fetchResults = async () => {
-    const token = localStorage.getItem("access_token"); // 로컬 스토리지에서 토큰 가져오기
+    const token = "eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzNzAxODQ2LCJleHAiOjE3OTUyMzc4NDYsImF1ZCI6IndlYiIsImlzcyI6Im15LWJhY2tlbmQtYXBpIn0.AzIeDBqcvfDapbj79tEa0q8Ta3RQQDVy-Urtn2qUqbo"; // 주어진 토큰
 
     const requestBody = {
       questionSearchRequestDTO: {
@@ -48,11 +48,11 @@ export default function SearchResult() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // 엑세스 토큰을 Authorization 헤더에 포함
+          "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
         },
         body: JSON.stringify(requestBody),
       });
-
+      
       if (!response.ok) {
         throw new Error("검색 결과를 가져오는 데 실패했습니다.");
       }
