@@ -12,7 +12,6 @@ export default function CategorySearchScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 토큰 없이 인기 검색어 데이터를 받아오기
     axios.get("http://3.36.131.35:8080/api/v1/search/popular")
       .then(response => {
         setPopularKeywords(response.data); // 인기 검색어 상태 업데이트
