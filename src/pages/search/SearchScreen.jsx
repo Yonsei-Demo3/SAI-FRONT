@@ -11,10 +11,16 @@ export default function SearchScreen() {
   const [recentSearches, setRecentSearches] = useState([]); // 최근 검색어 상태
   const [popularSearches, setPopularSearches] = useState([]); // 인기 검색어 상태
 
+  // 제공된 토큰
+  const token = "eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzNzAxODQ2LCJleHAiOjE3OTUyMzc4NDYsImF1ZCI6IndlYiIsImlzcyI6Im15LWJhY2tlbmQtYXBpIn0.AzIeDBqcvfDapbj79tEa0q8Ta3RQQDVy-Urtn2qUqbo";
+
   // API 요청 함수 (인기 검색어)
   const fetchPopularSearches = async () => {
     try {
       const response = await axios.get("http://3.36.131.35:8080/api/v1/search/popular", {
+        headers: {
+          "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
+        },
         params: {
           size: 10,
         },
@@ -29,6 +35,9 @@ export default function SearchScreen() {
   const fetchRecentSearches = async () => {
     try {
       const response = await axios.get("http://3.36.131.35:8080/api/v1/search/recent", {
+        headers: {
+          "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
+        },
         params: {
           size: 5,
         },

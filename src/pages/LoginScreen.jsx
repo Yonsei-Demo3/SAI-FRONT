@@ -35,8 +35,6 @@ export default function LoginScreen() {
       localStorage.setItem("tokenType", response.data.tokenType);
       localStorage.setItem("expiresIn", response.data.expiresIn);
 
-      alert("로그인 성공");
-
       // 로그인 성공 후 메인 화면으로 이동
       navigate("/main"); // 메인 화면으로 이동
     } catch (err) {
