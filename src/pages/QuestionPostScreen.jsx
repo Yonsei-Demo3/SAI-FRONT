@@ -197,7 +197,7 @@ export default function QuestionFormScreen() {
                 className={`border-none rounded-[0.25rem] box-border pl-[0.625rem] pr-[0.625rem] pt-[0.25rem] pb-[0.25rem]
                 ${
                   startOption === "allReady"   
-                    ? "bg-[#82A633]"
+                    ? "bg-[#FA502E]"
                     : "bg-[#F2F4F8]"
                 }`}
               >

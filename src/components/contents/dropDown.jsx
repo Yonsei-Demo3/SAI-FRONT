@@ -44,7 +44,7 @@ export default function Dropdown({ placeholder, options = [], value, onChange, d
       {open && (
         <ul
           role="listbox"
-          className="absolute z-10 w-full rounded-[0.5rem] overflow-auto border-none bg-white shadow-lg pl-[0.25rem] pr-[0.25rem] pt-[0.5rem] pb-[0.5rem]"
+          className="absolute z-10 w-full max-h-[13rem] rounded-[0.5rem] overflow-auto border-none bg-white shadow-lg pl-[0.25rem] pr-[0.25rem] pt-[0.5rem] pb-[0.5rem]"
         >
 
           {options.map(opt => (
