@@ -20,7 +20,6 @@ export default function MainScreen() {
   // 🔶 탭 메뉴 데이터
   const tabs = [
     { name: "NOW", path: "/main" },
-    { name: "추천 질문", path: "/main/sug" },
     { name: "최신 질문", path: "/main/new" },
     { name: "인기 질문", path: "/main/pop" },
   ];
@@ -41,7 +40,7 @@ export default function MainScreen() {
         <Navbar />
         
         {/* 🔶 탭 메뉴 */}
-        <div className="flex justify-center w-full bg-white gap-x-[2.25rem]">
+        <div className="flex justify-start w-full px-[1.5rem] bg-white gap-x-[2.25rem]">
           {tabs.map((tab) => {
             const active = location.pathname === tab.path;
 
@@ -103,12 +102,12 @@ export default function MainScreen() {
       <div className="flex-1 min-h-0 overflow-y-auto pb-[6rem]">
         <div className="flex flex-col">
         {/* 🔶 메인 카드 */}
-        <div className="w-full flex justify-center relative z-10">
-          <div className="w-[20.4375rem] h-[21.3125rem] mt-[1.5rem] rounded-[1.25rem] overflow-hidden shadow-sm relative bg-gradient-to-b from-[#FFDAC0] to-[#FA502E]">
+        <div className="w-full px-[1.5rem] flex justify-center relative z-10">
+          <div className="w-full h-[21.3125rem] mt-[1.5rem] rounded-[1.25rem] overflow-hidden shadow-sm relative bg-gradient-to-b from-[#FFDAC0] to-[#FA502E]">
             <img
               src="/icons/main-character.svg"
               alt="Main Character"
-              className="ml-[1.75rem] mr-[1rem] mt-[3.25rem] w-[17.3125rem] h-[10.6875rem]"
+              className="px-[1.75rem] mr-[1rem] mt-[3.25rem] w-full h-[10.6875rem]"
             />
 
             <div className="p-6 text-white rounded-[1.25rem] relative overflow-hidden">

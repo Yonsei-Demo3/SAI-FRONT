@@ -4,28 +4,22 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import SearchBar from "../../components/common/SearchBar";
+import { popular, recentSearch, deleteRecentSearch, clearAllRecentSearch} from "../../lib/searchService";
 
 export default function SearchScreen() {
   const navigate = useNavigate();
   const [query, setQuery] = useState(""); // 검색어 상태
   const [recentSearches, setRecentSearches] = useState([]); // 최근 검색어 상태
   const [popularSearches, setPopularSearches] = useState([]); // 인기 검색어 상태
-
-  // 제공된 토큰
-  const token = "eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzNzAxODQ2LCJleHAiOjE3OTUyMzc4NDYsImF1ZCI6IndlYiIsImlzcyI6Im15LWJhY2tlbmQtYXBpIn0.AzIeDBqcvfDapbj79tEa0q8Ta3RQQDVy-Urtn2qUqbo";
-
-  // API 요청 함수 (인기 검색어)
+  const handleSearch = () => {
+    if (!query.trim()) return; // 빈 문자열이면 무시
+    navigate("/search-result", { state: { query } });
+  };
+  
   const fetchPopularSearches = async () => {
-    try {
-      const response = await axios.get("http://3.36.131.35:8080/api/v1/search/popular", {
-        headers: {
-          "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
-        },
-        params: {
-          size: 10,
-        },
-      });
-      setPopularSearches(response.data); // 인기 검색어 상태 업데이트
+    try {      
+      const list = await popular();
+      setPopularSearches(list); 
     } catch (error) {
       console.error("Error fetching popular searches:", error);
     }
@@ -34,35 +28,30 @@ export default function SearchScreen() {
   // API 요청 함수 (최근 검색어)
   const fetchRecentSearches = async () => {
     try {
-      const response = await axios.get("http://3.36.131.35:8080/api/v1/search/recent", {
-        headers: {
-          "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
-        },
-        params: {
-          size: 5,
-        },
-      });
-      setRecentSearches(response.data); // 최근 검색어 상태 업데이트
+      const list = await recentSearch();
+      setRecentSearches(list);
     } catch (error) {
       console.error("Error fetching recent searches:", error);
     }
   };
 
-  // 검색어 추가
-  const addRecentSearch = (term) => {
-    if (!recentSearches.includes(term)) {
-      setRecentSearches([term, ...recentSearches]); // 최근 검색어 리스트에 추가
+
+  const deleteRecent = async (term) => {
+    try {
+      await deleteRecentSearch(term); 
+      setRecentSearches((prev) => prev.filter((x) => x !== term));
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  // 최근 검색어 삭제
-  const deleteRecent = (term) => {
-    setRecentSearches(recentSearches.filter((item) => item !== term));
-  };
-
-  // 전체 최근 검색어 삭제
-  const clearAllRecent = () => {
-    setRecentSearches([]);
+  const clearAllRecent = async () => {
+    try {
+      await clearAllRecentSearch();
+      setRecentSearches([]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // 컴포넌트가 마운트될 때 인기 검색어와 최근 검색어 데이터를 가져옴
@@ -80,10 +69,7 @@ export default function SearchScreen() {
         <SearchBar
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onEnter={() => {
-            addRecentSearch(query);
-            navigate("/search-result", { state: { query } });
-          }}
+           onEnter={handleSearch}
         />
 
         {/* 최근 검색어 */}

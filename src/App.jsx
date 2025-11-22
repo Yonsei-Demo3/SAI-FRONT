@@ -9,7 +9,6 @@ import ChatPage from "./pages/ChatPage";
 import LoginScreen from "./pages/LoginScreen";
 import SignupScreen from "./pages/SignupScreen";
 import MainScreen from "./pages/main/MainScreen";
-import MainSugQues from "./pages/main/MainSugQues";
 import MainNewQues from "./pages/main/MainNewQues";
 import MainPopQues from "./pages/main/MainPopQues";
 import SearchScreen from "./pages/search/SearchScreen";
@@ -39,7 +38,6 @@ export default function App() {
               <Route path="/login" element={<LoginScreen />} /> 
               <Route path="/signup" element={<SignupScreen />} />
               <Route path="/main" element={<MainScreen />} />
-              <Route path="/main/sug" element={<MainSugQues />} />
               <Route path="/main/new" element={<MainNewQues />} />
               <Route path="/main/pop" element={<MainPopQues />} />
               <Route path="/search" element={<SearchScreen />} />
