@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";  // axios import 추가
+import { signup } from "../lib/signupService";
 
 export default function SignupScreen() {
   const navigate = useNavigate();
@@ -18,19 +19,19 @@ export default function SignupScreen() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();  // 폼 제출 시 페이지 리로딩 방지
+    e.preventDefault(); 
+
+    const payload = {
+      email: formData.email,
+      user_id: formData.user_id,
+      password: formData.password,
+      nickname: formData.nickname,
+      phone: formData.phone,
+    };
 
     try {
       // 회원가입 API 호출
-      const response = await axios.post(
-        "http://3.36.131.35:8080/api/v1/members",  // 실제 API 주소로 변경 필요
-        {
-          email: formData.email,
-          password: formData.password,
-          nickname: formData.nickname,
-          phone: formData.phone
-        }
-      );
+      const response = await signup(payload);
       console.log("회원가입 성공:", response);
       navigate("/login");  // 회원가입 성공 후 로그인 화면으로 이동
     } catch (error) {

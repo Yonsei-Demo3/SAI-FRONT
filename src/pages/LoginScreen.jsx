@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // useNavigate 임포트
+import { login } from "../lib/loginService";
 
 export default function LoginScreen() {
   const navigate = useNavigate(); // navigate 훅 사용
@@ -23,28 +24,30 @@ export default function LoginScreen() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const payload = {
+      user_id: formData.user_id,
+      password: formData.password,
+    };
+
     try {
       // 로그인 API 요청
-      const response = await axios.post("http://3.36.131.35:8080/api/v1/auth/login", {
-        email: formData.user_id, // 아이디를 이메일로 보내는 형태로 수정
-        password: formData.password,
-      });
+      const response = await login(payload);
 
-      // 응답 데이터에서 accessToken을 로컬 스토리지에 저장
-      localStorage.setItem("accessToken", response.data.accessToken);
-      localStorage.setItem("tokenType", response.data.tokenType);
-      localStorage.setItem("expiresIn", response.data.expiresIn);
+      const authHeader =
+        response.headers["authorization"] ||
+        response.headers["Authorization"] ||
+        response.headers["access-token"];
 
-      // 로그인 성공 후 메인 화면으로 이동
-      navigate("/main"); // 메인 화면으로 이동
+      if(authHeader) {
+        localStorage.setItem("accessToken", authHeader);
+      }
+
+      navigate("/main");
     } catch (err) {
-      // 오류가 발생하면 에러 메시지 표시
       if (err.response) {
-        // 서버 응답이 있는 경우
-        setError(err.response.data.message || "로그인 실패");
+        console.log(err.response.data.message + "로그인 실패")
       } else {
-        // 서버와의 연결 문제 등
-        setError("서버와의 연결에 문제가 발생했습니다.");
+        console.log("서버와의 연결에 문제가 발생했습니다.")
       }
     }
   };

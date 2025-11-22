@@ -23,46 +23,22 @@ export default function SearchResult() {
   const [openSort, setOpenSort] = useState(false);
   const [sortType, setSortType] = useState("인기순");
 
-  // 토큰을 헤더에 포함하여 요청 보내기 위한 함수
   const fetchResults = async () => {
-    const token = "eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzNzAxODQ2LCJleHAiOjE3OTUyMzc4NDYsImF1ZCI6IndlYiIsImlzcyI6Im15LWJhY2tlbmQtYXBpIn0.AzIeDBqcvfDapbj79tEa0q8Ta3RQQDVy-Urtn2qUqbo"; // 주어진 토큰
+  try {
+    const data = await searchQuestions({
+      keyword: query,
+      tags,
+      page: 0,
+      size: 10,
+      sortType,
+    });
 
-    const requestBody = {
-      questionSearchRequestDTO: {
-        keyword: query, // 사용자가 입력한 검색어
-        categories: tags.map(tag => ({
-          main: tag,
-          sub: tag, // 태그를 main과 sub로 같은 값으로 설정
-        })),
-        tags: tags, // 태그
-      },
-      pageable: {
-        page: 0, // 페이지 번호
-        size: 10, // 한 번에 가져올 결과 수
-        sort: ["popularity"], // 정렬 기준
-      },
-    };
+    setResults(data.content || []);
+  } catch (error) {
+    console.error("Error fetching results:", error);
+  }
+};
 
-    try {
-      const response = await fetch("http://3.36.131.35:8080/api/v1/questions/search", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // Authorization 헤더에 토큰 추가
-        },
-        body: JSON.stringify(requestBody),
-      });
-      
-      if (!response.ok) {
-        throw new Error("검색 결과를 가져오는 데 실패했습니다.");
-      }
-
-      const data = await response.json();
-      setResults(data.content || []); // 검색 결과 데이터를 상태에 저장
-    } catch (error) {
-      console.error("Error fetching results:", error);
-    }
-  };
 
   useEffect(() => {
     fetchResults(); // 페이지가 로드될 때 검색 결과를 가져옵니다.
@@ -175,12 +151,12 @@ export default function SearchResult() {
         <div className="overflow-y-auto flex-1 px-[2.5rem] mt-[0.5rem] pb-[8rem] scrollbar-hide">
           {results.map((item) => (
             <div
-              key={item.id}
+              key={item.questionId}
               className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
               onClick={() => navigate("/detail", { state: { item } })}
             >
               <img src="/icons/quote.svg" className="w-[1rem] h-[1rem] mt-[0.75rem] opacity-70" />
-              <p className="text-[1rem] font-medium leading-[1.6rem] mt-[0.5rem]">{item.question}</p>
+              <p className="text-[1rem] font-medium leading-[1.6rem] mt-[0.5rem]">{item.questionTitle}</p>
               <p
                 className="text-[0.875rem] text-[#91969A] leading-[1.4rem] mt-[0.5rem] line-clamp-2"
                 style={{
@@ -189,15 +165,15 @@ export default function SearchResult() {
                   WebkitBoxOrient: "vertical",
                 }}
               >
-                {item.description}
+                {item.questionDescription}
               </p>
               <img src="/icons/line.svg" className="w-full mt-[0.8rem] mb-[0.5rem]" />
               <div className="flex items-center gap-[0.5rem]">
                 <img src="/icons/profile-gray.svg" className="w-[1.5rem] h-[1.5rem]" />
-                <span className="text-[#9CA3AF] text-[0.85rem]">익명의 사자</span>
+                <span className="text-[#9CA3AF] text-[0.85rem]">{item.hostNickname}</span>
               </div>
-              <p className="font-semibold text-[0.9rem] mt-[0.4rem]">{item.bookTitle}</p>
-              <p className="text-[0.7rem] text-[#555] mt-[0.2rem]">{item.categoryPath}</p>
+              <p className="font-semibold text-[0.9rem] mt-[0.4rem]">{item.contentName}</p>
+              <p className="text-[0.7rem] text-[#555] mt-[0.2rem]">{item.mainCategory} &gt; {item.subCategory}</p>
 
               <div className="flex items-center flex-wrap gap-[0.38rem] mt-[0.75rem]">
                 <div className="flex items-center text-[0.75rem] bg-[#F2F4F8] rounded-md px-[0.4rem] py-[0.2rem]">
@@ -205,7 +181,7 @@ export default function SearchResult() {
                   {item.participants}
                 </div>
 
-                {item.category.map((tag, idx) => (
+                {item.tagNames?.map((tag, idx) => (
                   <span
                     key={idx}
                     className="px-[0.5rem] py-[0.25rem] bg-[#FFF2EE] text-[#FA502E] text-[0.75rem] rounded-md"

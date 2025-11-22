@@ -10,7 +10,7 @@ instance.interceptors.request.use(
   (config) => {
     // 토큰 있으면 자동 삽입
     // const token = localStorage.getItem("accessToken");
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwicm9sZSI6IlVTRVIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzYzNzAxODQ2LCJleHAiOjE3OTUyMzc4NDYsImF1ZCI6IndlYiIsImlzcyI6Im15LWJhY2tlbmQtYXBpIn0.AzIeDBqcvfDapbj79tEa0q8Ta3RQQDVy-Urtn2qUqbo"
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1OGIyZmUyMS1lZDlhLTRhMDctODY4Zi1iOWM2NDEzM2ZhOTAiLCJyb2xlIjoiVVNFUiIsInR5cCI6ImFjY2VzcyIsInRva2VuX3R5cGUiOiJhY2Nlc3MiLCJpYXQiOjE3NjM4MTAyOTcsImV4cCI6MTc5NTM0NjI5NywiYXVkIjoid2ViIiwiaXNzIjoibXktYmFja2VuZC1hcGkifQ.IqcRquANqPend0843pWGqyIglxdEE6JJA5N-wLgimbc"
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
