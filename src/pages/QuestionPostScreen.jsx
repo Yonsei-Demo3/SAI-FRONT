@@ -1,9 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { createQuestion } from "../api/questionService.js";
+import { createQuestion } from "../lib/questionService.js";
 import QuestionTopBar from "../components/question/QuestionTopBar.jsx";
-const MAX_QUESTION_LEN = 100;
-const MAX_TAGS = 5;
 
+
+const MAX_QUESTION_LEN = 100;
+const MIN_PARTICIPANTS = 2;
+const MAX_PARTICIPANTS = 8;
+const MAX_TAGS = 5;
 
 function FieldLabel({ icon, children, optional = false }) {
   return (
@@ -29,48 +32,77 @@ export default function QuestionFormScreen() {
   const [desc, setDesc] = useState("");
   const [participants, setParticipants] = useState(2);
   const [startOption, setStartOption] = useState(""); 
-  const MIN_PARTICIPANTS = 2;
-  const MAX_PARTICIPANTS = 8;
+  const [tagInput, setTagInput] = useState("");
   const canDecrement = participants > MIN_PARTICIPANTS;
-  const canIncrement = participants < MAX_PARTICIPANTS;
-  
-  const canSubmit =
-    question.trim().length > 0 && startOption !== "";
+  const canIncrement = participants < MAX_PARTICIPANTS;  
+  const canSubmit = question.trim().length > 0 && startOption !== "";
 
 
-  // function onSubmit(e) {
-  //   e.preventDefault();
-  //   console.log({  question, desc, participants, tags });
-  //   alert("질문이 등록되었습니다");
-  // }
+  const parseTags = (input) =>
+    input
+      .split("#")           
+      .map((t) => t.trim()) 
+      .filter(Boolean)     
+      .map((t) => t.split(/\s+/)[0]); 
 
+
+  const handleTagChange = (e) => {
+    let value = e.target.value;
+
+    if (value.length === 1 && value !== "#" && !value.startsWith("#")) {
+      value = "#" + value;
+    }
+
+    setTagInput(value);
+  };
+
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === " ") {
+
+      const currentTags = parseTags(tagInput);
+
+      if (currentTags.length >= MAX_TAGS) {
+        e.preventDefault();
+        return;
+      }
+
+      e.preventDefault();
+
+      let next = tagInput.replace(/\s+$/g, ""); 
+
+      if (!next) {
+        setTagInput("#");
+        return;
+      }
+
+      setTagInput(next + " #");
+    }
+  };
 
 
   async function onSubmit(e) {
-
     e.preventDefault();
 
+    const tags = parseTags(tagInput);
+
     const payload = {
-      title,
-      description,
-      maxParticipants,
-      contentId,
-      tags: []
+      question: question.trim(),
+      description: desc.trim(),
+      participants: participants,
+      contentId: null,
+      tags: tags, 
+      startOption,
     };
 
     try {
       const response = await createQuestion(payload);
-
       console.log("서버 응답:", response.data);
-      alert("질문이 등록되었습니다");
-
-      // 등록 후 페이지 이동 필요하면 여기에 추가
-      // window.location.href = "/questions";
     } catch (error) {
       console.error("등록 실패:", error);
-      alert("질문 등록에 실패했습니다.");
     }
   }
+
 
 
   return (
@@ -224,6 +256,9 @@ export default function QuestionFormScreen() {
           <div className="flex flex-col items-center justify-center pl-[1.5rem] pr-[1.5rem]">
             <input
               type="text"
+              value={tagInput}
+              onChange={handleTagChange}
+              onKeyDown={handleTagKeyDown}
               placeholder="예: #사랑 #기억 #관계"
               className="w-full h-[2rem] bg-[#FFFFFF] border-[0.1rem] border-[#CCD2D8] rounded-[0.5rem] box-border p-[1rem] placeholder:text-[#CCD2D8] outline-none text-[0.8rem] font-pre placeholder:[font-family:inherit] placeholder:text-[0.8rem]"
             />
