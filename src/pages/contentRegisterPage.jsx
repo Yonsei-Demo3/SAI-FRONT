@@ -1,13 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ContentTopBar from "../components/contents/contentTopBar";
 import Dropdown from "../components/contents/dropDown";
+import { createContent } from "../lib/contentService";
 
-// 분류 옵션
 const MAJOR = ["책", "영화/TV", "기타 콘텐츠"];
 const MINOR_BY_MAJOR = {
-  "책": ["소설", "에세이", "인문", "경제"],
-  "영화/TV": ["드라마", "액션", "코미디"],
-  "기타 콘텐츠": ["다큐", "강연", "인터뷰"],
+  "책": ["소설", "인문/사회/역사", "경영/경제", "자기계발", "에세이/시", "여행", "종교/철학", "외국어", "과학", "진로/교육/교재", "컴퓨터/IT", "건강/다이어트", "가정/생활", "어린이/청소년", "잡지"],
+  "영화/TV": ["한국 예능", "한국", "외국", "아시아", "액션", "코미디", "드라마", "스포츠", "키즈/가족", "로맨스", "드라마 장르", "호러", "스릴러", "SF", "판타지", "애니메이션", "다큐멘터리", "뮤지컬"],
+  "기타 콘텐츠": ["웹툰", "웹소설", "만화", "유튜브 영상", "기타"],
 };
 
 function ReturnLabel({ text, optional = false }) {
@@ -21,23 +22,23 @@ function ReturnLabel({ text, optional = false }) {
   );
 }
 
-export default function ContentRegisterPage({ onRegister }) {
+export default function ContentRegisterPage({}) {
   
   // 선택 상태
+  const navigate = useNavigate();
   const [major, setMajor] = useState("");
   const [minor, setMinor] = useState("");
   const [contentsName, setContentsName] = useState("");
   const [creator, setCreator] = useState("");
   const [contentDesc, setContentDesc] = useState("");
   const [contentURL, setContentURL] = useState("");
+  const [preview, setPreview] = useState(null);
+  const fileRef = useRef(null);
 
   // 대분류 바뀌면 소분류 리셋
   useEffect(() => {
     setMinor("");
   }, [major]);
-
-  const [preview, setPreview] = useState(null);
-  const fileRef = useRef(null);
 
   const canSubmit =
     contentsName.trim().length > 0 && major.trim().length > 0 && minor.trim().length > 0;
@@ -45,7 +46,34 @@ export default function ContentRegisterPage({ onRegister }) {
   const handleImage = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    setPreview(URL.createObjectURL(f)); // 미리보기용 URL
+    setPreview(URL.createObjectURL(f)); 
+  };
+
+  const handleRegister = async () => {
+    
+    let imagePreview = preview;
+
+    if (preview === null) {
+      imagePreview = "https://placehold.co/300x400?font=roboto&text=SAI";
+    }
+
+    const payload = {
+      contentsName,
+      creator,
+      contentDesc,
+      imagePreview,
+      contentURL,
+      major,
+      minor
+    };
+
+    try {
+      const response = await createContent(payload);
+      console.log("콘텐츠 등록 성공:", response.data);
+      navigate(-1);
+    } catch (e) {
+      console.error("콘텐츠 등록 실패:", e.response?.data || e.message);
+    }
   };
 
   return (
@@ -173,7 +201,7 @@ export default function ContentRegisterPage({ onRegister }) {
       <div className="shrink-0 pl-[1.5rem] pr-[1.5rem] pb-[1rem] pt-[0rem] bg-white">
         <button
           type="button"
-          onClick={onRegister}              
+          onClick={handleRegister}              
           disabled={!canSubmit}           
           className={`w-full h-[2.5rem] rounded-[0.5rem] text-center transition-colors
             ${canSubmit
