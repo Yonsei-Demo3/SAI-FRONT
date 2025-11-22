@@ -1,4 +1,4 @@
-import axios from "./axios";
+import axiosInstance from "./axiosInstance";
 
 export async function createContent(payload) {
   
@@ -14,5 +14,5 @@ export async function createContent(payload) {
 
   console.log("createContent body:", body);
 
-  return axios.post("/api/v1/contents", body);  
+  return axiosInstance.post("/api/v1/contents", body);  
 }
