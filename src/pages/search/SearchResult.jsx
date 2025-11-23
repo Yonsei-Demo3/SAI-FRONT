@@ -11,11 +11,18 @@ export default function SearchResult() {
   const location = useLocation();
 
   // 전달받은 값
-  const initialQuery = location.state?.query || "";
-  const initialTags = location.state?.tags || [];
+  const initialQuery = location.state.query ?? "";
+  const initialTags = location.state.tags;
 
+  const [inputQuery, setInputQuery] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
-  const [tags, setTags] = useState(initialTags);
+  const [tags, setTags] = useState(initialTags?? []);
+
+  useEffect(() => {
+    setInputQuery(initialQuery);
+    setQuery(initialQuery);
+    setTags(initialTags ?? []);
+  }, [initialQuery, initialTags]);
 
   // 상태
   const [likeState, setLikeState] = useState({}); // { [questionId]: { liked, count } }
@@ -125,10 +132,13 @@ export default function SearchResult() {
       {/* 검색 영역 */}
       <div className="flex-1 flex flex-col overflow-hidden w-full max-w-[500px] mx-auto">
         <SearchBar
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={inputQuery}
+          onChange={(e) => setInputQuery(e.target.value)}
           tags={tags}
           onRemoveTag={handleRemoveTag}
+          onEnter={() => {
+          setQuery(inputQuery);
+        }}
         />
 
         {/* 결과 상단 */}

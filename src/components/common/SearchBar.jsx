@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchBar({
   value,
@@ -10,16 +11,20 @@ export default function SearchBar({
   onRemoveTag,
   noPadding
 }) {
+  const navigate = useNavigate();
+
   return (
     <div className={`${noPadding ? "" : "px-[1.5rem]"} w-full mt-[0.38rem] bg-white`}>
       <div className="relative flex items-center bg-[#F2F4F8] rounded-[0.75rem] min-h-[2.5rem] px-3 w-full">
 
+        <button onClick={()=> navigate("/search")}>
         {/* 🔍 검색 아이콘 */}
         <img
           src="/icons/search.svg"
           alt="검색"
           className="w-[1.5rem] h-[1.5rem] opacity-60 mr-[0.5rem]"
         />
+        </button>
 
         {/* 태그 + 입력 컨테이너 */}
         <div className="flex flex-wrap items-center gap-[0.4rem] flex-1 min-h-[2rem]">

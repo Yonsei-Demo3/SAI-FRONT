@@ -81,7 +81,7 @@ export default function MyPageChats() {
         </div>
 
       {/* 대화 리스트 */}
-      <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[6rem]">
+      <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[6rem] no-scrollbar">
         {chats.map((chat) => (
           <div
             key={chat.id}

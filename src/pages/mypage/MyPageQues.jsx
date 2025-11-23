@@ -60,7 +60,7 @@ export default function MyPageScrapScreen() {
         </div>
 
       {/* 내용 */}
-      <div className="flex-1 overflow-y-auto px-[1.5rem] pb-[7rem]">
+      <div className="flex-1 overflow-y-auto px-[1.5rem] pb-[7rem] no-scrollbar">
 
         <div className="w-full bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-6 my-[1rem] relative">
 

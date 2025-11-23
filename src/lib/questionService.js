@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-export async function searchQuestions({ keyword, tags, page = 0, size = 10, sortType = "인기순" }) {
+export async function searchQuestions({ keyword, tags=[], page = 0, size = 10, sortType = "인기순" }) {
   const sortMap = {
     인기순: "popularity",
     최신순: "createdAt,DESC",
@@ -8,20 +8,13 @@ export async function searchQuestions({ keyword, tags, page = 0, size = 10, sort
   };
 
   const body = {
-    questionSearchRequestDTO: {
       keyword,                    
       categories: tags.map((tag) => ({
         main: tag,                
         sub: tag,
       })),
       tags: tags, 
-    },
-    pageable: {
-      page,
-      size,
-      sort: [sortMap[sortType] || "popularity"],
-    },
-  };
+    };
 
   const token = localStorage.getItem("accessToken");
 

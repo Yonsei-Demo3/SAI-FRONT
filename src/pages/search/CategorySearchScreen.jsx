@@ -152,7 +152,15 @@ export default function CategorySearchScreen() {
                       className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                       onClick={() => toggleSelect(item.keyword)}
                     >
-                      <span>{i + 1} <span className="ml-[0.5rem]">{item.keyword}</span></span>
+                  <span className="w-[1.5rem] text-left">
+                    {i + 1}
+                  </span>
+
+                    <span
+                      className="max-w-[6rem] truncate inline-block"
+                    >
+                      {item.keyword}
+                    </span>
                       <span>{renderTrendIcon(item.movement)}</span>
                     </div>
                   ))}
@@ -165,7 +173,14 @@ export default function CategorySearchScreen() {
                       className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                       onClick={() => toggleSelect(item.keyword)}
                     >
-                      <span>{i + 6} <span className="ml-[0.5rem]">{item.keyword}</span></span>
+                    <span className="w-[1.5rem] text-left">
+                      {i + 6}
+                    </span>
+                      <span
+                        className="max-w-[6rem] truncate inline-block"
+                      >
+                        {item.keyword}
+                      </span>
                       <span>{renderTrendIcon(item.movement)}</span>
                     </div>
                   ))}

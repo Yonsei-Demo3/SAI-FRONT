@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getMyInfo } from "../../lib/memberService";
+import { getFriendCounts } from "../../lib/friendService";
 
 export default function MyPageNav() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [nickname, setNickname] = useState("닉네임");
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const me = await getMyInfo();
+        setNickname(me.nickname || "닉네임");
+
+        const counts = await getFriendCounts(me.userId);
+
+        setFollowerCount(
+          counts.followerCount ?? counts.FollowerCount ?? 0
+        );
+        setFollowingCount(
+          counts.followingCount ?? counts.FollowingCount ?? 0
+        );
+      } catch (e) {
+        console.error("마이페이지 정보 로드 실패:", e);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const tabs = [
     { name: "질문", path: "/mypage/ques" },
@@ -42,9 +70,9 @@ export default function MyPageNav() {
         </div>
 
         <div className="flex flex-col">
-          <p className="text-[1.25rem] font-semibold">멋쟁이 사자</p>
+          <p className="text-[1.25rem] font-semibold">{nickname}</p>
           <p className="text-[0.875rem] text-[#6B7280] mt-[0.25rem]">
-            팔로워 5 | 팔로잉 12
+            팔로워 {followerCount} | 팔로잉 {followingCount}
           </p>
         </div>
       </div>

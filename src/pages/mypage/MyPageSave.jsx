@@ -80,7 +80,7 @@ export default function MyPageScrapScreen() {
       </div>
 
       {/* 내용 */}
-      <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[7rem]">
+      <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[7rem] no-scrollbar">
 
         {/* 📌 관심 채팅 모드 */}
         {selectedTab === "관심 채팅" &&

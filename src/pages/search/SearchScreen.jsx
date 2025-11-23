@@ -11,11 +11,18 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState([]);
   const [popularSearches, setPopularSearches] = useState([]);
-    const [snapshotAt, setSnapshotAt] = useState("");
+  const [snapshotAt, setSnapshotAt] = useState("");
   const handleSearch = () => {
-    if (!query.trim()) return; // 빈 문자열이면 무시
+    if (!query.trim()) return;
     navigate("/search-result", { state: { query } });
   };
+
+  const handleSearchWithTerm = (term) => {
+    if (!term.trim()) return;
+    setQuery(term);
+    navigate("/search-result", { state: { query: term } });
+  };
+
   
   const fetchPopularSearches = async () => {
     try {      
@@ -32,6 +39,7 @@ export default function SearchScreen() {
   const fetchRecentSearches = async () => {
     try {
       const list = await recentSearch();
+      console.log("최근검색어 list:", list, list.length);
       setRecentSearches(list);
       
     } catch (error) {
@@ -112,21 +120,37 @@ export default function SearchScreen() {
           </div>
 
           <div className="flex flex-col mt-[0.75rem] gap-[1rem]">
-            {recentSearches.length === 0 ? (
-              <p className="text-[#9CA3AF] text-[0.875rem] mt-[0.25rem]">최근 검색어가 없습니다.</p>
-            ) : (
-              recentSearches.map((term, i) => (
-                <div key={i} className="flex justify-between items-center text-[0.95rem] text-[#000000]">
-                  <div className="flex items-center gap-[0.5rem]">
-                    <img src="/icons/history.svg" alt="최근" className="w-[1rem] h-[1rem]" />
-                    <span>{term}</span>
-                  </div>
-                  <button onClick={() => deleteRecent(term)} className="bg-transparent border-none outline-none">
-                    <img src="/icons/close.svg" alt="삭제" className="w-[1rem] h-[1rem] opacity-60" />
-                  </button>
-                </div>
-              ))
-            )}
+            {recentSearches.map((term, i) => (
+            <div
+              key={i}
+              className="flex justify-between items-center text-[0.95rem] text-[#000000] cursor-pointer"
+              onClick={() => handleSearchWithTerm(term)}  // ✅ 박스 전체 클릭 시 검색
+            >
+              <div className="flex items-center gap-[0.5rem]">
+                <img
+                  src="/icons/history.svg"
+                  alt="최근"
+                  className="w-[1rem] h-[1rem]"
+                />
+                <span>{term}</span>
+              </div>
+
+              <button
+                className="bg-transparent border-none outline-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteRecent(term);
+                }}
+              >
+                <img
+                  src="/icons/close.svg"
+                  alt="삭제"
+                  className="w-[1rem] h-[1rem] opacity-60"
+                />
+              </button>
+            </div>
+          ))}
+
           </div>
         </div>
 
@@ -141,7 +165,7 @@ export default function SearchScreen() {
             </p>
           </div>
 
-          <div className="flex gap-[3.5rem] mt-[0rem]">
+          <div className="flex gap-[3.5rem]">
             {/* 1~5위 */}
             <div className="flex flex-col gap-[0.75rem]">
               {popularSearches.slice(0, 5).map((item, i) => (
@@ -150,10 +174,15 @@ export default function SearchScreen() {
                   className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                   onClick={() => handleClickPopularKeyword(item.keyword)}
                 >
-                  <span>
+                  <span className="w-[1.5rem] text-left">
                     {i + 1}
-                    <span className="ml-[0.5rem]">{item.keyword}</span>
                   </span>
+                    <span
+                      className="max-w-[6rem] truncate inline-block"
+                    >
+                      {item.keyword}
+                    </span>
+
                   <span className="ml-[0.44rem]">
                     {renderTrendIcon(item.movement)}
                   </span>
@@ -169,10 +198,14 @@ export default function SearchScreen() {
                   className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                   onClick={() => handleClickPopularKeyword(item.keyword)}
                 >
-                  <span>
+                  <span className="w-[1.5rem] text-left">
                     {i + 6}
-                    <span className="ml-[0.5rem]">{item.keyword}</span>
                   </span>
+                    <span
+                      className="max-w-[6rem] truncate inline-block"
+                    >
+                      {item.keyword}
+                    </span>
                   <span className="ml-[0.44rem]">
                     {renderTrendIcon(item.movement)}
                   </span>
