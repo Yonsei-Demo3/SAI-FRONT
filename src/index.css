@@ -1,1 +1,99 @@
 @import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* Ensure form controls inherit font from body/html */
+button, select {
+  font: inherit;
+  font-family: inherit;
+}
+
+/* Pretendard 폰트 등록 */
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  src: url("/fonts/Pretendard-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  src: url("/fonts/Pretendard-Medium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  src: url("/fonts/Pretendard-Bold.otf") format("opentype");
+}
+
+/* input,
+textarea,
+select {
+  font-size: 16px !important;
+} */
+
+/* 스크롤바 숨기기 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+
+/* -------------------------------------------------- */
+/* ⭐ 팝업 애니메이션: 위 → 아래로 떨어지듯 등장 */
+/* -------------------------------------------------- */
+
+@keyframes slideDownPopup {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px); /* 위에서 시작 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);     /* 제자리 */
+  }
+}
+
+.animate-slide-down {
+  animation: slideDownPopup 0.35s ease-out;
+}
+
+.quote-box {
+  position: relative;
+  padding: 0.75rem 1rem;
+  line-height: 1.5rem;
+  text-align: center;
+  display: inline-block;
+}
+
+.quote-box::before {
+  content: "❝";
+  position: absolute;
+  left: -0.6rem;
+  top: -0.4rem;
+  font-size: 1.1rem;
+  color: rgba(0,0,0,0.45);
+}
+
+.quote-box::after {
+  content: "❞";
+  position: absolute;
+  right: -0.6rem;
+  bottom: -0.4rem;
+  font-size: 1.1rem;
+  color: rgba(0,0,0,0.45);
+}
