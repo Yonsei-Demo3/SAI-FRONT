@@ -1,11 +1,11 @@
 import React from "react";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import ContentSearchResultPage from "./pages/contentSearchResultPage";
-import ContentSearchPage from "./pages/contentSearchPage";
-import ContentRegisterPage from "./pages/contentRegisterPage"
-import ChatListPage from "./pages/ChatListPage";
-import ChatPage from "./pages/ChatPage";
+import ContentSearchResultPage from "./pages/content/contentSearchResultPage";
+import ContentSearchPage from "./pages/content/contentSearchPage";
+import ContentRegisterPage from "./pages/content/contentRegisterPage"
+import ChatListPage from "./pages/chat/ChatListPage";
+import ChatPage from "./pages/chat/ChatPage";
 import LoginScreen from "./pages/LoginScreen";
 import SignupScreen from "./pages/SignupScreen";
 import MainScreen from "./pages/main/MainScreen";
@@ -16,7 +16,7 @@ import SearchResult from "./pages/search/SearchResult";
 import CategorySearchScreen from "./pages/search/CategorySearchScreen";
 import Notification from "./components/Notification";
 import { NotificationProvider } from "./components/NotificationContext";
-import QuestionPostScreen from "./pages/QuestionPostScreen";
+import QuestionPostScreen from "./pages/question/QuestionPostScreen";
 import MyPageQues from "./pages/mypage/MyPageQues";
 import MyPageChats from "./pages/mypage/MyPageChats";
 import MyPageSave from "./pages/mypage/MyPageSave";

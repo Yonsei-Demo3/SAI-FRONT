@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
-import QuestionTopBar from "../components/question/QuestionTopBar.jsx";
+
+import QuestionTopBar from "../../components/question/QuestionTopBar";
+
 const MAX_QUESTION_LEN = 100;
 const MAX_TAGS = 5;
 

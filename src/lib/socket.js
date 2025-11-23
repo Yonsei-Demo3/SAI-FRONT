@@ -21,7 +21,6 @@ export function initSocket() {
         }
     });
 
-
     socket.on("connect", () => {
         console.log("[socket] connected:", socket.id);
     });
@@ -52,11 +51,11 @@ export function getChatSocket({id}) {
 
     console.log("[socket] join room:", id);
 
+    socket.emit("join room", {"roomId": id});
+    
     socket.on("chat message", (data) => {
         console.log("Received chat message:", data);
     });
-
-    socket.emit("join room", {"roomId": id});
 
     socket.emit("chat message", (data) => {
         console.log("Send chat message:", data);

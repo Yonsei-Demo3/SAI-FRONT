@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BottomNav from "../components/main/BottomNav";
-import ChatListTopBar from "../components/chat/ChatListTopBar";
-import { getChatList } from "../lib/chatService";
+import BottomNav from "../../components/main/BottomNav";
+import ChatListTopBar from "../../components/chat/ChatListTopBar";
+import { getChatList } from "../../lib/chatService";
 
 const API_RESPONSES = {
   prepare: [
@@ -100,7 +100,7 @@ export default function ChatListPage() {
 
         const participateList = response.data.map((q, index) => ({
           id: q.id,
-          // roomId: q.roomId,                 
+          roomId: q.roomId,                 
           title: q.questionTitle,           
           currentParticipant: 3,  // 임시값
           maxParticipant: 4, // 이것도 임시값
@@ -132,7 +132,12 @@ export default function ChatListPage() {
         {chatLists[tab].map((item) => (
           <div
             key={item.id}  
-            onClick={()=>navigate("/chat")}
+            onClick={()=>navigate("/chat", {
+              state: { 
+                questionId: item.id,
+                roomId: item.roomId 
+              }
+            })}
             className="text-left"
           >
             <div

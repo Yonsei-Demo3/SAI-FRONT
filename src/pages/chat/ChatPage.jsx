@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import ChatTopBar from "../components/chat/ChatTopBar";
-import ChatBubble from "../components/chat/ChatBubble";
-import ChatInput from "../components/chat/ChatInput";
-import { getSocket, disconnectSocket, getChatSocket } from "../lib/socket";
+import ChatTopBar from "../../components/chat/ChatTopBar";
+import ChatBubble from "../../components/chat/ChatBubble";
+import ChatInput from "../../components/chat/ChatInput";
+import { getSocket, disconnectSocket, getChatSocket } from "../../lib/socket";
 
 // Helpers
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -74,6 +74,9 @@ const apiResponse = {
 export default function ChatPage() {
 
   const socketRef = useRef(null);
+
+  const roomId = location.state?.roomId;   
+  const questionId = location.state?.questionId;
   
   const [messages, setMessages] = useState(apiResponse.seed);
   const [side, setSide] = useState("right");
