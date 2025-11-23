@@ -7,8 +7,6 @@ import ContentRegisterPage from "./pages/contentRegisterPage"
 import ChatListPage from "./pages/ChatListPage";
 import ChatPage from "./pages/ChatPage";
 import LoginScreen from "./pages/LoginScreen";
-import KaKaoLoginPage from './pages/KaKaoLoginPage';
-import MainPage from './pages/MainPage';
 import SignupScreen from "./pages/SignupScreen";
 import MainScreen from "./pages/main/MainScreen";
 import MainNewQues from "./pages/main/MainNewQues";
@@ -42,10 +40,6 @@ export default function App() {
               {/* 기본 경로로 들어오면 /login으로 자동 이동 */}
               <Route path="/" element={<Navigate to="/login" replace />} /> 
               <Route path="/login" element={<LoginScreen />} /> 
-
-
-              <Route path="/kakao-login" element={<KaKaoLoginPage />} />
-
               <Route path="/signup" element={<SignupScreen />} />
               <Route path="/main" element={<MainScreen />} />
               <Route path="/main/new" element={<MainNewQues />} />
