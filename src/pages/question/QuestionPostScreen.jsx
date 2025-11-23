@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { createQuestion } from "../lib/questionService.js";
-import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { createQuestion } from "../../lib/questionService";
 import QuestionTopBar from "../../components/question/QuestionTopBar";
 
 const MAX_QUESTION_LEN = 100;

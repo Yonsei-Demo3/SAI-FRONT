@@ -7,7 +7,7 @@ import { image } from "d3";
 // 빈 응답일 때 보여줄 기본 데이터
 const SAMPLE = {
   id: 1,
-  title: "이",
+  title: "샘플 제목입니다",
   category: "대분류 / 소분류",
   imageUrl:
     "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
@@ -33,6 +33,7 @@ export default function ContentSearchPage({
   const [searchDelete, setSearchDelete] = useState(false);
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState(null);
+  const canSubmit = selectedItem !== null;
 
   const handleDeleteItem = (id) => {
     setResults((prev) => prev.filter((item) => item.id !== id));
@@ -68,10 +69,10 @@ export default function ContentSearchPage({
       <div className="flex flex-col items-center justify-center pt-[1rem] pb-[1.5rem] pl-[1.5rem] pr-[1.5rem]">
         <form 
           className = "relative w-full"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSearch();
-          }}
+          // onSubmit={(e) => {
+          //   e.preventDefault();
+          //   handleSearch();
+          // }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -150,30 +151,7 @@ export default function ContentSearchPage({
                   </button>
                 )}
 
-                {!searchDelete && (
-                  // <button
-                  //   type="button"
-                  //   onClick={() => setSelectedItem(item.id)} 
-                  //   className="ml-2"
-                  // >  
-
-                  // </button>
-
-                  <button
-                    type="button"
-                    onClick={onSubmit}
-                    disabled={!canSubmit}   
-                    className={`h-[2rem] w-[3.5625rem] border-none rounded-[0.5rem] text-center transition-colors
-                      ${canSubmit
-                        ? "bg-[#FA502E] cursor-pointer"
-                        : "bg-[#CCD2D8] cursor-not-allowed"
-                      }`}
-                  >
-                    <span className="text-[#FFFFFF] text-[0.875rem] font-medium">
-                      등록
-                    </span>
-                  </button>
-                )}
+              
               </li>
             ))}
           </ul>
