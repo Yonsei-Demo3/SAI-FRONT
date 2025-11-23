@@ -25,6 +25,7 @@ import ConversationDetailScreen from "./pages/mypage/ConversationDetailScreen";
 import DetailScreen from "./pages/search/DetailScreen";
 import FriendsScreen from "./pages/setting/FriendScreen";
 import SettingScreen from "./pages/setting/settingScreen";
+import ProfileEditScreen from "./pages/mypage/ProfileEditScreen";
 
 export default function App() {
   
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="/mypage/chats" element={<MyPageChats />} />
               <Route path="/mypage/save" element={<MyPageSave />} />
               <Route path="/mypage/scrap" element={<MyPageScrap />} />
+              <Route path="/mypage/profile/edit" element={<ProfileEditScreen />} />
               <Route path="mypage/chat/:id" element={<ConversationDetailScreen />} />
               <Route path="/settings" element={<SettingScreen />} />
               <Route path="/settings/friends" element={<FriendsScreen />} />
