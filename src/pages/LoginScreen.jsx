@@ -108,12 +108,12 @@ export default function LoginScreen() {
       </div>
 
       {/* 하단 링크 */}
-      <div className="flex items-center justify-end gap-[0.375rem] mt-[0.5rem] text-[0.875rem] text-gray-500 w-full pr-[2.5rem]">
+      <div className="flex items-center justify-end gap-[0.375rem] mt-[0.5rem] text-[0.875rem] text-[#B5BBC1] w-full pr-[2.5rem]">
         <a href="/signup" className="hover:text-[#FA502E] no-underline">
           회원가입
         </a>
         <span className="text-[#B5BBC1]">|</span>
-        <a href="/find-id-pw" className="hover:text-[#FA502E] no-underline">
+        <a href="/find-id-pw" className=" text-[#B5BBC1] hover:text-[#FA502E] no-underline">
           ID/PW 찾기
         </a>
       </div>

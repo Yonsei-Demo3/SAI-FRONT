@@ -62,11 +62,17 @@ export default function MyPageNav() {
             alt="프로필"
             className="w-[4.5rem] h-[4.5rem] rounded-full"
           />
+          <button
+            type="button"
+            onClick={() => navigate("/mypage/profile/edit")}
+            className="absolute bottom-0 right-0 bg-transparent border-none outline-none"
+          >
           <img
             src="/icons/edit.svg"
             alt="편집"
-            className="absolute bottom-0 right-0 w-[1.4rem] h-[1.4rem]"
+            className="w-[1.4rem] h-[1.4rem]"
           />
+          </button>
         </div>
 
         <div className="flex flex-col">
