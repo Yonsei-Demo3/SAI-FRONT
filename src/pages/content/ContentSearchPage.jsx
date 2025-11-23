@@ -69,10 +69,10 @@ export default function ContentSearchPage({
       <div className="flex flex-col items-center justify-center pt-[1rem] pb-[1.5rem] pl-[1.5rem] pr-[1.5rem]">
         <form 
           className = "relative w-full"
-          // onSubmit={(e) => {
-          //   e.preventDefault();
-          //   handleSearch();
-          // }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
