@@ -21,7 +21,6 @@ export default function SearchResult() {
 
     const tabs = [
     { name: "NOW", path: "/main" },
-    { name: "추천 질문", path: "/main/sug" },
     { name: "최신 질문", path: "/main/new" },
     { name: "인기 질문", path: "/main/pop" },
   ];
@@ -80,7 +79,7 @@ export default function SearchResult() {
       <Navbar />
 
               {/* 🔶 탭 메뉴 */}
-        <div className="flex justify-center w-full bg-white gap-x-[2.25rem]">
+        <div className="flex justify-start px-[1.5rem] w-full bg-white gap-x-[2.25rem]">
           {tabs.map((tab) => {
             const active = location.pathname === tab.path;
 

@@ -3,23 +3,34 @@ import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../../components/common/SearchBar";
-import axios from "axios";
+import { popular } from "../../lib/searchService";
+
 
 export default function CategorySearchScreen() {
   const [selected, setSelected] = useState([]); // 선택된 카테고리 저장
   const [showPopular, setShowPopular] = useState(false); // 인기 검색어 표시 여부
   const [popularKeywords, setPopularKeywords] = useState([]); // 인기 검색어 상태
   const navigate = useNavigate();
+  const [snapshotAt, setSnapshotAt] = useState("");
+
 
   useEffect(() => {
-    axios.get("http://3.36.131.35:8080/api/v1/search/popular")
-      .then(response => {
-        setPopularKeywords(response.data); // 인기 검색어 상태 업데이트
-      })
-      .catch(error => {
-        console.error("Error fetching popular keywords:", error);
-      });
+    fetchPopularSearches();
   }, []);
+
+  const fetchPopularSearches = async () => {
+    try {      
+      const list = await popular();
+      console.log("응답", list);
+    
+      setPopularKeywords(list); 
+      if (list.length > 0) {
+      setSnapshotAt(list[0].snapshotAt);
+    }
+    } catch (error) {
+      console.error("Error fetching popular searches:", error);
+    }
+  };
 
   const categories = {
     도서: [
@@ -27,15 +38,15 @@ export default function CategorySearchScreen() {
       "여행", "종교", "외국어", "과학", "진로/교육/교재",
       "컴퓨터/IT", "건강/다이어트", "가정/생활", "어린이/청소년", "잡지",
     ],
-    "영화/TV": [
-      "로맨스 웹소설", "로판 웹소설", "판타지 웹소설", "만화 연재", "웹툰",
-      "여행", "종교", "외국어", "과학", "진로/교육/교재",
-      "컴퓨터/IT", "건강/다이어트", "가정/생활", "어린이/청소년", "잡지",
-    ],
     "웹툰/만화/웹소설": [
       "로맨스 웹소설", "로판 웹소설", "판타지 웹소설", "만화 연재", "웹툰",
-      "종교", "외국어", "과학", "진로/교육/교재",
-      "컴퓨터/IT", "건강/다이어트", "가정/생활", "어린이/청소년", "잡지",
+    ],
+    "영화/TV": [
+      "한국 예능", "한국", "외국", "아시아",
+      "액션", "코미디", "스포츠", "키즈&가족",
+      "로맨스", "드라마 장르", "호러", "스릴러",
+      "SF", "판타지", "애니메이션", "다큐멘터리",
+      "뮤지컬"
     ],
   };
 
@@ -49,21 +60,40 @@ export default function CategorySearchScreen() {
 
   const toggleSelect = (item) => {
     if (selected.includes(item)) {
-      setSelected(selected.filter((v) => v !== item)); // 선택 취소
+      setSelected(selected.filter((v) => v !== item));
     } else if (selected.length < 20) {
-      setSelected([...selected, item]); // 선택
+      setSelected([...selected, item]);
     }
   };
 
-  const resetSelection = () => setSelected([]); // 선택 초기화
+  const resetSelection = () => setSelected([]);
 
-  const renderTrendIcon = (trend) => {
-    if (trend === "up")
-      return <img src="/icons/trend-up.svg" alt="상승" className="w-[0.5rem] h-[0.5rem] ml-[0.44rem]" />;
-    if (trend === "down")
-      return <img src="/icons/trend-down.svg" alt="하락" className="w-[0.5rem] h-[0.5rem] ml-[0.44rem]" />;
-    return <img src="/icons/trend-same.svg" alt="변동없음" className="w-[0.5rem] h-[0.5rem] ml-[0.44rem]" />;
+  const renderTrendIcon = (movement) => {
+    if (movement === "UP")
+      return (
+        <img
+          src="/icons/trend-up.svg"
+          alt="상승"
+          className="w-[0.5rem] h-[0.5rem] ml-[0.44rem]"
+        />
+      );
+    if (movement === "DOWN")
+      return (
+        <img
+          src="/icons/trend-down.svg"
+          alt="하락"
+          className="w-[0.5rem] h-[0.5rem] ml-[0.44rem]"
+        />
+      );
+    return (
+      <img
+        src="/icons/trend-same.svg"
+        alt="변동없음"
+        className="w-[0.5rem] h-[0.5rem] ml-[0.44rem]"
+      />
+    );
   };
+
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
@@ -77,8 +107,9 @@ export default function CategorySearchScreen() {
             <div className="flex justify-between items-center mb-2">
               {popularKeywords.length > 0 && (
                 <p className="text-[1rem] font-refular flex items-center">
-                  1 {popularKeywords[0].keyword}
-                  <img src="/icons/trend-up.svg" alt="상승" className="w-[0.5rem] h-[0.5rem] ml-[0.43rem]" />
+                  1
+                  <span className="ml-[0.5rem]">{popularKeywords[0].keyword}</span>
+                  {renderTrendIcon(popularKeywords[0].movement)}
                 </p>
               )}
               <button
@@ -98,7 +129,7 @@ export default function CategorySearchScreen() {
                 <p className="text-[1rem] font-bold text-[#000000]">
                   인기 검색어{" "}
                   <span className="text-[#B5BBC1] text-[0.75rem] font-normal ml-[0.25rem]">
-                    2025.10.10 12:00 기준
+                    {snapshotAt} 기준
                   </span>
                 </p>
                 <button
@@ -121,7 +152,15 @@ export default function CategorySearchScreen() {
                       className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                       onClick={() => toggleSelect(item.keyword)}
                     >
-                      <span>{i + 1} <span className="ml-[0.5rem]">{item.keyword}</span></span>
+                  <span className="w-[1.5rem] text-left">
+                    {i + 1}
+                  </span>
+
+                    <span
+                      className="max-w-[6rem] truncate inline-block"
+                    >
+                      {item.keyword}
+                    </span>
                       <span>{renderTrendIcon(item.movement)}</span>
                     </div>
                   ))}
@@ -134,7 +173,14 @@ export default function CategorySearchScreen() {
                       className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                       onClick={() => toggleSelect(item.keyword)}
                     >
-                      <span>{i + 6} <span className="ml-[0.5rem]">{item.keyword}</span></span>
+                    <span className="w-[1.5rem] text-left">
+                      {i + 6}
+                    </span>
+                      <span
+                        className="max-w-[6rem] truncate inline-block"
+                      >
+                        {item.keyword}
+                      </span>
                       <span>{renderTrendIcon(item.movement)}</span>
                     </div>
                   ))}
@@ -152,7 +198,7 @@ export default function CategorySearchScreen() {
         </div>
         <div className="w-full h-[0.00625rem] mt-[-0.75rem] bg-[#CCD2D8]"></div>
         <div
-          className="overflow-y-auto flex-1 w-full max-w-[500px] mx-auto pl-[1.5rem] pr-6 pb-[10rem] scrollbar-hide relative z-0"
+          className="overflow-y-auto flex-1 w-full max-w-[500px] mx-auto pl-[1.5rem] pr-6 pb-[15rem] scrollbar-hide relative z-0"
           style={{
             msOverflowStyle: "none",
             scrollbarWidth: "none",

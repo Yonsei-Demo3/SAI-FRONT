@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import { useNavigate } from "react-router-dom";
+import MyPageNav from "../../components/mypage/MyPageNav";
 
 export default function MyPageChats() {
   const navigate = useNavigate();
   const [sortOpen, setSortOpen] = useState(false);
+  const [sortType, setSortType] = useState("최신순");
 
   const chats = [
     {
@@ -28,41 +30,58 @@ export default function MyPageChats() {
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
+      <MyPageNav/>
 
-      {/* 페이지 타이틀 */}
-      <div className="px-[1.5rem] mt-[1.25rem] flex items-center">
-        <button
-          className="mr-2"
-          onClick={() => navigate("/mypage")}
-        >
-          <img src="/icons/arrow-left.svg" className="w-[0.5369rem] h-[0.9281rem]" alt="뒤로" />
-        </button>
-        <p className="text-[1.25rem] font-bold ml-1">아카이브</p>
-      </div>
+    <div className="flex justify-end items-center pr-[1.5rem]">
 
-      {/* 상단 탭 */}
-      <div className="flex justify-start ml-[1.5rem] gap-[2.25rem] mt-[1.5rem] text-[1.125rem] font-semibold">
-        <button className="font-semibold text-[#FA502E] border-b-2 border-[#FA502E] pb-1">
-          대화
-        </button>
-        <button onClick={() => navigate("/mypage/scrap")}>스크랩</button>
-      </div>
+      <div className="relative text-[0.75rem]">
+            <button
+              className="text-[#6B7280] text-xs flex items-center"
+              onClick={() => setSortOpen(!sortOpen)}
+            >
+              {sortType}
+              <img
+                src="/icons/arrow-down.svg"
+                className="w-[1rem] h-[1rem] ml-[0.25rem]"
+              />
+            </button>
 
-      {/* 전체 갯수 + 정렬 버튼 */}
-      <div className="px-[1.5rem] mt-[1.25rem] flex justify-between items-center">
-        <p className="text-[1.125rem] font-semibold">전체 13</p>
-
-        <button
-          onClick={() => setSortOpen(true)}
-          className="flex items-center text-[1rem] text-[#6B7280]"
-        >
-          <img src="/icons/filter.svg" className="w-[1.3125rem] h-[1.3125rem] mr-[0.25rem]" />
-          최근 대화 순
-        </button>
-      </div>
+            {sortOpen && (
+              <div className="absolute right-0 mt-2 w-[6rem] bg-white rounded-xl shadow-lg z-50">
+                <button
+                  className="w-full text-left px-3 py-2 text-xs text-[#B5BBC1]"
+                  onClick={() => {
+                    setSortType("가나다순");
+                    setSortOpen(false);
+                  }}
+                >
+                  가나다순
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-xs text-[#B5BBC1]"
+                  onClick={() => {
+                    setSortType("인기순");
+                    setSortOpen(false);
+                  }}
+                >
+                  인기순
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-xs text-[#B5BBC1]"
+                  onClick={() => {
+                    setSortType("최신순");
+                    setSortOpen(false);
+                  }}
+                >
+                  최신순
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
       {/* 대화 리스트 */}
-      <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[6rem]">
+      <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[6rem] no-scrollbar">
         {chats.map((chat) => (
           <div
             key={chat.id}
@@ -89,58 +108,8 @@ export default function MyPageChats() {
         ))}
       </div>
 
-      {/* BottomNav (정렬 켜지면 숨김) */}
-      {!sortOpen && <BottomNav />}
+      <BottomNav/>
 
-      {/* 정렬 바텀시트 */}
-      {sortOpen && (
-        <div className="fixed inset-0 z-[60] flex flex-col justify-end">
-          {/* 흐릿한 회색 딤 */}
-          <div
-            className="absolute inset-0 bg-black/10"
-            onClick={() => setSortOpen(false)}
-          />
-
-          {/* 모달 박스 */}
-          <div className="relative bg-white rounded-t-[1.5rem] w-full max-w-[500px] mx-auto p-6 z-[70]">
-
-            {/* 손잡이 */}
-            <div className="flex justify-center mb-4">
-              <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-            </div>
-
-            <p className="text-center text-[1.25rem] font-bold mb-6">정렬</p>
-
-            {/* 옵션들 */}
-            <div className="grid grid-cols-2 gap-3">
-              <button className="p-3 border border-[#FA502E] bg-[#FFF2EE] rounded-lg text-[#FA502E] font-medium">
-                최근 대화 순
-              </button>
-
-              <button className="p-3 bg-[#F2F4F8] rounded-lg">오래된 대화 순</button>
-
-              <button className="p-3 bg-[#F2F4F8] rounded-lg">저장한 대화 많은 순</button>
-
-              <button className="p-3 bg-[#F2F4F8] rounded-lg">함께한 질문 많은 순</button>
-            </div>
-
-            {/* 적용/취소 버튼 */}
-            <div className="flex mt-6">
-              <button
-                onClick={() => setSortOpen(false)}
-                className="flex-1 py-3 bg-[#F2F4F8] text-[#000] rounded-l-lg"
-              >
-                취소
-              </button>
-
-              <button className="flex-1 py-3 bg-[#FA502E] text-white rounded-r-lg">
-                적용하기
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
     </div>
   );
 }

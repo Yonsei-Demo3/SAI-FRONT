@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/main/BottomNav";
 import MyPageNav from "../../components/mypage/MyPageNav";
 
 export default function MyPageScrapScreen() {
+  const navigate = useNavigate();
 
   const [selectedTab, setSelectedTab] = useState("관심 채팅");
   const [sortOpen, setSortOpen] = useState(false);
