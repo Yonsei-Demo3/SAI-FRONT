@@ -50,6 +50,8 @@ export function getChatSocket({id}) {
 
     const socket = getSocket();
 
+    console.log("[socket] join room:", id);
+
     socket.on("chat message", (data) => {
         console.log("Received chat message:", data);
     });

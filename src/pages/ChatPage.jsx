@@ -142,6 +142,7 @@ export default function ChatPage() {
     socketRef.current = socket;     
 
     const handleChatMessage = (data) => {
+      
       console.log("Received chat message:", data);
       const { from, message, room } = data;
 
@@ -159,9 +160,10 @@ export default function ChatPage() {
     
     socket.on("chat message", handleChatMessage);
 
-    return () => {
-      socket.off("chat message", handleChatMessage);
-    };
+    // return () => {
+    //   socket.off("chat message", handleChatMessage);
+    //   console.log("ChatPage unmounted, socket listeners removed.");
+    // };
   }, []);
 
   const handleSend = (content, s, type) => {
@@ -189,16 +191,24 @@ export default function ChatPage() {
         },
       ]);
     } else {
-            setMessages((prev) => [
-        ...prev,
-        {
+
+        const newMsg = {
           id: uid(),
-          text: content,        // 텍스트 메시지
+          text: content,
           type: "text",
           side: s,
           time: nowKo(),
-        },
-      ]);
+        };
+        
+        setMessages((prev) => [...prev, newMsg]);
+
+        // // 소켓으로 메시지 전송
+        // if (socketRef.current) {
+        //   socketRef.current.emit("chat message", {
+        //     "roomId" : 1,                 
+        //     "message" : content,
+        //   });
+        // }
     }
   };
 
