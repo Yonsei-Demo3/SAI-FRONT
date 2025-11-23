@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { createQuestion } from "../lib/questionService.js";
 import QuestionTopBar from "../components/question/QuestionTopBar.jsx";
 
-
 const MAX_QUESTION_LEN = 100;
 const MIN_PARTICIPANTS = 2;
 const MAX_PARTICIPANTS = 8;

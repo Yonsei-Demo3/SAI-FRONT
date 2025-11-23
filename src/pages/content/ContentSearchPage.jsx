@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ContentTopBar from "../components/contents/contentTopBar";
+import ContentTopBar from "../../components/contents/contentTopBar";
 
 
 // 빈 응답일 때 보여줄 기본 데이터

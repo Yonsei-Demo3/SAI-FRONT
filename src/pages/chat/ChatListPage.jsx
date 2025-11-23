@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import ContentTopBar from "../components/contents/contentTopBar";
-import BottomNav from "../components/main/BottomNav";
-import ChatListTopBar from "../components/chat/ChatListTopBar";
+import ContentTopBar from "../../components/contents/contentTopBar";
+import BottomNav from "../../components/main/BottomNav";
+import ChatListTopBar from "../../components/chat/ChatListTopBar";
 
 const API_RESPONSES = {
   prepare: [

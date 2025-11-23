@@ -1,13 +1,13 @@
 import React from "react";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import ContentSearchResultPage from "./pages/contentSearchResultPage";
-import ContentSearchPage from "./pages/contentSearchPage";
-import ContentRegisterPage from "./pages/contentRegisterPage"
-import ChatListPage from "./pages/ChatListPage";
-import ChatPage from "./pages/ChatPage";
-import LoginScreen from "./pages/LoginScreen";
-import SignupScreen from "./pages/SignupScreen";
+import ContentSearchResultPage from "./pages/content/ContentSearchResultPage";
+import ContentSearchPage from "./pages/content/ContentSearchPage";
+import ContentRegisterPage from "./pages/content/ContentRegisterPage"
+import ChatListPage from "./pages/chat/ChatListPage";
+import ChatPage from "./pages/chat/ChatPage";
+import LoginScreen from "./pages/login/LoginScreen";
+import SignupScreen from "./pages/login/SignupScreen";
 import MainScreen from "./pages/main/MainScreen";
 import MainNewQues from "./pages/main/MainNewQues";
 import MainPopQues from "./pages/main/MainPopQues";
@@ -16,7 +16,7 @@ import SearchResult from "./pages/search/SearchResult";
 import CategorySearchScreen from "./pages/search/CategorySearchScreen";
 import Notification from "./components/Notification";
 import { NotificationProvider } from "./components/NotificationContext";
-import QuestionPostScreen from "./pages/QuestionPostScreen";
+import QuestionPostScreen from "./pages/question/QuestionPostScreen";
 import MyPageQues from "./pages/mypage/MyPageQues";
 import MyPageChats from "./pages/mypage/MyPageChats";
 import MyPageSave from "./pages/mypage/MyPageSave";
@@ -24,7 +24,8 @@ import MyPageScrap from "./pages/mypage/MyPageScrap";
 import ConversationDetailScreen from "./pages/mypage/ConversationDetailScreen";
 import DetailScreen from "./pages/search/DetailScreen";
 import FriendsScreen from "./pages/setting/FriendScreen";
-import SettingScreen from "./pages/setting/settingScreen";
+import SettingScreen from "./pages/setting/SettingScreen";
+import ProfileEditScreen from "./pages/mypage/ProfileEditScreen";
 
 export default function App() {
   
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="/mypage/chats" element={<MyPageChats />} />
               <Route path="/mypage/save" element={<MyPageSave />} />
               <Route path="/mypage/scrap" element={<MyPageScrap />} />
+              <Route path="/mypage/profile/edit" element={<ProfileEditScreen />} />
               <Route path="mypage/chat/:id" element={<ConversationDetailScreen />} />
               <Route path="/settings" element={<SettingScreen />} />
               <Route path="/settings/friends" element={<FriendsScreen />} />

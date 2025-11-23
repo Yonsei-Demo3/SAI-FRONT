@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import ChatTopBar from "../components/chat/ChatTopBar";
-import ChatBubble from "../components/chat/ChatBubble";
-import ChatInput from "../components/chat/ChatInput";
-import { createSocket } from "../lib/socket";
+import ChatTopBar from "../../components/chat/ChatTopBar";
+import ChatBubble from "../../components/chat/ChatBubble";
+import ChatInput from "../../components/chat/ChatInput";
+import { createSocket } from "../../lib/socket";
 
 // Helpers
 const uid = () => Math.random().toString(36).slice(2, 10);

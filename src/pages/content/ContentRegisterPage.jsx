@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ContentTopBar from "../components/contents/contentTopBar";
-import Dropdown from "../components/contents/dropDown";
-import { createContent } from "../lib/contentService";
+import ContentTopBar from "../../components/contents/contentTopBar";
+import Dropdown from "../../components/contents/dropDown";
+import { createContent } from "../../lib/contentService";
 
 const MAJOR = ["책", "영화/TV", "기타 콘텐츠"];
 const MINOR_BY_MAJOR = {

@@ -47,3 +47,11 @@ export async function getQuestionDetail(questionId) {
   const res = await axiosInstance.get(`/api/v1/questions/${questionId}`);
   return res.data;
 }
+<<<<<<< HEAD
+=======
+
+export async function participateQuestion(questionId) {
+  const res = await axiosInstance.post(`/api/v1/questions/${questionId}`);
+  return res.data;
+}
+>>>>>>> dev
