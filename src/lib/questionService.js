@@ -30,3 +30,8 @@ export async function getQuestionDetail(questionId) {
   const res = await axiosInstance.get(`/api/v1/questions/${questionId}`);
   return res.data;
 }
+
+export async function participateQuestion(questionId) {
+  const res = await axiosInstance.post(`/api/v1/questions/${questionId}`);
+  return res.data;
+}
