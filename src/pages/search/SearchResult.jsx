@@ -238,7 +238,7 @@ export default function SearchResult() {
               <div
                 key={item.questionId}
                 className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
-                onClick={() => navigate("/detail", { state: { questionId: item.questionId, } })}
+                onClick={() => navigate("/detail", { state: { questionId: item.questionId, item, }, })}
               >
                 <img
                   src="/icons/quote.svg"
