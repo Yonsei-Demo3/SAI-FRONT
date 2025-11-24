@@ -148,7 +148,7 @@ export default function LoginScreen() {
           onClick={handleSubmit} // 로그인 버튼 클릭 시 handleSubmit 호출
           className="h-[3.25rem] bg-[#FA502E] text-[#FFFFFF] text-[1rem] leading-[2.25rem] rounded-[0.5rem] px-[1rem] py-[0.5rem] mt-[0.5rem] hover:opacity-90 focus:outline-none focus:ring-none border-none"
         >
-          <span className="font-bold">
+          <span>
             로그인
           </span>
         </button>

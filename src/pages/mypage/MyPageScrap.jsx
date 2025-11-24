@@ -226,6 +226,14 @@ export default function MyPageScrapScreen() {
           ))}
       </div>
 
+      <button
+        className="fixed bottom-[5.5rem] right-[1.5rem] w-[7rem] h-[2.75rem] bg-[#FA502E] text-[#FFFFFF] rounded-[1.5rem] text-[0.875rem] font-medium shadow-md flex items-center justify-center gap-[0.5rem] z-50 border-none outline-none"
+        onClick={() => navigate("/question")}
+      >
+        <img src="/icons/question.svg" alt="질문" className="w-[1rem] h-[1rem]" />
+        질문하기
+      </button>
+
       <BottomNav />
 
       {/* 📌 정렬 바텀시트 */}
