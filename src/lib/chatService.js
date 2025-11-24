@@ -12,5 +12,5 @@ export async function readyChat(questionId) {
 }
 
 export async function quitChat(questionId) {
-  return axiosInstance.delete(`/api/v1/questions/${questionId}`);  
+  return axiosInstance.delete(`/api/v1/questions/cancel/${questionId}`);  
 }
