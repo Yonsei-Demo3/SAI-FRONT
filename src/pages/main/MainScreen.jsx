@@ -2,7 +2,7 @@ import Navbar from "../../components/main/Navbar.jsx";
 import BottomNav from "../../components/main/BottomNav.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { searchQuestions } from "../../lib/questionService";
+import { searchQuestions, participateQuestion } from "../../lib/questionService";
 import {
   getLikeStatus,
   likeQuestion,
@@ -33,9 +33,7 @@ export default function MainScreen() {
     { name: "인기 질문", path: "/main/pop" },
   ];
 
-  // =========================
-  //  질문 목록 불러오기
-  // =========================
+
   useEffect(() => {
     const fetchPopular = async () => {
       setLoading((prev) => ({ ...prev, popular: true }));
@@ -128,9 +126,7 @@ export default function MainScreen() {
     fetchLatest();
   }, []);
 
-  // =========================
-  //  좋아요 토글
-  // =========================
+
   const toggleLike = async (questionId) => {
     let currentLiked = false;
 
@@ -198,15 +194,24 @@ export default function MainScreen() {
     }
   };
 
-  // =========================
-  //  참여하기 토글 + 팝업
-  // =========================
-  const toggleParticipate = (questionId) => {
-    const now = !participate[questionId];
-    setParticipate((prev) => ({ ...prev, [questionId]: now }));
 
-    setPopup(now ? "participate" : "cancel");
-    setTimeout(() => setPopup(null), 2000);
+  const toggleParticipate = async (questionId) => {
+    const now = !participate[questionId];
+    try {
+      if (now) {
+        const res = await participateQuestion(questionId);
+        console.log("참여 성공:", res);
+      } else {
+        await cancelParticipateQuestion(questionId);
+      }
+      setParticipate((prev) => ({ ...prev, [questionId]: now }));
+      setPopup(now ? "participate" : "cancel");
+      setTimeout(() => setPopup(null), 2000);
+    } catch (e) {
+      console.error("참여 API 실패", e);
+      setPopup("error");
+      setTimeout(() => setPopup(null), 2000);
+    }
   };
 
 

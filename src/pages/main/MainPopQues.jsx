@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import { useNavigate, useLocation } from "react-router-dom";
-import { searchQuestions } from "../../lib/questionService";
+import { searchQuestions, participateQuestion } from "../../lib/questionService";
 import {
   getLikeStatus,
   likeQuestion,
@@ -127,15 +127,24 @@ export default function SearchResult() {
     }
   };
 
-  // ✨ 참여하기 토글 + 팝업 (지금은 프론트 상태만)
-  const toggleParticipate = (questionId) => {
-    const now = !participate[questionId];
-    setParticipate((prev) => ({ ...prev, [questionId]: now }));
-
-    setPopup(now ? "participate" : "cancel");
-
-    setTimeout(() => setPopup(null), 2000);
-  };
+    const toggleParticipate = async (questionId) => {
+      const now = !participate[questionId];
+      try {
+        if (now) {
+          const res = await participateQuestion(questionId);
+          console.log("참여 성공:", res);
+        } else {
+          await cancelParticipateQuestion(questionId);
+        }
+        setParticipate((prev) => ({ ...prev, [questionId]: now }));
+        setPopup(now ? "participate" : "cancel");
+        setTimeout(() => setPopup(null), 2000);
+      } catch (e) {
+        console.error("참여 API 실패", e);
+        setPopup("error");
+        setTimeout(() => setPopup(null), 2000);
+      }
+    };
 
   // 태그 삭제 (지금은 거의 안 쓰이긴 함)
   const handleRemoveTag = (tag) => {
