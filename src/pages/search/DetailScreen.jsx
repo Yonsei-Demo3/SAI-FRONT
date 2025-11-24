@@ -44,7 +44,6 @@ export default function DetailScreen() {
     return <div className="p-6">{error}</div>;
   }
 
-  // { questionId, contentName, tags, questionTitle, description, hostNickname, imageUrl, ... }
   const item = data;
 
   return (
@@ -74,7 +73,7 @@ export default function DetailScreen() {
               {item.hostNickname}
             </span>
             <span className="text-[#3B3D40] text-[0.625rem]">
-              조금 전
+              {item.createdAt ?? "방금"}
             </span>
           </div>
         </div>
@@ -115,7 +114,7 @@ export default function DetailScreen() {
         <div className="flex items-center gap-3 mt-3">
           <div className="flex items-center bg-[#F2F4F8] px-2 py-1 rounded-md">
             <img src="/icons/people.svg" className="w-5 h-5 mr-1" />
-            <span className="text-sm">{item.maxparticipants ?? 0}</span>
+            <span className="text-sm">{item.currentParticipants ?? 0}/{item.maxParticipants ?? 0}</span>
           </div>
 
           <button className="px-3 py-1 bg-[#64a201] text-white rounded-md text-sm">
@@ -130,7 +129,7 @@ export default function DetailScreen() {
       </div>
 
       {/* 태그 */}
-      <div className="px-6 mt-6 flex flex-wrap gap-2">
+      <div className="px-6 mt-6 mb-[1.5rem] flex flex-wrap gap-2">
         {item.tags?.map((t, i) => (
           <span
             key={i}

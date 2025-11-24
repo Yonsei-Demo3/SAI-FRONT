@@ -64,7 +64,7 @@ export default function MyPageChats() {
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
       <MyPageNav stats={stats} />
 
-      <div className="flex justify-end items-center pr-[1.5rem]">
+      <div className="flex justify-end items-center pr-[1.5rem] mt-[1.25rem]">
 
           <div className="relative text-[0.75rem]">
             <button
