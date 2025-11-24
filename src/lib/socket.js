@@ -3,17 +3,71 @@ import { io } from "socket.io-client";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
-export function createSocket() {
-    
-    // const token = localStorage.getItem("accessToken");
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJhYTY5ZjVhOC02Y2JlLTRiYTctYTg5NC1kOWEyNTYwMjIyNWMiLCJzdWIiOiI1OGIyZmUyMS1lZDlhLTRhMDctODY4Zi1iOWM2NDEzM2ZhOTAiLCJpYXQiOjE3NjM4MDE3OTksImV4cCI6MTc2MzgwMjY5OSwiaXNzIjoibXktYmFja2VuZC1hcGkiLCJhdWQiOiJ3ZWIiLCJ0eXAiOiJhY2Nlc3MiLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwicm9sZSI6IlVTRVIifQ.8v1nEJ05eDZiSnrLIPdIcNaPmk2LcD8epJQzkqZj6rU"
+let socket = null;
 
-    const socket = io(SOCKET_URL, {
+export function initSocket() {
+    
+    const token = localStorage.getItem("accessToken");
+
+    if (socket) {
+        socket.disconnect();
+        socket = null;
+    }
+
+      socket = io(SOCKET_URL, {
         transports: ["websocket"],
         auth: {
             token : `Bearer ${token}`
         }
     });
 
-  return socket;
+    socket.on("connect", () => {
+        console.log("[socket] connected:", socket.id);
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.log("[socket] disconnected:", reason);
+    });
+
+    socket.on("connect_error", (err) => {
+        console.error("[socket] connect_error:", err.message);
+    });
+
+    return socket;
+    }
+
+export function getSocket() {
+
+    if (!socket) {
+        socket = initSocket();
+    }
+
+    return socket;
+}
+
+
+export function sendMessageSocket(message) {
+
+    const socket = getSocket();
+
+    console.log("[socket] emit chat message:", message);
+      
+    socket.emit("chat message", message);
+
+}
+
+export function joinSocket({roomId}) {
+
+    const socket = getSocket();
+
+    socket.emit("join room", {"roomId": roomId});
+
+}
+
+export function disconnectSocket() {
+
+    if (socket) {
+        socket.disconnect();
+        socket = null;
+    }
 }

@@ -1,8 +1,9 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import ChatTopBar from "../../components/chat/ChatTopBar";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatInput from "../../components/chat/ChatInput";
-import { createSocket } from "../../lib/socket";
+import { getSocket, sendMessageSocket, joinSocket  } from "../../lib/socket";
 
 // Helpers
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -13,7 +14,6 @@ const nowKo = () =>
     hour12: true,
   }).format(new Date());
 
-// // apiResponse 예시
 const apiResponse = {
     
     title : "기억 통제로 인간은 더 행복해질까? 어쩌면 더 불행해질지도 몰라",
@@ -74,8 +74,11 @@ const apiResponse = {
 
 export default function ChatPage() {
 
-
   const socketRef = useRef(null);
+
+  const location = useLocation();
+  const roomId = location.state?.roomId;   
+  const questionId = location.state?.questionId;
   
   const [messages, setMessages] = useState(apiResponse.seed);
   const [side, setSide] = useState("right");
@@ -105,27 +108,6 @@ export default function ChatPage() {
     hasOverflowedRef.current = el.scrollHeight > el.clientHeight + 1;
   };
 
-  useEffect(() => {
-    const socket = createSocket();      // 소켓 생성
-    socketRef.current = socket;         // ref에 보관
-
-    socket.on("connect", () => {
-      console.log("✅ connected", socket.id);
-    });
-
-    socket.on("disconnect", (reason) => {
-      console.log("❌ disconnected", reason);
-    });
-
-    socket.on("connect_error", (err) => {
-      console.error("🚨 connect_error:", err.message, err);
-    });
-
-    // cleanup: 컴포넌트가 언마운트될 때 연결 해제
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   // 메시지 추가 시 동작 규칙 및 화면 제어 로직
   useLayoutEffect(() => {
@@ -159,8 +141,43 @@ export default function ChatPage() {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, bookmarked: !m.bookmarked } : m)));
   };
 
+  useEffect(() => {
+
+    const socket = getSocket();    
+    socketRef.current = socket;     
+
+    // 채팅방 참여
+    if (roomId) {
+      joinSocket({ roomId });
+      console.log("[socket] join room:", roomId);
+    } else {
+      console.warn("[socket] roomId가 없어 채팅방 참여가 불가능합니다.");
+    }
+
+
+    const handleChatMessage = (data) => {
+      
+      console.log("Received chat message:", data);
+      const { from, message, room } = data;
+
+      const newMsg = {
+        id: uid(),                
+        name: from,
+        text: message,
+        time: nowKo(),
+        side: "left",             
+        room,
+      };
+
+      setMessages((prev) => [...prev, newMsg]);
+    };
+    
+    socket.on("chat message", handleChatMessage);
+
+  }, []);
 
   const handleSend = (content, s, type) => {
+  
     if (type === "image") {
       setMessages((prev) => [
         ...prev,
@@ -184,16 +201,24 @@ export default function ChatPage() {
         },
       ]);
     } else {
-            setMessages((prev) => [
-        ...prev,
-        {
+
+        const newMsg = {
           id: uid(),
-          text: content,        // 텍스트 메시지
+          text: content,
           type: "text",
           side: s,
           time: nowKo(),
-        },
-      ]);
+        };
+        
+        setMessages((prev) => [...prev, newMsg]);
+
+        // // 소켓으로 메시지 전송
+        // if (socketRef.current) {
+        //   socketRef.current.emit("chat message", {
+        //     "roomId" : 1,                 
+        //     "message" : content,
+        //   });
+        // }
     }
   };
 

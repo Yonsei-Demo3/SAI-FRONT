@@ -63,7 +63,7 @@ export default function BottomNav() {
           alt="채팅"
           className="w-[1.5rem] h-[1.5rem]"
         />
-        <span className="text-[0.625rem] mt-1">채팅</span>
+        <span className="text-[0.625rem] mt-1">대화</span>
       </button>
 
       {/* 마이페이지 */}

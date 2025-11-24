@@ -77,7 +77,7 @@ export default function ConversationDetailScreen() {
               : "text-gray-500"
           }`}
         >
-          저장한 질문
+          함께한 질문
         </button>
 
         <button

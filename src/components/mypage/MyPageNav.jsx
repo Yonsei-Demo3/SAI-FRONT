@@ -1,7 +1,9 @@
+// src/components/mypage/MyPageNav.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getMyInfo } from "../../lib/memberService";
 import { getFriendCounts } from "../../lib/friendService";
+import { getMyChats } from "../../lib/questionService"; // ★ 방금 만든 함수
 
 export default function MyPageNav() {
   const navigate = useNavigate();
@@ -11,33 +13,78 @@ export default function MyPageNav() {
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
+  // 질문/대화/저장/스크랩 개수
+  const [stats, setStats] = useState({
+    questionCount: 0,
+    chatCount: 0,
+    saveCount: 0,
+    scrapCount: 0,
+  });
+
+  // 프로필 + 친구 수
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfile = async () => {
       try {
         const me = await getMyInfo();
         setNickname(me.nickname || "닉네임");
 
         const counts = await getFriendCounts(me.userId);
-
-        setFollowerCount(
-          counts.followerCount ?? counts.FollowerCount ?? 0
-        );
-        setFollowingCount(
-          counts.followingCount ?? counts.FollowingCount ?? 0
-        );
+        setFollowerCount(counts.followerCount ?? counts.FollowerCount ?? 0);
+        setFollowingCount(counts.followingCount ?? counts.FollowingCount ?? 0);
       } catch (e) {
         console.error("마이페이지 정보 로드 실패:", e);
       }
     };
 
-    fetchData();
+    fetchProfile();
   }, []);
 
+  // ✨ 개수 불러오기 (지금은 대화만 실제로 채워 줌)
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // 내가 참여한 대화 리스트
+        const chats = await getMyChats();
+        setStats((prev) => ({
+          ...prev,
+          chatCount: Array.isArray(chats) ? chats.length : 0,
+          // questionCount / saveCount / scrapCount 도
+          // 나중에 API 생기면 여기서 같이 채우면 됨
+        }));
+      } catch (e) {
+        console.error("마이페이지 통계 로드 실패:", e);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // 탭 + 숫자 매핑
   const tabs = [
-    { name: "질문", path: "/mypage/ques" },
-    { name: "대화", path: "/mypage/chats" },
-    { name: "저장", path: "/mypage/save" },
-    { name: "스크랩", path: "/mypage/scrap" },
+    {
+      key: "ques",
+      label: "질문",
+      path: "/mypage/ques",
+      value: stats.questionCount,
+    },
+    {
+      key: "chats",
+      label: "대화",
+      path: "/mypage/chats",
+      value: stats.chatCount,
+    },
+    {
+      key: "save",
+      label: "저장",
+      path: "/mypage/save",
+      value: stats.saveCount,
+    },
+    {
+      key: "scrap",
+      label: "스크랩",
+      path: "/mypage/scrap",
+      value: stats.scrapCount,
+    },
   ];
 
   return (
@@ -67,11 +114,11 @@ export default function MyPageNav() {
             onClick={() => navigate("/mypage/profile/edit")}
             className="absolute bottom-0 right-0 bg-transparent border-none outline-none"
           >
-          <img
-            src="/icons/edit.svg"
-            alt="편집"
-            className="w-[1.4rem] h-[1.4rem]"
-          />
+            <img
+              src="/icons/edit.svg"
+              alt="편집"
+              className="w-[1.4rem] h-[1.4rem]"
+            />
           </button>
         </div>
 
@@ -83,7 +130,7 @@ export default function MyPageNav() {
         </div>
       </div>
 
-      {/* 탭 영역 */}
+      {/* 숫자 + 탭 한 줄에 붙이기 */}
       <div className="flex justify-around mt-[1.75rem] px-[1.5rem] text-center">
         {tabs.map((tab) => {
           const isActive =
@@ -92,18 +139,23 @@ export default function MyPageNav() {
 
           return (
             <button
-              key={tab.name}
-              onClick={() => {
-                navigate(tab.path);
-              }}
-              className={`relative flex flex-col items-center justify-center h-[2.5rem] bg-transparent border-none outline-none pb-2 text-[0.9rem] transition-colors duration-200 ${
-                isActive ? "text-black font-bold" : "text-black"
-              }`}
+              key={tab.key}
+              onClick={() => navigate(tab.path)}
+              className="flex flex-col items-center flex-1 bg-transparent border-none outline-none"
             >
-              {tab.name}
-
+              {/* 숫자 */}
+              <span className="text-[1rem] font-bold">{tab.value}</span>
+              {/* 라벨 */}
+              <span
+                className={`mt-[0.15rem] text-[0.85rem] ${
+                  isActive ? "text-[#111827]" : "text-[#6B7280]"
+                }`}
+              >
+                {tab.label}
+              </span>
+              {/* 언더라인 */}
               {isActive && (
-                <span className="absolute mt-[2rem] left-0 w-full h-[2px] bg-[#FA502E] rounded-full"></span>
+                <span className="mt-[0.25rem] w-[2rem] h-[2px] bg-[#FA502E] rounded-full" />
               )}
             </button>
           );
