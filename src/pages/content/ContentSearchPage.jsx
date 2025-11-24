@@ -6,7 +6,7 @@ import ContentTopBar from "../../components/contents/contentTopBar";
 // 빈 응답일 때 보여줄 기본 데이터
 const SAMPLE = {
   id: 1,
-  title: "이",
+  title: "샘플 제목입니다",
   category: "대분류 / 소분류",
   imageUrl:
     "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
@@ -31,6 +31,8 @@ export default function ContentSearchPage({
   const [results, setResults] = useState(initialResults ?? API_RESULTS);
   const [searchDelete, setSearchDelete] = useState(false);
   const navigate = useNavigate();
+  const [selectedItem, setSelectedItem] = useState(null);
+  const canSubmit = selectedItem !== null;
 
   const handleDeleteItem = (id) => {
     setResults((prev) => prev.filter((item) => item.id !== id));
@@ -147,6 +149,8 @@ export default function ContentSearchPage({
                     </svg>
                   </button>
                 )}
+
+              
               </li>
             ))}
           </ul>
