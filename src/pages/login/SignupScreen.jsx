@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";  // axios import 추가
-import { signup } from "../lib/signupService";
+import { signup } from "../../lib/signupService";
 
 export default function SignupScreen() {
   const navigate = useNavigate();

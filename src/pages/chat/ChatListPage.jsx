@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getChatList } from "../../lib/chatService";
 import BottomNav from "../../components/main/BottomNav";
 import ChatListTopBar from "../../components/chat/ChatListTopBar";
-import { getChatList } from "../../lib/chatService";
 
 const API_RESPONSES = {
   prepare: [

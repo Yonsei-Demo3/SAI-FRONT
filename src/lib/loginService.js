@@ -8,8 +8,11 @@ export async function login(payload) {
     }
 
     return axiosInstance.post("/api/v1/auth/login", body);  
-
 }
 
-
-
+export async function kakaoLogin(code, redirectUri) {
+    return axiosInstance.post("/api/v1/auth/oauth/kakao/login-by-code", {
+        code: code,
+        redirectUri: redirectUri
+    });
+}

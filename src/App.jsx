@@ -1,13 +1,13 @@
 import React from "react";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import ContentSearchResultPage from "./pages/content/contentSearchResultPage";
-import ContentSearchPage from "./pages/content/contentSearchPage";
-import ContentRegisterPage from "./pages/content/contentRegisterPage"
+import ContentSearchResultPage from "./pages/content/ContentSearchResultPage";
+import ContentSearchPage from "./pages/content/ContentSearchPage";
+import ContentRegisterPage from "./pages/content/ContentRegisterPage"
 import ChatListPage from "./pages/chat/ChatListPage";
 import ChatPage from "./pages/chat/ChatPage";
-import LoginScreen from "./pages/LoginScreen";
-import SignupScreen from "./pages/SignupScreen";
+import LoginScreen from "./pages/login/LoginScreen";
+import SignupScreen from "./pages/login/SignupScreen";
 import MainScreen from "./pages/main/MainScreen";
 import MainNewQues from "./pages/main/MainNewQues";
 import MainPopQues from "./pages/main/MainPopQues";
@@ -24,7 +24,7 @@ import MyPageScrap from "./pages/mypage/MyPageScrap";
 import ConversationDetailScreen from "./pages/mypage/ConversationDetailScreen";
 import DetailScreen from "./pages/search/DetailScreen";
 import FriendsScreen from "./pages/setting/FriendScreen";
-import SettingScreen from "./pages/setting/settingScreen";
+import SettingScreen from "./pages/setting/SettingScreen";
 import ProfileEditScreen from "./pages/mypage/ProfileEditScreen";
 
 export default function App() {

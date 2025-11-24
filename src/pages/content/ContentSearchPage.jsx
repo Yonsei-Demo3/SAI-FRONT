@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ContentTopBar from "../../components/contents/contentTopBar";
+// import { image } from "d3";
 
 
 // 빈 응답일 때 보여줄 기본 데이터
 const SAMPLE = {
   id: 1,
-  title: "서사의 위기",
+  title: "이",
   category: "대분류 / 소분류",
-  thumb:
+  imageUrl:
     "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
 };
 
@@ -36,9 +37,22 @@ export default function ContentSearchPage({
     setResults((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleClickRegister = () => {
-    onRegister?.(); 
-    navigate("/content/register");
+  const handleSearch = () => {
+
+     const trimmed = query.trim();
+     if (!trimmed) return;
+
+     navigate("/content/search/result", { state: { query: trimmed } });
+  };
+
+  
+  const handleClickItem = (item) => {
+    const keyword = (item.title || "").trim();
+    if (!keyword) return;
+
+    navigate("/content/search/result", {
+      state: { query: keyword },
+    });
   };
 
   return (
@@ -51,7 +65,13 @@ export default function ContentSearchPage({
 
       {/* 검색창 */}
       <div className="flex flex-col items-center justify-center pt-[1rem] pb-[1.5rem] pl-[1.5rem] pr-[1.5rem]">
-        <div className = "relative w-full">
+        <form 
+          className = "relative w-full"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
@@ -65,10 +85,12 @@ export default function ContentSearchPage({
 
           <input
             type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="책, 영화, 영상 등 콘텐츠 제목을 입력하세요"
             className="w-full h-[2rem] bg-[#F2F4F8] border-0 rounded-[0.5rem] box-border pl-[2.5rem] placeholder:text-[#CCD2D8] outline-none text-[0.8rem] font-pre placeholder:[font-family:inherit] placeholder:text-[0.875rem]"
           />
-        </div>
+        </form>
       </div>
 
       {/* 검색 결과 */}
@@ -94,13 +116,13 @@ export default function ContentSearchPage({
       <div>
         <ul className="w-full bg-white">
             {results.map((item) => (
-              <li key={item.id} className="flex justify-center items-center pt-[0.5rem] pb-[0.5rem] pl-[1.5rem] pr-[1.5rem]">
-                <button
-                  onClick={() => onSelectItem?.(item)}
+              <li key={item.id} className="flex justify-center items-center pt-[1em] pb-[1rem] pl-[1.5rem] pr-[1.5rem]">
+                <div
+                  onClick={() => handleClickItem(item)}
                   className="w-full border-[0rem] flex items-center p-[0rem] bg-[#FFFFFF]"
                 >
                   <img
-                    src={item.thumb}
+                    src={item.imageUrl}
                     alt=""
                     className="w-[3.75rem] h-[5rem] rounded-[0.5rem] object-cover border-[0rem]"
                   />
@@ -112,12 +134,12 @@ export default function ContentSearchPage({
                       {item.title}
                     </p>
                   </div>
-                </button>
+                </div>
 
                 {searchDelete && (
                   <button
                     type="button"
-                    onClick={() => handleDeleteItem(item.id)} // ✅ 여기서 삭제
+                    onClick={() => handleDeleteItem(item.id)} 
                     className="ml-2"
                   >  
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
