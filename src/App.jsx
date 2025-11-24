@@ -60,7 +60,7 @@ export default function App() {
               <Route path="/mypage/save" element={<MyPageSave />} />
               <Route path="/mypage/scrap" element={<MyPageScrap />} />
               <Route path="/mypage/profile/edit" element={<ProfileEditScreen />} />
-              <Route path="mypage/chat/:id" element={<ConversationDetailScreen />} />
+              <Route path="/mypage/chat/:id" element={<ConversationDetailScreen />} />
               <Route path="/settings" element={<SettingScreen />} />
               <Route path="/settings/friends" element={<FriendsScreen />} />
             </Routes>

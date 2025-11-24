@@ -1,4 +1,4 @@
-import axios from "./axiosInstance";
+import axiosInstance from "./axiosInstance";
 
 export const createQuestion = async (payload) => {
 
@@ -14,7 +14,7 @@ export const createQuestion = async (payload) => {
   
   console.log("Request Body:", body); 
 
-  return axios.post("api/v1/questions", body);
+  return axiosInstance.post("api/v1/questions", body);
 };
 
 function getAuthConfig() {
@@ -73,9 +73,19 @@ export async function getQuestionDetail(questionId) {
 
 export async function participateQuestion(questionId) {
   const res = await axiosInstance.post(
-    `/api/v1/questions/${questionId}`,
+    `/api/v1/questions/participate/${questionId}`,
     null,
     getAuthConfig()
   );
+  return res.data;
+}
+
+export async function cancelParticipateQuestion(questionId) {
+  const res = await axiosInstance.delete(`/api/v1/questions/cancel/${questionId}`);
+  return res.data;
+}
+
+export async function getMyChats() {
+  const res = await axiosInstance.get("/api/v1/questions", getAuthConfig());
   return res.data;
 }

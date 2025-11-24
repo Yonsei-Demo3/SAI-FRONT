@@ -86,35 +86,24 @@ export default function SearchResult() {
     }
   };
 
-    // ✨ 참여하기 토글 + 서버 연결 + 팝업
-    const toggleParticipate = async (questionId) => {
-      const now = !participate[questionId];
-
-      try {
-        if (now) {
-          const res = await participateQuestion(questionId);
-          console.log("참여 성공:", res);
-        } else {
-          console.log("참여 취소(프론트 상태만 변경)");
-        }
-
-        setParticipate((prev) => ({ ...prev, [questionId]: now }));
-        setPopup(now ? "participate" : "cancel");
-        setTimeout(() => setPopup(null), 2000);
-      } catch (e) {
-        const status = e.response?.status;
-        console.error("참여/취소 실패:", e);
-        console.log("status:", status, "data:", e.response?.data);
-
-        if (status === 403) {
-          alert("이 질문에 참여할 권한이 없어요.\n로그인 상태 또는 권한을 확인해 주세요.");
-        } else if (status === 401) {
-          alert("로그인이 필요해요. 다시 로그인해 주세요.");
-        } else {
-          alert("참여 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.");
-        }
+  const toggleParticipate = async (questionId) => {
+    const now = !participate[questionId];
+    try {
+      if (now) {
+        const res = await participateQuestion(questionId);
+        console.log("참여 성공:", res);
+      } else {
+        await cancelParticipateQuestion(questionId);
       }
-    };
+      setParticipate((prev) => ({ ...prev, [questionId]: now }));
+      setPopup(now ? "participate" : "cancel");
+      setTimeout(() => setPopup(null), 2000);
+    } catch (e) {
+      console.error("참여 API 실패", e);
+      setPopup("error");
+      setTimeout(() => setPopup(null), 2000);
+    }
+  };
 
 
 
