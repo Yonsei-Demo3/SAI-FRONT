@@ -97,6 +97,8 @@ export default function QuestionFormScreen() {
   async function onSubmit(e) {
     e.preventDefault();
 
+    const tags = parseTags(tagInput);
+
     console.log({ 
       selectedContentId: selectedContent?.contentId,
       imageUrl: selectedContent?.imageUrl,
@@ -105,8 +107,6 @@ export default function QuestionFormScreen() {
       participants, 
       tags 
     });
-
-    const tags = parseTags(tagInput);
 
     const payload = {
       question: question.trim(),

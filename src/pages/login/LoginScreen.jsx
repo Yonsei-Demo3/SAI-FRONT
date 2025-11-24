@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { login, kakaoLogin } from "../../lib/loginService";
+import { initSocket } from "../../lib/socket";
 
 export default function LoginScreen() {
   
@@ -78,7 +79,6 @@ export default function LoginScreen() {
     };
 
     try {
-
       const response = await login(payload);
 
       const authHeader =
@@ -87,7 +87,20 @@ export default function LoginScreen() {
         response.headers["access-token"];
 
       if(authHeader) {
-        localStorage.setItem("accessToken", authHeader);
+
+        let token = authHeader;
+        
+        if (typeof token === "string") {
+          const parts = token.split(" "); // ["Bearer", "eyJhbGciOi..."]
+          if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
+            token = parts[1];
+          }
+        }
+
+        localStorage.setItem("accessToken", token);
+
+        initSocket();
+
       }
 
       navigate("/main", { replace: true });
