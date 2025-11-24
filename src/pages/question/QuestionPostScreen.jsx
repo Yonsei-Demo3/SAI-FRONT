@@ -112,7 +112,7 @@ export default function QuestionFormScreen() {
       question: question.trim(),
       description: desc.trim(),
       participants: participants,
-      contentId: null,
+      contentId: contentId,
       tags: tags, 
       startOption,
     };
@@ -123,6 +123,8 @@ export default function QuestionFormScreen() {
     } catch (error) {
       console.error("등록 실패:", error);
     }
+
+    navigate("/main");
   }
 
 

@@ -7,7 +7,7 @@ export const createQuestion = async (payload) => {
     title: payload.question,
     description: payload.description,
     maxParticipants: payload.participants,
-    contentId: 1,
+    contentId: payload.contentId,
     tags: payload.tags
     // startOption: payload.startOption
   };
