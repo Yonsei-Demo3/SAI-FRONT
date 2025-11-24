@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import { useNavigate, useLocation } from "react-router-dom";
-import { searchQuestions, participateQuestion } from "../../lib/questionService";
+import { searchQuestions, participateQuestion, cancelParticipateQuestion } from "../../lib/questionService";
 import {
   getLikeStatus,
   likeQuestion,
@@ -223,7 +223,7 @@ export default function SearchResult() {
               <div
                 key={item.questionId}
                 className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
-                onClick={() => navigate("/detail", { state: { item } })}
+                onClick={() => navigate("/detail", { state: { questionId: item.questionId, item, }, })}
               >
                 <img
                   src="/icons/quote.svg"
@@ -275,7 +275,7 @@ export default function SearchResult() {
                       src="/icons/people.svg"
                       className="w-[1rem] h-[1rem] mr-[0.25rem]"
                     />
-                    {`참여자 ${item.participantCount ?? 0}명`}
+                    {`${item.currentParticipants ?? 0}/${item.maxParticipants}`}
                   </div>
 
                   {(item.tagNames || []).map((tag, idx) => (

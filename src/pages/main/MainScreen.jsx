@@ -2,7 +2,7 @@ import Navbar from "../../components/main/Navbar.jsx";
 import BottomNav from "../../components/main/BottomNav.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { searchQuestions, participateQuestion } from "../../lib/questionService";
+import { searchQuestions, participateQuestion, cancelParticipateQuestion } from "../../lib/questionService";
 import {
   getLikeStatus,
   likeQuestion,
@@ -218,8 +218,8 @@ export default function MainScreen() {
   const renderQuestionCard = (item) => (
     <div
       key={item.questionId}
-      className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-6 my-[1rem] relative"
-      onClick={() => navigate("/detail", { state: { item } })}
+      className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-6 my-[1rem] relative flex flex-col"
+      onClick={() => navigate("/detail", { state: { questionId: item.questionId, item, }, })}
     >
       <div className="flex-1">
       {/* 따옴표 + 문장 */}
@@ -260,8 +260,7 @@ export default function MainScreen() {
       <div className="flex flex-wrap gap-[0.5rem] items-center mt-3">
         <div className="flex items-center gap-[0.12rem] px-2 py-1 rounded-md bg-[#F2F4F8] text-[#3B3D40] text-[0.75rem]">
           <img src="/icons/people.svg" className="w-4 h-4" />
-          {/* 참여자 수가 응답에 있으면 이 부분 맞춰서 바꿔줘 */}
-          {` ${item.participantCount ?? 0}`}
+          {` ${item.currentParticipants ?? 0}/${item.maxParticipants}`}
         </div>
 
         {(item.tagNames || []).map((tag, idx) => (
@@ -276,7 +275,7 @@ export default function MainScreen() {
     </div>
 
       {/* 하트 + 참여하기 버튼 */}
-      <div className="flex items-center justify-between mt-[0.5rem]">
+      <div className="flex items-center justify-between mt-[1rem]">
         {/* ❤️ 하트 */}
         <button
           onClick={(e) => {

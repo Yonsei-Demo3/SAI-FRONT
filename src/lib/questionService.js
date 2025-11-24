@@ -81,7 +81,9 @@ export async function participateQuestion(questionId) {
 }
 
 export async function cancelParticipateQuestion(questionId) {
-  const res = await axiosInstance.delete(`/api/v1/questions/cancel/${questionId}`);
+  const res = await axiosInstance.delete(`/api/v1/questions/cancel/${questionId}`,
+  getAuthConfig()
+  );
   return res.data;
 }
 

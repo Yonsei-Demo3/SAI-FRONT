@@ -1,8 +1,8 @@
-// src/screens/mypage/MyPageScrapScreen.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/main/BottomNav";
 import MyPageNav from "../../components/mypage/MyPageNav";
+import { getMyScraps, cancelScrap } from "../../lib/scrapService";
 
 export default function MyPageScrapScreen() {
   const navigate = useNavigate();
@@ -12,27 +12,11 @@ export default function MyPageScrapScreen() {
   const [sortType, setSortType] = useState("최신순");
   const [openMenuId, setOpenMenuId] = useState(null);
 
-  // 📌 관심 대화 리스트 (스크랩된 하이라이트)
-  const favoriteChats = [
-    {
-      id: 1,
-      contentTitle: "바깥은 여름",
-      question:
-        "저는 그래서 처음에는 제목을 보고 굉장히 밝은 이야기들이 담겨 있을 거라고 생각했었는데 읽고보니 여름의 따사로움보다는 장마에 가까운 이야기여서 놀랐었어요.",
-      bookTitle:
-        "잊고 싶은 기억을 완전히 지울 수 있다면 삶은 더 나아질까요, 아니면 그 기억까지 포함한 내가 사라지는 걸까요?",
-      date: "2025.10.31 16:56",
-    },
-    {
-      id: 2,
-      contentTitle: "바깥은 여름",
-      question:
-        "이 작품의 제목이 ‘바깥은 여름’인 이유에 대한 생각을 자유롭게 나눠보아요.",
-      bookTitle:
-        "잊고 싶은 기억을 완전히 지울 수 있다면 삶은 더 나아질까요, 아니면 그 기억까지 포함한 내가 사라지는 걸까요?",
-      date: "2025.10.31 16:56",
-    },
-  ];
+  const [scrapChats, setScrapChats] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+
 
   // 📌 관심 질문 리스트 (스크랩된 질문)
   const favoriteQuestions = [
@@ -68,10 +52,69 @@ export default function MyPageScrapScreen() {
     },
   ];
 
+    useEffect(() => {
+    const fetchScraps = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const list = await getMyScraps();
+        console.log("my scraps:", list);
+
+        const mapped = list.map((item) => ({
+          id: item.scrapId,
+          messageId: item.messageId,
+          roomId: item.roomId,
+          question: item.content,
+          contentTitle: item.contentTitle || "콘텐츠 제목",
+          bookTitle: item.questionTitle || "질문 제목",
+          date: item.scrappedAt,
+          source: item.source, 
+        }));
+
+        setScrapChats(mapped);
+      } catch (e) {
+        console.error("스크랩 목록 불러오기 실패", e);
+        setError("스크랩한 대화를 불러오지 못했어요.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScraps();
+  }, []);
+
+    const sortedScrapChats = useMemo(() => {
+    const arr = [...scrapChats];
+    arr.sort((a, b) => {
+      const da = new Date(a.date);
+      const db = new Date(b.date);
+      if (sortType === "최신순") return db - da;
+      return da - db;
+    });
+    return arr;
+  }, [scrapChats, sortType]);
+
+
+ 
   const totalCount =
     selectedTab === "관심 대화"
-      ? favoriteChats.length
+      ? sortedScrapChats.length
       : favoriteQuestions.length;
+
+    const handleDeleteScrap = async (messageId) => {
+    try {
+      await cancelScrap(messageId);
+      setScrapChats((prev) =>
+        prev.filter((item) => item.messageId !== messageId)
+      );
+    } catch (e) {
+      console.error("스크랩 삭제 실패", e);
+      alert("스크랩을 삭제하지 못했어요. 잠시 후 다시 시도해 주세요.");
+    }
+  };
+
+
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
@@ -139,13 +182,12 @@ export default function MyPageScrapScreen() {
       {/* 리스트 영역 */}
       <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[7rem] no-scrollbar">
         {/* ==== 관심 대화 탭 ==== */}
-        {selectedTab === "관심 대화" &&
-          favoriteChats.map((item) => (
+                {selectedTab === "관심 대화" &&
+          sortedScrapChats.map((item) => (
             <div
               key={item.id}
               className="bg-white rounded-[0.5rem] border border-[#F3F4F6] p-5 mb-6 relative"
             >
-
               {/* 따옴표 + 문장 */}
               <div className="mt-[0.25rem]">
                 <img
@@ -172,13 +214,20 @@ export default function MyPageScrapScreen() {
               <div className="flex justify-between items-center mt-[1rem] text-[0.75rem] text-[#6B7280] mb-[0.5rem]">
                 <p>{item.date}</p>
                 <div className="flex gap-4">
-                  <button>
+                  <button
+                    onClick={() => {
+                      // TODO: 공유 기능
+                      console.log("share", item.messageId);
+                    }}
+                  >
                     <img
                       src="/icons/share.svg"
                       className="w-[1.2rem] h-[1.2rem]"
                     />
                   </button>
-                  <button>
+                  <button
+                    onClick={() => handleDeleteScrap(item.messageId)}
+                  >
                     <img
                       src="/icons/trash.svg"
                       className="w-[1.2rem] h-[1.2rem]"
@@ -189,6 +238,25 @@ export default function MyPageScrapScreen() {
             </div>
           ))}
 
+          {selectedTab === "관심 대화" && (
+          <>
+            {sortedScrapChats.length === 0 ? (
+              <p className="text-[0.875rem] text-[#9CA3AF] px-[0.5rem]">
+                스크랩한 문장이 없어요.
+              </p>
+            ) : (
+              sortedScrapChats.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-[0.5rem] border border-[#F3F4F6] p-5 mb-6 relative"
+                >
+                </div>
+              ))
+            )}
+          </>
+        )}
+
+          
         {/* ==== 관심 질문 탭 ==== */}
         {selectedTab === "관심 질문" &&
           favoriteQuestions.map((q) => (
