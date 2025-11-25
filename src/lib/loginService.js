@@ -16,3 +16,8 @@ export async function kakaoLogin(code, redirectUri) {
         redirectUri: redirectUri
     });
 }
+
+export async function logout() {
+  const res = await axiosInstance.post("/api/v1/auth/logout");
+  return res.data;
+}

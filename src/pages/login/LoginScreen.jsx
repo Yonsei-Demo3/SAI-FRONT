@@ -122,24 +122,22 @@ export default function LoginScreen() {
       />
 
       <div className="w-full flex flex-col gap-[1rem] px-[1.5rem]">
-        {/* 아이디 입력 폼 */}
         <div className="relative">
           <div className="flex flex-col justify-center border border-[#D0D6DD] rounded-[0.5rem] h-[3.75rem] px-[1rem]">
             <label className="text-[0.625rem] text-[#9EA4AA] font-medium mb-[0.2rem]">
-              아이디
+              이메일
             </label>
             <input
               type="text"
               name="user_id"
               value={formData.user_id}
               onChange={handleChange}
-              placeholder="아이디 입력"
+              placeholder="이메일 입력"
               className="text-[1rem] text-[#000] placeholder-[#C2C6CA] focus:outline-none border-none"
             />
           </div>
         </div>
 
-        {/* 비밀번호 입력 폼 */}
         <div className="relative">
           <div className="flex flex-col justify-center border border-[#D0D6DD] rounded-[0.5rem] h-[3.75rem] px-[1rem]">
             <label className="text-[0.625rem] text-[#9EA4AA] font-medium mb-[0.2rem]">
