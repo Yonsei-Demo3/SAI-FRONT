@@ -42,7 +42,6 @@ export default function MainScreen() {
     { name: "인기 질문", path: "/main/pop" },
   ];
 
-  // 날짜 → "n일 전" 포맷
   const formatTimeAgo = (isoString) => {
     if (!isoString) return "";
     const created = new Date(isoString);
@@ -53,7 +52,6 @@ export default function MainScreen() {
     return `${diffDays}일 전`;
   };
 
-  // ✅ 질문 상태 라벨 (참여 가능 / 진행중 / 종료)
   const getStatusLabel = (status, current, max) => {
     if (!status) return null;
 
@@ -89,13 +87,12 @@ export default function MainScreen() {
     const fetchPopular = async () => {
       setLoading((prev) => ({ ...prev, popular: true }));
       try {
-        // 인기 질문 상위 3개 (좋아요 수 기준)
         const data = await searchQuestions({
           keyword: "",
           categories: [],
           tags: [],
           page: 0,
-          size: 10, // 넉넉히 받아서 좋아요 수 기준으로 다시 상위 3개만 사용
+          size: 10,
           sortType: "인기순",
         });
 
@@ -122,7 +119,6 @@ export default function MainScreen() {
           })
         );
 
-        // ✅ 좋아요 수 기준으로 정렬해서 상위 3개만
         listWithLike.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
         const top3 = listWithLike.slice(0, 3);
 
@@ -137,7 +133,6 @@ export default function MainScreen() {
     const fetchLatest = async () => {
       setLoading((prev) => ({ ...prev, latest: true }));
       try {
-        // 최신 질문 상위 3개
         const data = await searchQuestions({
           keyword: "",
           categories: [],
@@ -180,7 +175,6 @@ export default function MainScreen() {
     const fetchHighlights = async () => {
       setScrapLoading(true);
       try {
-        // ✅ 스크랩 많이 된 메시지 TOP N
         const list = await getPopularScraps(5); // 필요하면 숫자 조정
         setPopularScraps(Array.isArray(list) ? list : []);
       } catch (e) {
@@ -482,7 +476,7 @@ export default function MainScreen() {
                 key={tab.name}
                 onClick={() => navigate(tab.path)}
                 className={`relative flex flex-col items-center justify-center h-[2.5rem] bg-transparent border-none outline-none pb-2 text-[0.9rem] transition-colors duration-200 ${
-                  active ? "text-black font-medium-bold" : "text-black"
+                  active ? "text-black font-bold" : "text-black"
                 }`}
               >
                 {tab.name}

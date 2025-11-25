@@ -14,51 +14,29 @@ export default function SearchResult() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 전달받은 값
-  const initialQuery = location.state.query ?? "";
-  const initialTags = location.state.tags;
+  // 전달받은 값 (state 없을 수도 있으니까 안전하게 옵셔널 체이닝)
+  const initialQuery = location.state?.query || "";
+  const initialTags = location.state?.tags || [];
 
   const [inputQuery, setInputQuery] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
-  const [tags, setTags] = useState(initialTags ?? []);
-
-  useEffect(() => {
-    setInputQuery(initialQuery);
-    setQuery(initialQuery);
-    setTags(initialTags ?? []);
-  }, [initialQuery, initialTags]);
+  const [tags, setTags] = useState(initialTags);
 
   // 상태
   const [likeState, setLikeState] = useState({});
-  const [participate, setParticipate] = useState({});
-  const [popup, setPopup] = useState(null);
   const [results, setResults] = useState([]);
+  const [popup, setPopup] = useState(null);
   const [openSort, setOpenSort] = useState(false);
   const [sortType, setSortType] = useState("인기순");
 
-  useEffect(() => {
-  const fetchMyJoined = async () => {
-    try {
-      const joinedList = await searchQuestions();
-      const map = {};
-      joinedList.forEach((q) => {
-        map[q.questionId] = true;
-      });
-      setParticipate(map);
-    } catch (e) {
-      console.error("내가 참여한 질문 목록 불러오기 실패", e);
-    }
-  };
-
-  fetchMyJoined();
-}, []);
-
+  // 검색 결과 불러오기
   const fetchResults = async () => {
     try {
       if (!query && tags.length === 0) {
         setResults([]);
         return;
       }
+
       const data = await searchQuestions({
         keyword: query,
         tags,
@@ -67,14 +45,17 @@ export default function SearchResult() {
         sortType,
       });
 
+      // 여기서 이미 각 item에 myParticipationStatus 가 들어온다고 가정
       setResults(data.content || []);
     } catch (error) {
       console.error("Error fetching results:", error);
     }
   };
 
+  // query / tags / sortType 바뀔 때만 검색
   useEffect(() => {
     fetchResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, tags, sortType]);
 
   // ❤️ 좋아요 토글
@@ -105,21 +86,40 @@ export default function SearchResult() {
     }
   };
 
-  const toggleParticipate = async (questionId) => {
-    const now = !participate[questionId];
+  // 참여 / 참여취소 토글 (myParticipationStatus 기반)
+  const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
-      if (now) {
-        const res = await participateQuestion(questionId);
-        console.log("참여 성공:", res);
+      if (currentMyStatus === "NONE") {
+        // 참여 신청
+        await participateQuestion(questionId);
+
+        setResults((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "WAITING" }
+              : item
+          )
+        );
+
+        setPopup("participate");
       } else {
+        // WAITING / JOINED 둘 다 취소 처리
         await cancelParticipateQuestion(questionId);
+
+        setResults((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "NONE" }
+              : item
+          )
+        );
+
+        setPopup("cancel");
       }
-      setParticipate((prev) => ({ ...prev, [questionId]: now }));
-      setPopup(now ? "participate" : "cancel");
-      setTimeout(() => setPopup(null), 2000);
     } catch (e) {
       console.error("참여 API 실패", e);
       setPopup("error");
+    } finally {
       setTimeout(() => setPopup(null), 2000);
     }
   };
@@ -128,10 +128,8 @@ export default function SearchResult() {
   const getStatusLabel = (status, current, max) => {
     if (!status) return null;
 
-    // 백엔드 상태값에 맞게 여기만 맞춰주면 됨
     switch (status) {
       case "RECRUITING":
-        // 자리가 남아 있으면 참여 가능, 다 찼으면 진행중 취급
         if (max && current >= max) return "진행중";
         return "참여 가능";
       case "PROGRESS":
@@ -145,20 +143,16 @@ export default function SearchResult() {
     }
   };
 
-
   const getStatusChipClass = (label) => {
     if (label === "진행중") {
-      // 연두색 배경 + 초록 글자
       return "bg-[#F3FFE1] text-[#6BB600]";
     }
     if (label === "종료") {
-      // 연한 회색 배경 + 진회색 글자
       return "bg-[#F3F4F6] text-[#4B5563]";
     }
     // 참여 가능
-    return "bg-[#E3F2FF] text-[#1D72FF]"; // 연한 파랑 배경 + 파랑 글자
+    return "bg-[#E3F2FF] text-[#1D72FF]";
   };
-
 
   // 태그 삭제
   const handleRemoveTag = (tag) => {
@@ -188,13 +182,20 @@ export default function SearchResult() {
                 <p className="text-[0.875rem] font-bold text-[#3B3D40] leading-[1.4rem]">
                   {popup === "participate"
                     ? "질문 참여가 등록되었습니다"
-                    : "참여가 취소되었어요"}
+                    : popup === "cancel"
+                    ? "참여가 취소되었어요"
+                    : "참여 처리 중 오류가 발생했어요"}
                 </p>
-                <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
-                  {popup === "participate"
-                    ? "대화 인원이 모두 모이면 알려드릴게요.\n알림을 받으면 30초 안에 ‘준비 완료’를 눌러 참여할 수 있습니다."
-                    : "다시 참여하려면 ‘참여하기’를 눌러주세요."}
-                </p>
+                {popup === "participate" && (
+                  <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
+                    {"대화 인원이 모두 모이면 알려드릴게요.\n알림을 받으면 30초 안에 ‘준비 완료’를 눌러 참여할 수 있습니다."}
+                  </p>
+                )}
+                {popup === "cancel" && (
+                  <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
+                    {"다시 참여하려면 ‘참여하기’를 눌러주세요."}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -208,9 +209,7 @@ export default function SearchResult() {
           onChange={(e) => setInputQuery(e.target.value)}
           tags={tags}
           onRemoveTag={handleRemoveTag}
-          onEnter={() => {
-            setQuery(inputQuery);
-          }}
+          onEnter={() => setQuery(inputQuery)}
         />
 
         {/* 결과 상단 */}
@@ -274,7 +273,6 @@ export default function SearchResult() {
                 liked: item.likedByMe ?? false,
                 count: item.likeCount ?? 0,
               };
-              const isParticipating = !!participate[item.questionId];
 
               const current =
                 item.currentParticipants ?? item.participants ?? 0;
@@ -286,6 +284,10 @@ export default function SearchResult() {
                 max
               );
               const showJoinButton = statusLabel === "참여 가능";
+
+              const myStatus = item.myParticipationStatus || "NONE";
+              const isParticipating =
+                myStatus === "WAITING" || myStatus === "JOINED";
 
               return (
                 <div
@@ -334,7 +336,7 @@ export default function SearchResult() {
                     {item.mainCategory} &gt; {item.subCategory}
                   </p>
 
-                  {/* 👉 인원수 + 상태 + 태그 순서 */}
+                  {/* 인원수 + 상태 + 태그 */}
                   <div className="flex items-center flex-wrap gap-[0.38rem] mt-[0.75rem]">
                     <div className="flex items-center text-[0.75rem] bg-[#F2F4F8] rounded-md px-[0.4rem] py-[0.2rem]">
                       <img
@@ -391,7 +393,10 @@ export default function SearchResult() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleParticipate(item.questionId);
+                          handleToggleParticipate(
+                            item.questionId,
+                            myStatus
+                          );
                         }}
                         className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
                           isParticipating
