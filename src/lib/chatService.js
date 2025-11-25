@@ -30,3 +30,8 @@ export async function scrapMessage(messageId) {
 export async function unscrapMessage(messageId) {
   return axiosInstance.delete(`/api/v1/messages/${messageId}/scrap`);  
 }
+
+export async function finishChat(roomId) {
+  // 대화 종료 API 입니다.
+  return null
+}

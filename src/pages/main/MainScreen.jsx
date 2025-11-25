@@ -1,13 +1,19 @@
+// src/screens/main/MainScreen.jsx
 import Navbar from "../../components/main/Navbar.jsx";
 import BottomNav from "../../components/main/BottomNav.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { searchQuestions, participateQuestion, cancelParticipateQuestion } from "../../lib/questionService";
+import {
+  searchQuestions,
+  participateQuestion,
+  cancelParticipateQuestion,
+} from "../../lib/questionService";
 import {
   getLikeStatus,
   likeQuestion,
   unlikeQuestion,
 } from "../../lib/likeService";
+import { getPopularScraps } from "../../lib/scrapService";
 
 export default function MainScreen() {
   const navigate = useNavigate();
@@ -21,10 +27,13 @@ export default function MainScreen() {
   // 홈에 띄울 목록
   const [popularQuestions, setPopularQuestions] = useState([]); // 섹션1
   const [latestQuestions, setLatestQuestions] = useState([]); // 섹션3
+  const [popularScraps, setPopularScraps] = useState([]); // 섹션2 하이라이트
+
   const [loading, setLoading] = useState({
     popular: false,
     latest: false,
   });
+  const [scrapLoading, setScrapLoading] = useState(false);
 
   // 🔶 탭 메뉴 데이터
   const tabs = [
@@ -33,18 +42,57 @@ export default function MainScreen() {
     { name: "인기 질문", path: "/main/pop" },
   ];
 
+  const formatTimeAgo = (isoString) => {
+    if (!isoString) return "";
+    const created = new Date(isoString);
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return "오늘";
+    return `${diffDays}일 전`;
+  };
+
+  const getStatusLabel = (status, current, max) => {
+    if (!status) return null;
+
+    switch (status) {
+      case "RECRUITING":
+        // 인원 다 찼으면 진행중으로 처리
+        if (max && current >= max) return "진행중";
+        return "참여 가능";
+      case "PROGRESS":
+      case "IN_PROGRESS":
+        return "진행중";
+      case "COMPLETED":
+      case "DONE":
+        return "종료";
+      default:
+        return null;
+    }
+  };
+
+  // 상태 뱃지 색
+  const getStatusChipClass = (label) => {
+    if (label === "진행중") {
+      return "bg-[#F3FFE1] text-[#6BB600]";
+    }
+    if (label === "종료") {
+      return "bg-[#F3F4F6] text-[#4B5563]";
+    }
+    // 참여 가능
+    return "bg-[#E3F2FF] text-[#1D72FF]";
+  };
 
   useEffect(() => {
     const fetchPopular = async () => {
       setLoading((prev) => ({ ...prev, popular: true }));
       try {
-        // 인기 질문 상위 3개
         const data = await searchQuestions({
           keyword: "",
           categories: [],
           tags: [],
           page: 0,
-          size: 3,
+          size: 10,
           sortType: "인기순",
         });
 
@@ -64,14 +112,17 @@ export default function MainScreen() {
               console.error("홈 인기질문 좋아요 상태 조회 실패", e);
               return {
                 ...q,
-                likeCount: 0,
-                likedByMe: false,
+                likeCount: q.likeCount ?? 0,
+                likedByMe: q.likedByMe ?? false,
               };
             }
           })
         );
 
-        setPopularQuestions(listWithLike);
+        listWithLike.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+        const top3 = listWithLike.slice(0, 3);
+
+        setPopularQuestions(top3);
       } catch (e) {
         console.error("홈 인기질문 불러오기 실패", e);
       } finally {
@@ -82,7 +133,6 @@ export default function MainScreen() {
     const fetchLatest = async () => {
       setLoading((prev) => ({ ...prev, latest: true }));
       try {
-        // 최신 질문 상위 3개
         const data = await searchQuestions({
           keyword: "",
           categories: [],
@@ -107,8 +157,8 @@ export default function MainScreen() {
               console.error("홈 최신질문 좋아요 상태 조회 실패", e);
               return {
                 ...q,
-                likeCount: 0,
-                likedByMe: false,
+                likeCount: q.likeCount ?? 0,
+                likedByMe: q.likedByMe ?? false,
               };
             }
           })
@@ -122,10 +172,22 @@ export default function MainScreen() {
       }
     };
 
+    const fetchHighlights = async () => {
+      setScrapLoading(true);
+      try {
+        const list = await getPopularScraps(5); // 필요하면 숫자 조정
+        setPopularScraps(Array.isArray(list) ? list : []);
+      } catch (e) {
+        console.error("하이라이트 인기 스크랩 불러오기 실패", e);
+      } finally {
+        setScrapLoading(false);
+      }
+    };
+
     fetchPopular();
     fetchLatest();
+    fetchHighlights();
   }, []);
-
 
   const toggleLike = async (questionId) => {
     let currentLiked = false;
@@ -194,7 +256,6 @@ export default function MainScreen() {
     }
   };
 
-
   const toggleParticipate = async (questionId) => {
     const now = !participate[questionId];
     try {
@@ -214,104 +275,191 @@ export default function MainScreen() {
     }
   };
 
+  const renderQuestionCard = (item) => {
+    const statusLabel = getStatusLabel(
+      item.questionStatus,
+      item.currentParticipants,
+      item.maxParticipants
+    );
+    const isJoinable = statusLabel === "참여 가능";
+    const isParticipating = !!participate[item.questionId];
 
-  const renderQuestionCard = (item) => (
-    <div
-      key={item.questionId}
-      className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-6 my-[1rem] relative flex flex-col"
-      onClick={() => navigate("/detail", { state: { questionId: item.questionId, item, }, })}
-    >
-      <div className="flex-1">
-      {/* 따옴표 + 문장 */}
-      <div className="relative w-full ml-[-0.2rem] mt-[1.5rem] flex items-start justify-center">
-        <img
-          src="/icons/quote.svg"
-          alt="quote"
-          className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] flex-shrink-0 ml-[-1rem] mr-2"
-        />
+    return (
+      <div
+        key={item.questionId}
+        className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-6 my-[1rem] relative flex flex-col"
+        onClick={() =>
+          navigate("/detail", { state: { questionId: item.questionId, item } })
+        }
+      >
+        <div className="flex-1">
+          {/* 따옴표 + 문장 */}
+          <div className="relative w-full ml-[-0.2rem] mt-[1.5rem] flex items-start justify-center">
+            <img
+              src="/icons/quote.svg"
+              alt="quote"
+              className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] flex-shrink-0 ml-[-1rem] mr-2"
+            />
 
-        <div className="relative max-w-[14rem] text-center mt-[0.5rem] leading-[1.5]">
-          <p className="text-[1rem] font-medium ml-[0.5rem] text-gray-800 line-clamp-3">
-            {item.questionTitle}
-          </p>
+            <div className="relative max-w-[14rem] text-center mt-[0.5rem] leading-[1.5]">
+              <p className="text-[1rem] font-medium ml-[0.5rem] text-gray-800 line-clamp-3">
+                {item.questionTitle}
+              </p>
 
-          <img
-            src="/icons/quote-down.svg"
-            alt="quote close"
-            className="w-[1rem] h-[1rem] mr-[-2rem] opacity-70 absolute right-0 bottom-0 translate-y-[20%]"
-          />
+              <img
+                src="/icons/quote-down.svg"
+                alt="quote close"
+                className="w-[1rem] h-[1rem] mr-[-2rem] opacity-70 absolute right-0 bottom-0 translate-y-[20%]"
+              />
+            </div>
+          </div>
+
+          {/* 구분선 */}
+          <div className="w-full mt-[2.5rem] h-[1px] bg-[#E7EBEF] my-4" />
+
+          {/* 닉네임 + 콘텐츠 제목 */}
+          <div>
+            <p className="text-[0.75rem] text-[#6B7280] mb-1">
+              {item.hostNickname || "익명의 닉네임"}
+            </p>
+            <p className="text-[0.9rem] font-bold text-[#3B3D40] line-clamp-1">
+              {item.contentName}
+            </p>
+          </div>
+
+          {/* 참여 인원 + 상태 + 태그 */}
+          <div className="flex flex-wrap gap-[0.5rem] items-center mt-3">
+            <div className="flex items-center gap-[0.12rem] px-2 py-1 rounded-md bg-[#F2F4F8] text-[#3B3D40] text-[0.75rem]">
+              <img src="/icons/people.svg" className="w-4 h-4" />
+              {` ${item.currentParticipants ?? 0}/${item.maxParticipants}`}
+            </div>
+
+            {statusLabel && (
+              <span
+                className={`px-2 py-1 text-[0.75rem] rounded-md ${getStatusChipClass(
+                  statusLabel
+                )}`}
+              >
+                {statusLabel}
+              </span>
+            )}
+
+            {(item.tagNames || []).map((tag, idx) => (
+              <span
+                key={idx}
+                className="px-2 py-1 bg-[#FFF2EE] text-[#FA502E] text-[0.75rem] rounded-md"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* 구분선 */}
-      <div className="w-full mt-[2.5rem] h-[1px] bg-[#E7EBEF] my-4" />
-
-      {/* 닉네임 + 콘텐츠 제목 */}
-      <div>
-        <p className="text-[0.75rem] text-[#6B7280] mb-1">
-          {item.hostNickname || "익명의 닉네임"}
-        </p>
-        <p className="text-[0.9rem] font-bold text-[#3B3D40] line-clamp-1">
-          {item.contentName}
-        </p>
-      </div>
-
-      {/* 참여 인원 + 태그 */}
-      <div className="flex flex-wrap gap-[0.5rem] items-center mt-3">
-        <div className="flex items-center gap-[0.12rem] px-2 py-1 rounded-md bg-[#F2F4F8] text-[#3B3D40] text-[0.75rem]">
-          <img src="/icons/people.svg" className="w-4 h-4" />
-          {` ${item.currentParticipants ?? 0}/${item.maxParticipants}`}
-        </div>
-
-        {(item.tagNames || []).map((tag, idx) => (
-          <span
-            key={idx}
-            className="px-2 py-1 bg-[#FFF2EE] text-[#FA502E] text-[0.75rem] rounded-md"
+        {/* 하트 + 참여/대화 버튼 */}
+        <div className="flex items-center justify-between mt-[1rem]">
+          {/* ❤️ 하트 */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleLike(item.questionId);
+            }}
+            className="flex items-center gap-1"
           >
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
+            <img
+              src={
+                item.likedByMe ? "/icons/heart-filled.svg" : "/icons/heart.svg"
+              }
+              className="w-6 h-6"
+            />
+            <span className="text-[0.9rem] text-[#3B3D40]">
+              {item.likeCount ?? 0}
+            </span>
+          </button>
 
-      {/* 하트 + 참여하기 버튼 */}
-      <div className="flex items-center justify-between mt-[1rem]">
-        {/* ❤️ 하트 */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleLike(item.questionId);
-          }}
-          className="flex items-center gap-1"
-        >
-          <img
-            src={
-              item.likedByMe ? "/icons/heart-filled.svg" : "/icons/heart.svg"
-            }
-            className="w-6 h-6"
-          />
-          <span className="text-[0.9rem] text-[#3B3D40]">
-            {item.likeCount ?? 0}
-          </span>
-        </button>
-
-        {/* 참여하기 버튼 */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleParticipate(item.questionId);
-          }}
-          className={`px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-            participate[item.questionId]
-              ? "bg-[#B5BBC1] text-white"
-              : "bg-[#FA502E] text-white"
-          }`}
-        >
-          {participate[item.questionId] ? "참여 취소" : "참여하기"}
-        </button>
+          {/* 상태에 따라 버튼 변경 */}
+          {isJoinable ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleParticipate(item.questionId);
+              }}
+              className={`px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
+                isParticipating
+                  ? "bg-[#B5BBC1] text-white"
+                  : "bg-[#FA502E] text-white"
+              }`}
+            >
+              {isParticipating ? "참여 취소" : "참여하기"}
+            </button>
+          ) : (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/detail", {
+                  state: { questionId: item.questionId, item },
+                });
+              }}
+              className="px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+            >
+              대화 보기
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  // 하이라이트 카드
+  const renderHighlightCard = (item, index) => {
+    const nickname = item.nickname || "익명의 회원";
+    const contentTitle = item.contentTitle || "콘텐츠 제목";
+    const questionTitle = item.questionTitle || "질문 제목";
+    const messageContent =
+      item.content ||
+      item.messageContent ||
+      "하이라이트 문장이 여기에 들어가요.";
+    const createdAt = item.scrappedAt || item.createdAt;
+    const timeLabel = formatTimeAgo(createdAt);
+
+    return (
+        <div
+        key={item.messageId ?? index}
+        className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]"
+      >
+        
+        <div className="relative w-full flex items-start">
+          <div className="mt-[0.5rem] ml-[0.25rem] leading-[1.5]">
+            <div className="flex items-center mb-[0.25rem]">
+              <img
+                src="/icons/profile-gray.svg"
+                alt="프로필"
+                className="w-[2rem] h-[2rem]"
+              />
+              <div className="flex flex-col">
+                <p className="text-[#3B3D40] text-[0.75rem]">{nickname}</p>
+                <p className="text-[#3B3D40] text-[0.625rem]">
+                  하이라이트{timeLabel ? ` • ${timeLabel}` : ""}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-[0.75rem] mt-[0.75rem] font-regular text-[#3B3D40]">
+              {contentTitle}
+            </p>
+            <p className="text-[0.875rem] font-bold text-[#3B3D40]">
+              {questionTitle}
+            </p>
+
+            <div className="w-full h-[0.0625rem] bg-[#E7EBEF] mt-[0.75rem]" />
+
+            <p className="text-[0.875rem] text-[#3B3D40] mt-[1.5rem]">
+              {messageContent}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col w-full h-full bg-[#FAFAFA] font-[Pretendard]">
@@ -328,7 +476,7 @@ export default function MainScreen() {
                 key={tab.name}
                 onClick={() => navigate(tab.path)}
                 className={`relative flex flex-col items-center justify-center h-[2.5rem] bg-transparent border-none outline-none pb-2 text-[0.9rem] transition-colors duration-200 ${
-                  active ? "text-black font-medium-bold" : "text-black"
+                  active ? "text-black font-bold" : "text-black"
                 }`}
               >
                 {tab.name}
@@ -426,85 +574,41 @@ export default function MainScreen() {
             </div>
           </div>
 
-        {/* 🔸 섹션 2 (그대로 유지) */}
-        <div className="w-full px-6 mt-[2rem]">
-          <div className="flex items-center justify-between">
-            <p className="text-[1.5rem] font-bold">
-              대화 사이에 머문 하이라이트
+          {/* 🔸 섹션 2 : 대화 사이에 머문 하이라이트 */}
+          <div className="w-full px-6 mt-[2rem]">
+            <div className="flex items-center justify-between">
+              <p className="text-[1.5rem] font-bold">
+                대화 사이에 머문 하이라이트
+              </p>
+            </div>
+            <p className="text-[0.875rem] text-gray-500">
+              다른 회원들이 하이라이트로 저장한 문장을 만나보세요.
             </p>
           </div>
-          <p className="text-[0.875rem] text-gray-500">
-            다른 회원들이 하이라이트로 저장한 문장을 만나보세요.
-          </p>
-        </div>
 
-        <div className="w-full mt-4 overflow-x-auto overflow-y-visible no-scrollbar relative z-10" style={{ overflowY: "visible" }}>
-          <div className="flex gap-4 w-max">
-            <div className="w-[20.4375rem] ml-[1.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]">
-                  <div className="relative w-full flex items-start">
-
-                    <div className="mt-[0.5rem] ml-[0.25rem] leading-[1.5]">
-                      <div className="flex items-center gap-[0.5rem] mb-[0.25rem]">
-                      <img
-                        src="/icons/profile-gray.svg"
-                        alt="프로필"
-                        className="w-[2rem] h-[2rem]"
-                      />
-                      <div className="flex flex-col">
-                        <p className="text-[#3B3D40] text-[0.75rem]">익명의 사자</p>
-                        <p className="text-[#3B3D40] text-[0.625rem]"> 하이라이트 • 5일 전</p>
-                      </div>
-                    </div>
-                      <p className="text-[0.75rem] mt-[0.75rem] font-regular text-[#3B3D40]">
-                        이터널션샤인
-                      </p>
-                      <p className="text-[0.875rem] font-bold text-[#3B3D40]">
-                        기억을 지운다는 건 고통을 없애기 위함일까, 아니면<br />
-                        다시 사랑하기 위해 자신을 비워내는 행위일까?
-                      </p>
-                      <div className="w-full h-[0.0625rem] bg-[#E7EBEF] mt-[0.75rem]"></div>
-                      <p className="text-[0.875rem] text-[#3B3D40] mt-[1.5rem]">
-                        AI가 기억을 없애주는 게 꼭 나쁜 건 아닐 수도 있겠죠. 고통이 줄어드니까요. 
-                        하지만 후회나 성장의 감정도 함께 사라질 거예요. 
-                        그러면 결국 ‘나’라는 사람이 점점 비워지는 게 아닐까요?</p>
-                    </div>
-                  </div>
+          <div
+            className="w-full mt-4 overflow-x-auto overflow-y-visible no-scrollbar relative z-10"
+            style={{ overflowY: "visible" }}
+          >
+            <div className="flex gap-4 w-max">
+              {scrapLoading && popularScraps.length === 0 && (
+                <div className="pl-[1.5rem] text-sm text-gray-500">
+                  하이라이트 불러오는 중...
                 </div>
+              )}
 
-                {/* 2번 카드 */}
-                <div className="w-[20.4375rem] ml-[-1.5rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]">
-                  <div className="relative w-full flex items-start">
-
-                    <div className="mt-[0.5rem] ml-[0.25rem] leading-[1.5]">
-                      <div className="flex items-center gap-[0.5rem] mb-[0.25rem]">
-                      <img
-                        src="/icons/profile-gray.svg"
-                        alt="프로필"
-                        className="w-[2rem] h-[2rem]"
-                      />
-                      <div className="flex flex-col">
-                        <p className="text-[#3B3D40] text-[0.75rem]">익명의 사자</p>
-                        <p className="text-[#3B3D40] text-[0.625rem]"> 하이라이트 • 5일 전</p>
-                      </div>
-                    </div>
-                      <p className="text-[0.75rem] mt-[0.75rem] font-regular text-[#3B3D40]">
-                        이터널션샤인
-                      </p>
-                      <p className="text-[0.875rem] font-bold text-[#3B3D40]">
-                        기억을 지운다는 건 고통을 없애기 위함일까, 아니면<br />
-                        다시 사랑하기 위해 자신을 비워내는 행위일까?
-                      </p>
-                      <div className="w-full h-[0.0625rem] bg-[#E7EBEF] mt-[0.75rem]"></div>
-                      <p className="text-[0.875rem] text-[#3B3D40] mt-[1.5rem]">
-                        AI가 기억을 없애주는 게 꼭 나쁜 건 아닐 수도 있겠죠. 고통이 줄어드니까요. 
-                        하지만 후회나 성장의 감정도 함께 사라질 거예요. 
-                        그러면 결국 ‘나’라는 사람이 점점 비워지는 게 아닐까요?</p>
-                    </div>
-                  </div>
+              {!scrapLoading && popularScraps.length === 0 && (
+                <div className="pl-[1.5rem] text-sm text-gray-400 my-[1.5rem]">
+                  아직 하이라이트가 없어요.
                 </div>
-              </div>
+              )}
+
+              {!scrapLoading &&
+                popularScraps.map((item, idx) =>
+                  renderHighlightCard(item, idx)
+                )}
             </div>
-
+          </div>
 
           {/* 🔸 섹션 3 : 최신 질문 상위 3개 */}
           <div className="w-full px-6 mt-10 flex justify-between items-center z-0 relative">

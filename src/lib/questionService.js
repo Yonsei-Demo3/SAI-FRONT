@@ -91,3 +91,11 @@ export async function getMyChats() {
   const res = await axiosInstance.get("/api/v1/questions", getAuthConfig());
   return res.data;
 }
+
+export async function getMyQuestions() {
+  const res = await axiosInstance.get(
+    "/api/v1/questions/my",
+    getAuthConfig()
+  );
+  return res.data;
+}

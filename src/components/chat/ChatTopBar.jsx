@@ -48,7 +48,9 @@ export default function TopBar({ startAt, endAt, onExpire, title}) {
           </button>
         </div>
       </div>
-      <TimerBanner startAt={startAt} endAt={endAt} onExpire={onExpire} />
+      {startAt && endAt && (
+        <TimerBanner startAt={startAt} endAt={endAt} onExpire={onExpire} />
+     )}
       <QuestionStrip title={title} />
     </div>
   );

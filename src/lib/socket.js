@@ -1,4 +1,3 @@
-// src/lib/socket.js
 import { io } from "socket.io-client";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
@@ -45,18 +44,59 @@ export function getSocket() {
     return socket;
 }
 
+export function subscribeToAlarm(handler) {
+  
+    const socket = getSocket();
 
-export function sendMessageSocket(message) {
+    const listener = (payload) => {
+        console.log("[socket] new notification:", payload);
+        if (typeof handler === "function") {
+        handler(payload);
+        }
+    };
+
+    socket.on("new notification", listener);
+
+    return () => {
+        socket.off("new notification", listener);
+    };
+}
+
+export function sendMessageSocket({ roomId, content, type = "TEXT" }) {
 
     const socket = getSocket();
 
-    console.log("[socket] emit chat message:", message);
+      const payload = {
+        roomId,
+        content,
+        type,
+    };
+
+    console.log("[socket] send message:", payload);
       
-    socket.emit("chat message", message);
+    socket.emit("chat message", payload);
 
 }
 
-export function joinSocket({roomId}) {
+export function receiveMessageSocket(handler) {
+
+    const socket = getSocket();
+    
+    const listener = (payload) => {
+        console.log("[socket] chat message:", payload);
+        if (typeof handler === "function") {
+            handler(payload);
+        }
+    };
+
+    socket.on("chat message", listener);
+
+      return () => {
+    socket.off("chat message", listener);
+  };
+}
+
+export function joinRoomSocket({roomId}) {
 
     const socket = getSocket();
 

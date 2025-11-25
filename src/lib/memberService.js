@@ -15,3 +15,8 @@ export async function updateMyNickname(nickname) {
 
   return res.data;
 }
+
+export async function deleteAccount() {
+  const res = await axiosInstance.delete(`/api/v1/members/me`);
+  return res.data;
+}
