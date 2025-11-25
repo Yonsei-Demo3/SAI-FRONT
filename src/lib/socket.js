@@ -62,17 +62,41 @@ export function subscribeToAlarm(handler) {
     };
 }
 
-export function sendMessageSocket(message) {
+export function sendMessageSocket({ roomId, content, type = "TEXT" }) {
 
     const socket = getSocket();
 
-    console.log("[socket] emit chat message:", message);
+      const payload = {
+        roomId,
+        content,
+        type,
+    };
+
+    console.log("[socket] send message:", payload);
       
-    socket.emit("chat message", message);
+    socket.emit("chat message", payload);
 
 }
 
-export function joinSocket({roomId}) {
+export function receiveMessageSocket(handler) {
+
+    const socket = getSocket();
+    
+    const listener = (payload) => {
+        console.log("[socket] chat message:", payload);
+        if (typeof handler === "function") {
+            handler(payload);
+        }
+    };
+
+    socket.on("chat message", listener);
+
+      return () => {
+    socket.off("chat message", listener);
+  };
+}
+
+export function joinRoomSocket({roomId}) {
 
     const socket = getSocket();
 

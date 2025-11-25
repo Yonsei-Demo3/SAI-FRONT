@@ -20,7 +20,7 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
   const content = msg.content;
   const senderNickname = msg.senderNickname;
   const isMine = msg.isMine;
-  const type = msg.type || "text";
+  const type = msg.type || "TEXT";
   const time = msg.time || "오후 4:20";
   const imageUrl = msg.imageUrl || null;
   const images = msg.images || [];
@@ -40,7 +40,7 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
       )}
 
       {/* 상대 대화 북마크 */}
-      {isMine && type === "text" && (
+      {isMine && type === "TEXT" && (
         <div className="self-end mb-[1rem]">
           <button
             onClick={() => onToggleBookmark?.(messageId)}
@@ -75,7 +75,7 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
 
 
               {/* 텍스트 메시지 */}
-              {type === "text" && (
+              {type === "TEXT" && (
                 <div
                   className={`relative max-w-[15rem] rounded-[1rem] pl-[1.25rem] pr-[1.25rem] pt-[0.875rem] pb-[0.875rem] 
                               ${isMine ? "border border-[#DEE2E6] bg-[#FFFFFF]" : "bg-[#FA502E]"}`}
@@ -92,7 +92,7 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
               
 
               {/* 이미지 메시지 */}
-              {type === "image" && images && (
+              {type === "IMAGE" && images && (
                 <div
                   className={`relative max-w-[15rem] rounded-[1rem] pl-[1.25rem] pr-[1.25rem] pt-[0.875rem] pb-[0.875rem]`}
                 >
@@ -114,7 +114,7 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
               </div>
               )}
 
-              {type === "file" && files && (
+              {type === "FILE" && files && (
                   <div
                     className="relative max-w-[15rem] rounded-[1rem] pl-[1.25rem] pr-[1.25rem] pt-[0.875rem] pb-[0.875rem]"
                   >
@@ -172,7 +172,7 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
       </div>
 
       {/*상대 대화 북마크 */}
-      {!isMine && type === "text" && (
+      {!isMine && type === "TEXT" && (
         <div className="self-end mb-[1rem] ml-[0.1rem]">
           <button
             onClick={() => onToggleBookmark?.(messageId)}

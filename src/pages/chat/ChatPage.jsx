@@ -3,10 +3,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import ChatTopBar from "../../components/chat/ChatTopBar";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatInput from "../../components/chat/ChatInput";
-import { getSocket, sendMessageSocket, joinSocket  } from "../../lib/socket";
-import { getTimeChat, getFinishChat, scrapMessage, unscrapMessage } from "../../lib/chatService";
+import { getSocket, receiveMessageSocket, sendMessageSocket, joinRoomSocket  } from "../../lib/socket";
+import { getTimeChat, getFinishChat, scrapMessage, unscrapMessage, finishChat } from "../../lib/chatService";
 
 const SAI_TIME_LIMIT = 42 * 60 * 1000; // 42분 in milliseconds
+// const SAI_TIME_LIMIT = 2 * 60 * 1000; // 1분
+
 
 // Helpers
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -23,6 +25,17 @@ const serverTimeToUtcMs = (serverDateTimeStr) => {
   return utcDate.getTime(); 
 };
 
+const formatTimeFromISO = (isoString) => {
+  if (!isoString) return nowKo(); // fallback
+  const date = new Date(isoString);
+  return new Intl.DateTimeFormat("ko-KR", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
+};
+
+
 
 export default function ChatPage() {
 
@@ -30,17 +43,14 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  {/* active : 활성화된 채팅, finished : 종료된 채팅  */}
-  const status = location.state?.status || "finished"; 
+  const initialStatus = location.state?.status || "active";
+  const [status, setStatus] = useState(initialStatus);
   const roomId = location.state?.roomId;   
   const questionId = location.state?.questionId;
   const questionTitle = location.state?.questionTitle || "";
   
-  const [messages, setMessages] = useState([]);
-
-
-  const [side, setSide] = useState("right");
-  
+  // 채팅 메시지 
+  const [messages, setMessages] = useState([]);  
   
   const scrollRef = useRef(null);
   const didMountRef = useRef(false);
@@ -55,6 +65,32 @@ export default function ChatPage() {
   const [isTimeLoading, setIsTimeLoading] = useState(false);
 
   const [previewImage, setPreviewImage] = useState(null);
+
+  const handleTimerExpire = () => {
+
+    if (status === "finished") return;
+
+    console.log("[chat] 타이머 만료 - 상태를 finished로 변경");
+    setStatus("finished");
+
+    {/* 대화 종료 API 호출 */}
+    async function finish() {
+      try {
+        if (roomId) {
+
+          await finishChat(roomId);
+          console.log("[chat] 대화 종료");
+        
+        } else {
+          console.warn("[chat] 유효하지 않은 roomId");
+        }
+      } catch (err) {
+        console.error("[chat] 대화 종료 API 호출 실패:", err);
+      }
+    }
+
+    finish();
+  };
 
   // 하단 근처 판정 유틸
   const isNearBottom = (el) => {
@@ -75,9 +111,6 @@ export default function ChatPage() {
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-
-    console.log("questionId:", questionId);
-    console.log("roomId:", roomId);
 
     if (!didMountRef.current) {
       el.scrollTop = el.scrollHeight;        
@@ -103,6 +136,7 @@ export default function ChatPage() {
   }, [messages.length]);
 
 
+  {/* 메시지 스크랩 */}
   const toggleBookmark = async (messageId) => {
 
     const target = messages.find((m) => m.messageId === messageId);
@@ -120,7 +154,6 @@ export default function ChatPage() {
     );
 
     try {
-
       if (wasBookmarked) {
         await unscrapMessage(messageId);
       } else {
@@ -138,6 +171,7 @@ export default function ChatPage() {
     }
   };
 
+  {/* 채팅 시작 시간 가져오기*/}
   useEffect(() => {
 
     if (!questionId) return; // questionId 없으면 요청 안 보냄
@@ -165,6 +199,8 @@ export default function ChatPage() {
     fetchTime();
   }, [questionId]);
 
+
+  {/* 종료된 채팅 메시지 불러오기 */}
   useEffect(() => {
     if(status !== "finished") return;
 
@@ -182,7 +218,7 @@ export default function ChatPage() {
           isMine: msg.isMine,
 
           // 더미 값
-          type: "text",          
+          type: "TEXT",          
           time: msg.time || "오후 4:20",
           images: msg.images ?? [],
           files: msg.files ?? [],
@@ -203,6 +239,8 @@ export default function ChatPage() {
   
   }, [questionId, status]);
 
+
+  {/* 채팅방 참여*/}
   useEffect(() => {
 
     const socket = getSocket();    
@@ -210,77 +248,98 @@ export default function ChatPage() {
 
     // 채팅방 참여
     if (roomId) {
-      joinSocket({ roomId });
-      console.log("[socket] join room:", roomId);
-    } else {
-      console.warn("[socket] roomId가 없어 채팅방 참여가 불가능합니다.");
-    }
-
-
-    const handleChatMessage = (data) => {
       
-      console.log("Received chat message:", data);
-      const { from, message, room } = data;
+      joinRoomSocket({ roomId });
+      console.log("[socket] join room:", roomId);
+
+    } else {
+      
+      console.warn("[socket] roomId가 없어 채팅방 참여가 불가능합니다.");
+    
+    }
+  }, []);
+
+  {/* 메시지 수신*/}
+  useEffect(() => {
+    if (!roomId) return;
+
+    const cancelReceive = receiveMessageSocket((payload) => {
 
       const newMsg = {
-        // messageId: ,                
-        name: from,
-        text: message,
-        time: nowKo(),
-        side: "left",             
-        room,
+        messageId: payload.messageId,
+        content: payload.content,
+        senderId: payload.senderId,
+        senderNickname: payload.senderNickname,
+        isMine: false,
+        type: payload.type === "TEXT" ? "TEXT" : "TEXT", 
+        time: formatTimeFromISO(payload.createdAt),
+        images: [],
+        files: [],
+        bookmarked: false,
+        imageColor: "bg-orange-400",
       };
 
       setMessages((prev) => [...prev, newMsg]);
+    });
+
+    return () => {
+      cancelReceive();
     };
-    
-    socket.on("chat message", handleChatMessage);
+  }, [roomId]);
 
-  }, []);
 
-  const handleSend = (content, s, type) => {
-  
-    if (type === "image") {
+  {/*메세지 전송 핸들러*/}
+  const handleSend = (content, type) => {
+
+    if (status === "finished") return;
+    if (!content) return;
+
+    if (type === "IMAGE") {
       setMessages((prev) => [
         ...prev,
         {
-          id: uid(),
-          images: content,       // 이미지 배열
-          type: "image",
-          side: s,
+          messageId: uid(),
+          images: content, 
+          isMine: true,      
+          type: "IMAGE",
           time: nowKo(),
+          bookmarked: false,
+          senderNickname: "", 
         },
       ]);
-    } else if (type === "file") {
+    } else if (type === "FILE") {
       setMessages((prev) => [
         ...prev,
         {
-          id: uid(),
-          files: content,       // File[] 또는 파일 정보 배열
-          type: "file",
-          side: s,
+          messageId: uid(),
+          files: content, 
+          isMine: true,
+          type: "FILE",
           time: nowKo(),
+          bookmarked: false,
+          senderNickname: "",
         },
       ]);
     } else {
 
         const newMsg = {
-          id: uid(),
-          content: content,
-          type: "text",
+          messageId: uid(), // key 용 임시 ID
+          content,
           isMine: true,
+          type: "TEXT",
           time: nowKo(),
+          bookmarked: false,
+          senderNickname: "",      
         };
         
         setMessages((prev) => [...prev, newMsg]);
 
-        // // 소켓으로 메시지 전송
-        // if (socketRef.current) {
-        //   socketRef.current.emit("chat message", {
-        //     "roomId" : 1,                 
-        //     "message" : content,
-        //   });
-        // }
+        if(roomId) {
+          sendMessageSocket({ roomId, content, type: "TEXT" });
+        } else {
+            console.warn("[chat] roomId 없음: 메시지 전송 불가");
+        }
+
     }
   };
 
@@ -316,7 +375,7 @@ export default function ChatPage() {
         <ChatTopBar 
           startAt={startAt} 
           endAt={endAt} 
-          onExpire={() => console.log("타이머 종료")} 
+          onExpire={handleTimerExpire}
           onSearchChange={setSearchText}
           title={questionTitle}
         />
@@ -401,7 +460,7 @@ export default function ChatPage() {
       )}
 
       <footer className="bg-white justify-center items-center">
-        <ChatInput onSend={handleSend} side={side} status={status} />
+        <ChatInput onSend={handleSend} status={status} />
       </footer>
     </div>
   );

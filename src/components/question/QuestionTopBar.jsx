@@ -16,7 +16,7 @@ export default function QuestionTopBar({ title,   onSubmit, canSubmit }) {
       </svg>
     </button>
 
-    <button
+    {/* <button
       type="button"
       onClick={onSubmit}
       disabled={!canSubmit}   
@@ -29,7 +29,7 @@ export default function QuestionTopBar({ title,   onSubmit, canSubmit }) {
       <span className="text-[#FFFFFF] text-[0.875rem] font-medium">
         등록
       </span>
-    </button>
+    </button> */}
 
   </div>
   );
