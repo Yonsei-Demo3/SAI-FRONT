@@ -4,10 +4,10 @@ import ContentTopBar from "../../components/contents/contentTopBar";
 import Dropdown from "../../components/contents/dropDown";
 import { createContent } from "../../lib/contentService";
 
-const MAJOR = ["책", "영화/TV", "기타 콘텐츠"];
+const MAJOR = ["책", "영화·TV", "기타 콘텐츠"];
 const MINOR_BY_MAJOR = {
   "책": ["소설", "에세이", "논픽션", "시 / 문학", "역사 / 인문", "과학 / 기술", "만화 / 그래픽노블"],
-  "영화/TV": ["영화", "드라마", "다큐", "애니메이션", "예능 / 리얼리티", "OTT 오리지널"],
+  "영화·TV": ["영화", "드라마", "다큐", "애니메이션", "예능 / 리얼리티", "OTT 오리지널"],
   "기타 콘텐츠": ["음악", "유튜브", "팟캐스트", "웹툰 / 웹 소설", "게임", "전시 / 공연", "SNS / 밈", "뉴스 / 시사", "기타"],
 };
 

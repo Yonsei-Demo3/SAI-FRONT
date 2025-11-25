@@ -17,10 +17,12 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
  
   const isLeft = msg.side === "left";
   const type = msg.type || "text";
+  
+  const isMine = msg.isMine;
 
   return (
     
-    <div className={`w-full flex pl-[0.625rem] pr-[0.625rem] pt-[0.5rem] pb-[0.5rem] ${isLeft ? "justify-start" : "justify-end"}`}>
+    <div className={`w-full flex pl-[0.625rem] pr-[0.625rem] pt-[0.5rem] pb-[0.5rem] ${isMine ? "justify-start" : "justify-end"}`}>
 
 
       {isLeft && (
