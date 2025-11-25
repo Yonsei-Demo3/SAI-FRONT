@@ -6,83 +6,6 @@ import ChatListTopBar from "../../components/chat/ChatListTopBar";
 import { readyChat, quitChat } from "../../lib/chatService";
 import { participateQuestion } from "../../lib/questionService";
 
-const API_RESPONSES = {
-  ready: [
-    {
-      id: 0,
-      title: "기억 통제로 인간은 더 행복해질까?",
-      participant: 3,
-      maxParticipant: 4,
-      status: "participate",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 1,
-      title: "기억 통제로 인간은 더 행복해질까?",
-      participant: 2,
-      maxParticipant: 4,
-      status: "cancelled",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    }
-  ],
-
-  participate: [
-    {
-      id: 0,
-      title: "기억 통제로 인간은 더 행복해질까?",
-      participant: 2,
-      maxParticipant: 4,
-      status: "participate",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 1,
-      title: "기억 통제로 인간은 더 행복해질까?",
-      participant: 3,
-      maxParticipant: 4,
-      status: "cancelled",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      title: "기억 통제로 인간은 더 행복해질까?",
-      participant: 4,
-      maxParticipant: 4,
-      status: "participate",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-  ],
-
-  finish: [
-    {
-      id: 0,
-      title: "기술이 인간의 감정과 어떻게 연결될까?",
-      question:
-        "좋든 기억이든 나쁜 기억이든 다 내 일부니까, 고통도 성장의 근원이 될 수 있지 않을까?",
-      participant: 4,
-      date: "25.10.09",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 1,
-      title: "기억 통제로 인간은 더 행복해질까?",
-      question:
-        "좋든 기억이든 나쁜 기억이든 다 내 일부니까, 고통도 성장의 근원이 될 수 있지 않을까?",
-      participant: 8,
-      date: "25.10.09",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      title: "기억 통제로 인간은 더 행복해질까? 아니면 오히려 이것이 불행의 시작이 될까?",
-      question:
-        "좋든 기억이든 나쁜 기억이든 다 내 일부니까, 고통도 성장의 근원이 될 수 있지 않을까?",
-      participant: 5,
-      date: "25.10.09",
-      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop"
-    },
-  ],
-};
 
 export default function ChatListPage() {
   
@@ -110,8 +33,8 @@ export default function ChatListPage() {
           questionId: q.questionId,
           roomId: q.roomId,                 
           title: q.questionTitle,           
-          participant: q.currentParticipant || 2,
-          maxParticipant: q.maxParticipant || 4, 
+          participant: q.currentParticipants,
+          maxParticipant: q.maxParticipants, 
           date: q.createdAt || "02.07" ,
           status:
             tab === "ready"
