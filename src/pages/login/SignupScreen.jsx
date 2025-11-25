@@ -10,8 +10,8 @@ export default function SignupScreen() {
     email: "",
     user_id: "",
     password: "",
-    nickname: "",  // nickname 추가
-    phone: ""      // phone 추가
+    nickname: "",
+    phone: ""    
   });
 
   const handleChange = (e) => {
@@ -107,27 +107,6 @@ export default function SignupScreen() {
               required
             />
           </div>
-        </div>
-
-        {/* 아이디 */}
-        <div className="relative">
-          <div className="flex flex-col justify-center border border-[#D0D6DD] rounded-[0.5rem] h-[3.75rem] px-[1rem]">
-            <label className="text-[0.625rem] text-[#9EA4AA] font-medium mb-[0.2rem]">
-              아이디 <span className="text-[#FA502E]">*</span>
-            </label>
-            <input
-              type="text"
-              name="user_id"
-              value={formData.user_id}
-              onChange={handleChange}
-              placeholder="아이디 입력"
-              className="text-[1rem] text-[#000] placeholder-[#C2C6CA] focus:outline-none border-none"
-              required
-            />
-          </div>
-          <p className="text-[0.75rem] text-[#9EA4AA] mt-[0.37rem] ml-[0.3rem]">
-            영문, 숫자, 특수문자 사용 가능 8~16자
-          </p>
         </div>
 
         {/* 비밀번호 */}

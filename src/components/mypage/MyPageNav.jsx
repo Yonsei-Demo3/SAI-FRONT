@@ -1,9 +1,10 @@
-// src/components/mypage/MyPageNav.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getMyInfo } from "../../lib/memberService";
 import { getFriendCounts } from "../../lib/friendService";
-import { getMyChats } from "../../lib/questionService"; // ★ 방금 만든 함수
+import { getMyChats, getMyQuestions } from "../../lib/questionService"; // ★ 방금 만든 함수
+import { getMyScraps } from "../../lib/scrapService";
+import { getMyLikedQuestions } from "../../lib/likeService";
 
 export default function MyPageNav() {
   const navigate = useNavigate();
@@ -13,7 +14,6 @@ export default function MyPageNav() {
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
-  // 질문/대화/저장/스크랩 개수
   const [stats, setStats] = useState({
     questionCount: 0,
     chatCount: 0,
@@ -21,7 +21,6 @@ export default function MyPageNav() {
     scrapCount: 0,
   });
 
-  // 프로필 + 친구 수
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -39,18 +38,47 @@ export default function MyPageNav() {
     fetchProfile();
   }, []);
 
-  // ✨ 개수 불러오기 (지금은 대화만 실제로 채워 줌)
+  // ✨ 개수 불러오기
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // 내가 참여한 대화 리스트
-        const chats = await getMyChats();
-        setStats((prev) => ({
-          ...prev,
-          chatCount: Array.isArray(chats) ? chats.length : 0,
-          // questionCount / saveCount / scrapCount 도
-          // 나중에 API 생기면 여기서 같이 채우면 됨
-        }));
+        // 한 번에 호출
+        const [chats, myQuestions, scraps, likedQuestions] = await Promise.all([
+          getMyChats(),
+          getMyQuestions(),
+          getMyScraps(),
+          getMyLikedQuestions()
+        ]);
+
+        const chatCount = Array.isArray(chats) ? chats.length : 0;
+        const questionCount = Array.isArray(myQuestions) ? myQuestions.length : 0;
+        const likedCount = Array.isArray(likedQuestions) ? likedQuestions.length : 0;
+
+        let saveCount = 0;
+        let scrapFromMessages = 0;
+
+        if (Array.isArray(scraps)) {
+          scraps.forEach((s) => {
+            // 🔽 백엔드에서 source 값 어떻게 주는지에 따라 바꿔 쓰면 됨
+            if (s.source === "INTERNAL") {
+              // 내가 참여한 방에서 저장한 메시지 → "저장"
+              saveCount += 1;
+            } else if (s.source === "EXTERNAL") {
+              // 참여 안 한 방에서 스크랩한 메시지 → "스크랩"
+              scrapFromMessages += 1;
+            } else {
+              // source 없으면 일단 저장 쪽으로
+              saveCount += 1;
+            }
+          });
+        }
+
+        setStats({
+          questionCount,
+          chatCount,
+          saveCount,
+          scrapCount: scrapFromMessages + likedCount,
+        });
       } catch (e) {
         console.error("마이페이지 통계 로드 실패:", e);
       }
@@ -58,6 +86,7 @@ export default function MyPageNav() {
 
     fetchStats();
   }, []);
+
 
   // 탭 + 숫자 매핑
   const tabs = [

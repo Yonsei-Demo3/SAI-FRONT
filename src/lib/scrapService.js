@@ -41,3 +41,10 @@ export async function getUserScraps(userId) {
   );
   return res.data;
 }
+
+export async function getPopularScraps(size = 5) {
+  const res = await axiosInstance.get("/api/v1/messages/scrap/popular", {
+    params: { size },
+  });
+  return res.data; 
+}

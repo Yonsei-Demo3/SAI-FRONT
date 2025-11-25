@@ -1,5 +1,3 @@
-// src/screens/mypage/MyPageChats.jsx
-
 import React, { useState, useEffect } from "react";
 import BottomNav from "../../components/main/BottomNav";
 import MyPageNav from "../../components/mypage/MyPageNav";

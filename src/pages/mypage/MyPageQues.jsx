@@ -1,48 +1,98 @@
-// src/screens/mypage/MyPageScrapScreen.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/main/BottomNav";
 import MyPageNav from "../../components/mypage/MyPageNav";
+import { getMyQuestions } from "../../lib/questionService";
+import { getLikeStatus } from "../../lib/likeService";
 
 export default function MyPageQuesScreen() {
   const navigate = useNavigate();
 
   const [sortOpen, setSortOpen] = useState(false);
   const [sortType, setSortType] = useState("최신순");
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+    useEffect(() => {
+    const fetchMyQuestions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 1) /api/v1/questions/my 로 질문 목록 가져오기
+        const list = await getMyQuestions();
+
+        // 2) 각 질문에 좋아요 정보 붙이기
+        const withLike = await Promise.all(
+          list.map(async (q) => {
+            try {
+              const likeInfo = await getLikeStatus(q.questionId);
+
+              return {
+                id: q.questionId,
+                questionTitle: q.questionTitle,
+                questionDescription: q.questionDescription,
+                hostNickname: q.hostNickname,
+                contentName: q.contentName,
+                mainCategory: q.mainCategory,
+                subCategory: q.subCategory,
+                participantCount: q.currentParticipants,
+                maxParticipants: q.maxParticipants,
+                chatTags: [
+                  q.questionStatus === "RECRUITING" ? "진행중" : "종료",
+                ],
+                tags: q.tagNames || [],
+                likeCount: likeInfo.likeCount,
+                createdAt: q.createdAt,
+              };
+            } catch (e) {
+              console.error("좋아요 상태 조회 실패", e);
+              return {
+                id: q.questionId,
+                questionTitle: q.questionTitle,
+                questionDescription: q.questionDescription,
+                hostNickname: q.hostNickname,
+                contentName: q.contentName,
+                mainCategory: q.mainCategory,
+                subCategory: q.subCategory,
+                participantCount: q.currentParticipants,
+                maxParticipants: q.maxParticipants,
+                chatTags: [
+                  q.questionStatus === "RECRUITING" ? "진행중" : "마감",
+                ],
+                tags: q.tagNames || [],
+                likeCount: 0,
+                createdAt: q.createdAt,
+              };
+            }
+          })
+        );
+
+        setQuestions(withLike);
+      } catch (e) {
+        console.error("내 질문 목록 불러오기 실패", e);
+        setError("질문 목록을 불러오지 못했어요.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyQuestions();
+  }, []);
 
 
-  const favoriteQuestions = [
-    {
-      id: 101,
-      questionTitle:
-        "기억을 지운다는 건 고통을 없애기 위함일까, 아니면 다시 사랑하기 위해 자신을 비워내는 행위일까?",
-      questionDescription: "아픈 기억이 사라지면 편해질 것 같지만, 그 기억이 사라지면 지금의 나도 조금 달라질 것 같다는 생각이 들더라고요.",
-      hostNickname: "익명의 사자",
-      contentName: "이터널 선샤인",
-      mainCategory: "도서",
-      subCategory: "소설",
-      participantCount: 1,
-      maxParticipants: 4,
-      chatTags: ["진행중"],
-      tags: ["용서", "기억"],
-      likeCount: 20,
-    },
-    {
-      id: 102,
-      questionTitle:
-        "잊고 싶은 기억을 완전히 지울 수 있다면 삶은 더 나아질까요?",
-      questionDescription: "아픈 기억이 사라지면 편해질 것 같지만, 그 기억이 사라지면 지금의 나도 조금 달라질 것 같다는 생각이 들더라고요.",
-      hostNickname: "익명의 사자",
-      contentName: "이터널 선샤인",
-      mainCategory: "도서",
-      subCategory: "소설",
-      participantCount: 1,
-      maxParticipants: 4,
-      chatTags: ["진행중"],
-      tags: ["기억"],
-      likeCount: 12,
-    },
-  ];
+    const sortedQuestions = useMemo(() => {
+    const arr = [...questions];
+    arr.sort((a, b) => {
+      const da = new Date(a.createdAt);
+      const db = new Date(b.createdAt);
+      return sortType === "최신순" ? db - da : da - db;
+    });
+    return arr;
+  }, [questions, sortType]);
+
+
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
@@ -88,14 +138,30 @@ export default function MyPageQuesScreen() {
       </div>
 
       {/* 리스트 영역 */}
+      {/* 리스트 영역 */}
       <div className="flex-1 overflow-y-auto px-[1.5rem] mt-[1rem] pb-[7rem] no-scrollbar">
+        {/* 로딩 / 에러 / 빈 목록 처리 */}
+        {loading && (
+          <p className="mt-4 text-center text-[0.875rem] text-[#9CA3AF]">
+            불러오는 중...
+          </p>
+        )}
+        {error && (
+          <p className="mt-4 text-center text-[0.875rem] text-red-500">
+            {error}
+          </p>
+        )}
+        {!loading && !error && sortedQuestions.length === 0 && (
+          <p className="mt-4 text-center text-[0.875rem] text-[#9CA3AF]">
+            등록한 질문이 없어요.
+          </p>
+        )}
 
-
-        {/* ==== 관심 질문 탭 ==== */}
-          {favoriteQuestions.map((q)=> (
-            <div
-              key={q.id}
-            >
+        {/* ==== 내 질문 목록 ==== */}
+        {!loading &&
+          !error &&
+          sortedQuestions.map((q) => (
+            <div key={q.id}>
               {/* 질문 문장 + 따옴표 */}
               <div className="relative w-full flex px-[1.5rem] items-start">
                 <img
@@ -104,16 +170,15 @@ export default function MyPageQuesScreen() {
                   className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] flex-shrink-0"
                 />
               </div>
-                <div className="relative text-left mt-[0.5rem] leading-[1.5] px-[1.5rem]">
-                  <p className="text-[1rem] font-medium text-[#191D1F]">
-                    {q.questionTitle}
-                  </p>
+              <div className="relative text-left mt-[0.5rem] leading-[1.5] px-[1.5rem]">
+                <p className="text-[1rem] font-medium text-[#191D1F]">
+                  {q.questionTitle}
+                </p>
 
-                  <p className="text-[0.875rem] text-[#6B7280] mt-[0.5rem] mb-[0.75rem]">
-                    {q.questionDescription}
-                  </p>
-                </div>
-              
+                <p className="text-[0.875rem] text-[#6B7280] mt-[0.5rem] mb-[0.75rem]">
+                  {q.questionDescription}
+                </p>
+              </div>
 
               {/* 구분선 */}
               <div className="w-full h-[1px] px-[1.5rem] bg-[#E7EBEF] my-4" />
@@ -138,12 +203,12 @@ export default function MyPageQuesScreen() {
                   {q.participantCount}/{q.maxParticipants}
                 </div>
 
-                {q.chatTags.map((chatTags) => (
+                {q.chatTags.map((chatTag) => (
                   <span
-                    key={chatTags}
+                    key={chatTag}
                     className="px-2 py-1 bg-[#F0FFD9] text-[#7DCA01] text-[0.75rem] rounded-md"
                   >
-                    {chatTags}
+                    {chatTag}
                   </span>
                 ))}
 
@@ -172,10 +237,11 @@ export default function MyPageQuesScreen() {
 
                 <button
                   className="px-4 py-[0.4rem] rounded-[0.5rem] bg-[#54575C] text-white text-[0.75rem] font-bold"
-                  onClick={() => {
-                    // TODO: 실제 상세 페이지로 이동할 때 경로 맞게 수정
-                    navigate("/detail", { state: { item: q } });
-                  }}
+                  onClick={() =>
+                    navigate("/detail", {
+                      state: { questionId: q.id },
+                    })
+                  }
                 >
                   대화 보기
                 </button>
@@ -183,6 +249,7 @@ export default function MyPageQuesScreen() {
             </div>
           ))}
       </div>
+
 
       {/* 질문하기 버튼 */}
       <button

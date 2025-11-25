@@ -3,7 +3,11 @@ import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import { useNavigate, useLocation } from "react-router-dom";
 import SearchBar from "../../components/common/SearchBar";
-import { searchQuestions, participateQuestion } from "../../lib/questionService";
+import {
+  searchQuestions,
+  participateQuestion,
+  cancelParticipateQuestion,
+} from "../../lib/questionService";
 import { likeQuestion, unlikeQuestion } from "../../lib/likeService";
 
 export default function SearchResult() {
@@ -16,7 +20,7 @@ export default function SearchResult() {
 
   const [inputQuery, setInputQuery] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
-  const [tags, setTags] = useState(initialTags?? []);
+  const [tags, setTags] = useState(initialTags ?? []);
 
   useEffect(() => {
     setInputQuery(initialQuery);
@@ -25,7 +29,7 @@ export default function SearchResult() {
   }, [initialQuery, initialTags]);
 
   // 상태
-  const [likeState, setLikeState] = useState({}); // { [questionId]: { liked, count } }
+  const [likeState, setLikeState] = useState({});
   const [participate, setParticipate] = useState({});
   const [popup, setPopup] = useState(null);
   const [results, setResults] = useState([]);
@@ -67,10 +71,8 @@ export default function SearchResult() {
     try {
       let res;
       if (!current.liked) {
-        // 아직 안 눌렀으면 → 좋아요 등록
         res = await likeQuestion(questionId);
       } else {
-        // 이미 눌러져 있으면 → 좋아요 취소
         res = await unlikeQuestion(questionId);
       }
 
@@ -105,6 +107,40 @@ export default function SearchResult() {
     }
   };
 
+  // 상태 라벨 매핑 함수
+  const getStatusLabel = (status, current, max) => {
+    if (!status) return null;
+
+    // 백엔드 상태값에 맞게 여기만 맞춰주면 됨
+    switch (status) {
+      case "RECRUITING":
+        // 자리가 남아 있으면 참여 가능, 다 찼으면 진행중 취급
+        if (max && current >= max) return "진행중";
+        return "참여 가능";
+      case "PROGRESS":
+      case "IN_PROGRESS":
+        return "진행중";
+      case "COMPLETED":
+      case "DONE":
+        return "종료";
+      default:
+        return null;
+    }
+  };
+
+
+  const getStatusChipClass = (label) => {
+    if (label === "진행중") {
+      // 연두색 배경 + 초록 글자
+      return "bg-[#F3FFE1] text-[#6BB600]";
+    }
+    if (label === "종료") {
+      // 연한 회색 배경 + 진회색 글자
+      return "bg-[#F3F4F6] text-[#4B5563]";
+    }
+    // 참여 가능
+    return "bg-[#E3F2FF] text-[#1D72FF]"; // 연한 파랑 배경 + 파랑 글자
+  };
 
 
   // 태그 삭제
@@ -156,15 +192,13 @@ export default function SearchResult() {
           tags={tags}
           onRemoveTag={handleRemoveTag}
           onEnter={() => {
-          setQuery(inputQuery);
-        }}
+            setQuery(inputQuery);
+          }}
         />
 
         {/* 결과 상단 */}
         <div className="flex justify-between items-center px-[2.5rem] mt-[1.5rem]">
-          <p className="text-[1rem] font-semibold">
-            검색결과 {results.length}
-          </p>
+          <p className="text-[1rem] font-semibold">검색결과 {results.length}</p>
 
           <div className="relative text-[0.75rem]">
             <button
@@ -179,16 +213,7 @@ export default function SearchResult() {
             </button>
 
             {openSort && (
-              <div className="absolute right-0 mt-2 w-[6rem] bg-white rounded-xl shadow-lg z-50">
-                <button
-                  className="w-full text-left px-3 py-2 text-[0.75rem] text-[#B5BBC1]"
-                  onClick={() => {
-                    setSortType("가나다순");
-                    setOpenSort(false);
-                  }}
-                >
-                  가나다순
-                </button>
+              <div className="absolute right-0 mt-2 w-[4.5rem] bg-white rounded-[0.25rem] shadow-lg z-50">
                 <button
                   className="w-full text-left px-3 py-2 text-[0.75rem] text-[#B5BBC1]"
                   onClick={() => {
@@ -227,118 +252,158 @@ export default function SearchResult() {
               </p>
             </div>
           ) : (
-          results.map((item) => {
-            const likeInfo = likeState[item.questionId] || {
-              liked: item.likedByMe ?? false,
-              count: item.likeCount ?? 0,
-            };
-            const isParticipating = !!participate[item.questionId];
+            results.map((item) => {
+              const likeInfo = likeState[item.questionId] || {
+                liked: item.likedByMe ?? false,
+                count: item.likeCount ?? 0,
+              };
+              const isParticipating = !!participate[item.questionId];
 
-            return (
-              <div
-                key={item.questionId}
-                className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
-                onClick={() => navigate("/detail", { state: { questionId: item.questionId, item, }, })}
-              >
-                <img
-                  src="/icons/quote.svg"
-                  className="w-[1rem] h-[1rem] mt-[0.75rem] opacity-70"
-                />
-                <p className="text-[1rem] font-medium leading-[1.6rem] mt-[0.5rem]">
-                  {item.questionTitle}
-                </p>
-                <p
-                  className="text-[0.875rem] text-[#91969A] leading-[1.4rem] mt-[0.5rem] line-clamp-2"
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                  }}
+              const current =
+                item.currentParticipants ?? item.participants ?? 0;
+              const max = item.maxParticipants ?? item.maxparticipants ?? 0;
+
+              const statusLabel = getStatusLabel(
+                item.questionStatus,
+                current,
+                max
+              );
+              const showJoinButton = statusLabel === "참여 가능";
+
+              return (
+                <div
+                  key={item.questionId}
+                  className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
+                  onClick={() =>
+                    navigate("/detail", {
+                      state: { questionId: item.questionId, item },
+                    })
+                  }
                 >
-                  {item.questionDescription}
-                </p>
-                <img
-                  src="/icons/line.svg"
-                  className="w-full mt-[0.8rem] mb-[0.5rem]"
-                />
-                <div className="flex items-center gap-[0.5rem]">
                   <img
-                    src="/icons/profile-gray.svg"
-                    className="w-[1.5rem] h-[1.5rem]"
+                    src="/icons/quote.svg"
+                    className="w-[1rem] h-[1rem] mt-[0.75rem] opacity-70"
                   />
-                  <span className="text-[#9CA3AF] text-[0.85rem]">
-                    {item.hostNickname}
-                  </span>
-                </div>
-                <p className="font-semibold text-[0.9rem] mt-[0.4rem]">
-                  {item.contentName}
-                </p>
-                <p className="text-[0.7rem] text-[#555] mt-[0.2rem]">
-                  {item.mainCategory} &gt; {item.subCategory}
-                </p>
-
-                <div className="flex items-center flex-wrap gap-[0.38rem] mt-[0.75rem]">
-                  <div className="flex items-center text-[0.75rem] bg-[#F2F4F8] rounded-md px-[0.4rem] py-[0.2rem]">
+                  <p className="text-[1rem] font-medium leading-[1.6rem] mt-[0.5rem]">
+                    {item.questionTitle}
+                  </p>
+                  <p
+                    className="text-[0.875rem] text-[#91969A] leading-[1.4rem] mt-[0.5rem] line-clamp-2"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {item.questionDescription}
+                  </p>
+                  <img
+                    src="/icons/line.svg"
+                    className="w-full mt-[0.8rem] mb-[0.5rem]"
+                  />
+                  <div className="flex items-center gap-[0.5rem]">
                     <img
-                      src="/icons/people.svg"
-                      className="w-[1rem] h-[1rem] mr-[0.25rem]"
+                      src="/icons/profile-gray.svg"
+                      className="w-[1.5rem] h-[1.5rem]"
                     />
-                    {item.participants ?? 0}
+                    <span className="text-[#9CA3AF] text-[0.85rem]">
+                      {item.hostNickname}
+                    </span>
+                  </div>
+                  <p className="font-semibold text-[0.9rem] mt-[0.4rem]">
+                    {item.contentName}
+                  </p>
+                  <p className="text-[0.7rem] text-[#555] mt-[0.2rem]">
+                    {item.mainCategory} &gt; {item.subCategory}
+                  </p>
+
+                  {/* 👉 인원수 + 상태 + 태그 순서 */}
+                  <div className="flex items-center flex-wrap gap-[0.38rem] mt-[0.75rem]">
+                    <div className="flex items-center text-[0.75rem] bg-[#F2F4F8] rounded-md px-[0.4rem] py-[0.2rem]">
+                      <img
+                        src="/icons/people.svg"
+                        className="w-[1rem] h-[1rem] mr-[0.25rem]"
+                      />
+                      {current}/{max}
+                    </div>
+
+                    {statusLabel && (
+                      <span
+                        className={`px-[0.5rem] py-[0.25rem] text-[0.75rem] rounded-md ${getStatusChipClass(
+                          statusLabel
+                        )}`}
+                      >
+                        {statusLabel}
+                      </span>
+                    )}
+
+                    {item.tagNames?.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="px-[0.5rem] py-[0.25rem] bg-[#FFF2EE] text-[#FA502E] text-[0.75rem] rounded-md"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
 
-                  {item.tagNames?.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="px-[0.5rem] py-[0.25rem] bg-[#FFF2EE] text-[#FA502E] text-[0.75rem] rounded-md"
+                  <div className="flex justify-between items-center mt-[0.8rem]">
+                    {/* 좋아요 버튼 */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleLike(item.questionId);
+                      }}
+                      className="flex items-center gap-[0.25rem]"
                     >
-                      {tag}
-                    </span>
-                  ))}
+                      <img
+                        src={
+                          likeInfo.liked
+                            ? "/icons/heart-filled.svg"
+                            : "/icons/heart.svg"
+                        }
+                        className="w-[1rem] h-[1rem]"
+                      />
+                      <span className="text-[0.875rem] text-[#6B7280]">
+                        {likeInfo.count}
+                      </span>
+                    </button>
+
+                    {/* 참여 / 대화 보기 버튼 */}
+                    {showJoinButton ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleParticipate(item.questionId);
+                        }}
+                        className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
+                          isParticipating
+                            ? "bg-[#B5BBC1] text-white"
+                            : "bg-[#FA502E] text-white"
+                        }`}
+                      >
+                        {isParticipating ? "참여 취소" : "참여하기"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/detail", {
+                            state: { questionId: item.questionId, item },
+                          });
+                        }}
+                        className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+                      >
+                        대화 보기
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />
                 </div>
-
-                <div className="flex justify-between items-center mt-[0.8rem]">
-                  {/* 좋아요 버튼 */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleLike(item.questionId);
-                    }}
-                    className="flex items-center gap-[0.25rem]"
-                  >
-                    <img
-                      src={
-                        likeInfo.liked
-                          ? "/icons/heart-filled.svg"
-                          : "/icons/heart.svg"
-                      }
-                      className="w-[1rem] h-[1rem]"
-                    />
-                    <span className="text-[0.875rem] text-[#6B7280]">
-                      {likeInfo.count}
-                    </span>
-                  </button>
-
-                  {/* 참여 버튼 */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleParticipate(item.questionId);
-                    }}
-                    className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-                      isParticipating
-                        ? "bg-[#B5BBC1] text-white"
-                        : "bg-[#FA502E] text-white"
-                    }`}
-                  >
-                    {isParticipating ? "참여 취소" : "참여하기"}
-                  </button>
-                </div>
-
-                <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />
-              </div>
-            );
-          })
-        )}
+              );
+            })
+          )}
         </div>
       </div>
 
