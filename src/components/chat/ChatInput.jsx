@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function ChatInput({ onSend, side = "right", status }) {
+export default function ChatInput({ onSend, status }) {
   const [text, setText] = useState("");
   const[open, setOpen] = useState(false);
 
@@ -15,9 +15,9 @@ export default function ChatInput({ onSend, side = "right", status }) {
 
   const sendText = () => {
     const t = text.trim();
-  if (!t || isFinished) return; 
-    onSend(t, side, "text");
-    setText("");
+    if (!t || isFinished) return; 
+      onSend(t, "TEXT");
+      setText("");
   };
 
   
@@ -46,7 +46,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
     if (!files.length) return;
 
     // 부모에 File[] 전달
-    onSend(files, side, "file");
+    onSend(files, "FILE");
 
     // 같은 파일 다시 선택 가능하도록 초기화
     e.target.value = "";
@@ -58,7 +58,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
   // 미리보기 → 전송
   const sendImages = () => {
     if (isFinished) return; 
-    onSend(previewImages, side, "image");
+    onSend(previewImages, "IMAGE");
     setPreviewImages([]);
     setShowPreview(false);
     setOpen(false);
@@ -73,7 +73,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
   return (
     <>
       <input
-         type="file"
+         type="FILE"
          accept="image/*"
          capture="environment"
          ref={cameraInputRef}
@@ -82,7 +82,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
        />
   
        <input
-         type="file"
+         type="FILE"
          accept="image/*"
          multiple
          ref={albumInputRef}
@@ -91,7 +91,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
        />
 
         <input
-          type="file"
+          type="FILE"
           ref={fileInputRef}
           style={{ display: "none" }}
           onChange={handleFile}
@@ -139,7 +139,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
               </button>
             </div>
                             
-            <div className="flex justify-center items-center gap-[2rem]">
+            <div className="flex justify-center items-center gap-[3rem]">
               {/* 카메라 */}
               <div className="flex flex-col justify-center items-center">
                 <button
@@ -187,7 +187,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
                 </span>
               </div>
 
-              <div className="flex flex-col justify-center items-center">
+              {/* <div className="flex flex-col justify-center items-center">
                 <button
                   type="save"
                   className="flex justify-center items-center bg-[#F2F4F8] w-[3rem] h-[3rem] rounded-full"
@@ -200,7 +200,7 @@ export default function ChatInput({ onSend, side = "right", status }) {
                 <span className="text-[#3B3D40] text-[0.75rem]">
                   저장
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
