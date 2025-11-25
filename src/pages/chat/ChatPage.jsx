@@ -4,7 +4,7 @@ import ChatTopBar from "../../components/chat/ChatTopBar";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatInput from "../../components/chat/ChatInput";
 import { getSocket, sendMessageSocket, joinSocket  } from "../../lib/socket";
-import { getTimeChat, getFinishChat } from "../../lib/chatService";
+import { getTimeChat, getFinishChat, scrapMessage, unscrapMessage } from "../../lib/chatService";
 
 const SAI_TIME_LIMIT = 42 * 60 * 1000; // 42분 in milliseconds
 
@@ -103,14 +103,39 @@ export default function ChatPage() {
   }, [messages.length]);
 
 
-  const toggleBookmark = (messageId) => {
+  const toggleBookmark = async (messageId) => {
+
+    const target = messages.find((m) => m.messageId === messageId);
+    if (!target) return;
+
+    const wasBookmarked = !!target.bookmarked;
+
+    // UI 먼저 업데이트
     setMessages((prev) =>
       prev.map((m) =>
         m.messageId === messageId
-          ? { ...m, bookmarked: !m.bookmarked }
+          ? { ...m, bookmarked: !wasBookmarked }   
           : m
       )
     );
+
+    try {
+
+      if (wasBookmarked) {
+        await unscrapMessage(messageId);
+      } else {
+        await scrapMessage(messageId);
+      }
+    } catch (err) {
+      console.error("스크랩 요청 실패:", err);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.messageId === messageId
+            ? { ...m, bookmarked: wasBookmarked }
+            : m
+        )
+      );
+    }
   };
 
   useEffect(() => {
