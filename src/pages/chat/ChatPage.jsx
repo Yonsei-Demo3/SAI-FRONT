@@ -4,6 +4,9 @@ import ChatTopBar from "../../components/chat/ChatTopBar";
 import ChatBubble from "../../components/chat/ChatBubble";
 import ChatInput from "../../components/chat/ChatInput";
 import { getSocket, sendMessageSocket, joinSocket  } from "../../lib/socket";
+import { getTimeChat, getFinishChat } from "../../lib/chatService";
+
+const SAI_TIME_LIMIT = 42 * 60 * 1000; // 42분 in milliseconds
 
 // Helpers
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -13,6 +16,12 @@ const nowKo = () =>
     minute: "2-digit",
     hour12: true,
   }).format(new Date());
+
+const serverTimeToUtcMs = (serverDateTimeStr) => {
+  const isoUtc = serverDateTimeStr.replace(" ", "T") + "Z";
+  const utcDate = new Date(isoUtc);
+  return utcDate.getTime(); 
+};
 
 const apiResponse = {
     
@@ -77,8 +86,12 @@ export default function ChatPage() {
   const socketRef = useRef(null);
 
   const location = useLocation();
-  const roomId = location.state?.roomId;   
-  const questionId = location.state?.questionId;
+
+  {/* active : 활성화된 채팅, finished : 종료된 채팅  */}
+  const status = location.state?.status || "finished"; 
+  const roomId = location.state?.roomId || 19;   
+  const questionId = location.state?.questionId || 19;
+  const questionTitle = location.state?.questionTitle || "기억 통제로 인간은 더 행복해질까? 어쩌면 더 불행해질지도 몰라";
   
   const [messages, setMessages] = useState(apiResponse.seed);
   const [side, setSide] = useState("right");
@@ -91,6 +104,10 @@ export default function ChatPage() {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]); // 검색된 메시지 id 리스트
   const [searchIndex, setSearchIndex] = useState(0); // 현재 선택된 검색 결과 index
+
+  const [startAt, setStartAt] = useState(null);
+  const [endAt, setEndAt] = useState(null);
+  const [isTimeLoading, setIsTimeLoading] = useState(false);
 
   const [previewImage, setPreviewImage] = useState(null);
 
@@ -140,6 +157,52 @@ export default function ChatPage() {
   const toggleBookmark = (id) => {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, bookmarked: !m.bookmarked } : m)));
   };
+
+  useEffect(() => {
+
+    // if (!questionId) return; // questionId 없으면 요청 안 보냄
+
+    const fetchTime = async () => {
+      try {
+        setIsTimeLoading(true);
+
+        const res = await getTimeChat(questionId);
+
+        const { updatedAt } = res.data;
+        const start = serverTimeToUtcMs(updatedAt);
+        const end = start + SAI_TIME_LIMIT;
+        
+        setStartAt(start);
+        setEndAt(end);
+
+      } catch (err) {
+        console.error("시간 정보 가져오기 실패:", err);
+      } finally {
+        setIsTimeLoading(false);
+      }
+    };
+
+    fetchTime();
+  }, [questionId]);
+
+  useEffect(() => {
+    if(status !== "finished") return;
+
+    const fetchMessage = async () => {
+      try {
+
+        const response = await getFinishChat(roomId);
+
+        console.log("getFinishChat response:", response.data);   
+
+      } catch (err) {
+        console.error("채팅 가져오기 실패:", err);
+      } finally {
+        setIsTimeLoading(false);
+      }
+    };
+    fetchMessage();
+  }, [questionId, status]);
 
   useEffect(() => {
 
@@ -252,8 +315,8 @@ export default function ChatPage() {
       
       <header className="bg-white">
         <ChatTopBar 
-          startAt={apiResponse.startAt} 
-          endAt={apiResponse.endAt} 
+          startAt={startAt} 
+          endAt={endAt} 
           onExpire={() => console.log("타이머 종료")} 
           onSearchChange={setSearchText}
           title={apiResponse.title}

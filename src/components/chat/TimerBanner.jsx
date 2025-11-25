@@ -42,7 +42,7 @@ export default function TimerBanner({ startAt, endAt, onExpire }) {
   const label = notStarted
     ? `질문 시작까지 ${fmt}`
     : finished
-    ? `질문 종료`
+    ? `대화 시간이 종료되었습니다`
     : `질문 종료까지 ${fmt}`;
 
   return (

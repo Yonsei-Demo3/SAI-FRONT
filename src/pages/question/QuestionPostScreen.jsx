@@ -44,11 +44,11 @@ export default function QuestionFormScreen() {
   const [question, setQuestion] = useState("");
   const [desc, setDesc] = useState("");
   const [participants, setParticipants] = useState(2);
-  const [startOption, setStartOption] = useState(""); 
+  const [startMode, setStartOption] = useState(""); 
   const [tagInput, setTagInput] = useState("");
   const canDecrement = participants > MIN_PARTICIPANTS;
   const canIncrement = participants < MAX_PARTICIPANTS;  
-  const canSubmit = question.trim().length > 0 && startOption !== "";
+  const canSubmit = question.trim().length > 0 && startMode !== "";
 
 
   const parseTags = (input) =>
@@ -114,7 +114,7 @@ export default function QuestionFormScreen() {
       participants: participants,
       contentId: contentId,
       tags: tags, 
-      startOption,
+      startMode,
     };
 
     try {
@@ -252,29 +252,29 @@ export default function QuestionFormScreen() {
           <div className="flex flex-col items-start justify-center pl-[1.5rem] pr-[1.5rem] gap-[0.75rem]">
               <button
                 type="button"
-                onClick={() => setStartOption("readyOnly")}
+                onClick={() => setStartOption("WITH_READY")}
                 className={`border-none rounded-[0.25rem] box-border pl-[0.625rem] pr-[0.625rem] pt-[0.25rem] pb-[0.25rem]
                 ${
-                  startOption === "readyOnly"   
+                  startMode === "WITH_READY"   
                     ? "bg-[#82A633]"
                     : "bg-[#F2F4F8]"
                 }`}
               >
-                <span className={`text-[0.875rem] ${startOption === "readyOnly" ? "text-white" : ""}`}>
+                <span className={`text-[0.875rem] ${startMode === "WITH_READY" ? "text-white" : ""}`}>
                   준비된 인원끼리 바로 시작
                 </span>
               </button>
               <button
                 type="button"
-                onClick={() => setStartOption("allReady")}
+                onClick={() => setStartOption("ALL_READY")}
                 className={`border-none rounded-[0.25rem] box-border pl-[0.625rem] pr-[0.625rem] pt-[0.25rem] pb-[0.25rem]
                 ${
-                  startOption === "allReady"   
+                  startMode === "ALL_READY"   
                     ? "bg-[#FA502E]"
                     : "bg-[#F2F4F8]"
                 }`}
               >
-                <span className={`text-[0.875rem] ${startOption === "allReady" ? "text-white" : ""}`}>
+                <span className={`text-[0.875rem] ${startMode === "ALL_READY" ? "text-white" : ""}`}>
                   모든 인원이 준비되면 시작
                 </span>
               </button>
