@@ -91,6 +91,7 @@ export default function ChatPage() {
   const status = location.state?.status || "finished"; 
   const roomId = location.state?.roomId || 19;   
   const questionId = location.state?.questionId || 19;
+  const questionTitle = location.state?.questionTitle || "기억 통제로 인간은 더 행복해질까? 어쩌면 더 불행해질지도 몰라";
   
   const [messages, setMessages] = useState(apiResponse.seed);
   const [side, setSide] = useState("right");
