@@ -7,8 +7,7 @@ import { getSocket, receiveMessageSocket, sendMessageSocket, joinRoomSocket  } f
 import { getTimeChat, getFinishChat, scrapMessage, unscrapMessage, finishChat } from "../../lib/chatService";
 import { getMyInfo } from "../../lib/memberService";
 
-// const SAI_TIME_LIMIT = 42 * 60 * 1000; // 42분
-const SAI_TIME_LIMIT = 1 * 60 * 1000; // 1분
+const SAI_TIME_LIMIT = 42 * 60 * 1000; // 42분
 
 // Helpers
 const uid = () => Math.random().toString(36).slice(2, 10);
