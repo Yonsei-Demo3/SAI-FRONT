@@ -1,4 +1,4 @@
-// src/pages/mypage/MyPageliked.jsx  (파일 이름은 네가 쓰는 거 그대로 쓰면 돼)
+// src/pages/mypage/MyPageliked.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/main/BottomNav";
@@ -24,12 +24,11 @@ export default function MyPageScrapScreen() {
   const [loadingLike, setLoadingLike] = useState(false);
   const [error, setError] = useState(null);
 
-  // 👉 참여 상태 / 팝업
-  const [participate, setParticipate] = useState({});
+  // 참여 팝업
   const [popup, setPopup] = useState(null);
 
   // ===========================
-  // 공통: 상태 라벨 / 칩 스타일 (SearchResult랑 동일)
+  // 공통: 상태 라벨 / 칩 스타일
   // ===========================
   const getStatusLabel = (status, current, max) => {
     if (!status) return null;
@@ -85,11 +84,13 @@ export default function MyPageScrapScreen() {
               subCategory: q.subCategory,
               participantCount: q.currentParticipants,
               maxParticipants: q.maxParticipants,
-              questionStatus: q.questionStatus, // 상태 그대로 저장
+              questionStatus: q.questionStatus,
               tags: q.tagNames || [],
               likeCount: item.likeCount,
               likedByMe: item.likedByMe,
               createdAt: q.createdAt,
+              // 🔹 백엔드에서 내려주는 내 참여 상태
+              myParticipationStatus: q.myParticipationStatus || "NONE",
             };
           })
         );
@@ -153,24 +154,43 @@ export default function MyPageScrapScreen() {
   };
 
   // ===========================
-  // 참여하기 / 취소 (SearchResult와 동일 로직)
+  // 참여하기 / 취소 (NONE ↔ WAITING)  ← SearchResult와 동일 패턴
   // ===========================
-  const toggleParticipate = async (questionId) => {
-    const now = !participate[questionId];
-
+  const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
-      if (now) {
-        const res = await participateQuestion(questionId);
-        console.log("참여 성공:", res);
-      } else {
+      if (currentMyStatus === "NONE") {
+        // 참여 신청
+        await participateQuestion(questionId);
+
+        // 내 참여 상태를 WAITING으로 변경
+        setFavoriteQuestions((prev) =>
+          prev.map((q) =>
+            q.id === questionId
+              ? { ...q, myParticipationStatus: "WAITING" }
+              : q
+          )
+        );
+
+        setPopup("participate");
+      } else if (currentMyStatus === "WAITING") {
+        // 대기 중 취소
         await cancelParticipateQuestion(questionId);
+
+        setFavoriteQuestions((prev) =>
+          prev.map((q) =>
+            q.id === questionId ? { ...q, myParticipationStatus: "NONE" } : q
+          )
+        );
+
+        setPopup("cancel");
+      } else {
+        // JOINED는 여기서 처리 안 함 (대화 보기만)
+        return;
       }
-      setParticipate((prev) => ({ ...prev, [questionId]: now }));
-      setPopup(now ? "participate" : "cancel");
-      setTimeout(() => setPopup(null), 2000);
     } catch (e) {
       console.error("참여 API 실패", e);
       setPopup("error");
+    } finally {
       setTimeout(() => setPopup(null), 2000);
     }
   };
@@ -179,7 +199,7 @@ export default function MyPageScrapScreen() {
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
       <MyPageNav />
 
-      {/* 참여/취소 팝업 (SearchResult와 동일 형식) */}
+      {/* 참여/취소 팝업 */}
       {popup && popup !== "error" && (
         <div className="fixed top-[4.5rem] left-1/2 -translate-x-1/2 w-[100%] max-w-[500px] p-4 z-[200] animate-slide-down">
           <div className="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-[#F2F2F2]">
@@ -273,23 +293,23 @@ export default function MyPageScrapScreen() {
               current,
               max
             );
-            const showJoinButton = statusLabel === "참여 가능";
-            const isParticipating = !!participate[q.id];
+            const canParticipate = statusLabel === "참여 가능";
+            const myStatus = q.myParticipationStatus || "NONE";
 
             return (
               <div
                 key={q.id}
-                className="bg-white rounded-[1rem] shadow-[0px_4px_20px_rgba(0,0,0,0.06)] mb-[1rem] px-[1.25rem] py-[0.25rem]"
+                className="bg-white mb-[1rem] px-[1.25rem] py-[0.25rem]"
               >
                 {/* 질문 문장 + 따옴표 */}
-                <div className="relative w-full flex px-[1.5rem] items-start">
+                <div className="relative w-full flex px-[1.25rem] items-start">
                   <img
                     src="/icons/quote.svg"
                     alt="quote"
                     className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] flex-shrink-0"
                   />
                 </div>
-                <div className="relative text-left mt-[0.5rem] leading-[1.5] px-[1.5rem]">
+                <div className="relative text-left mt-[0.5rem] leading-[1.5] px-[1.25rem]">
                   <p className="text-[1rem] font-medium text-[#191D1F]">
                     {q.questionTitle}
                   </p>
@@ -303,7 +323,7 @@ export default function MyPageScrapScreen() {
                 <div className="w-full h-[1px] px-[1.5rem] bg-[#E7EBEF] my-4" />
 
                 {/* 닉네임 + 콘텐츠명 */}
-                <div className="flex flex-col px-[1.5rem] gap-[0.2rem]">
+                <div className="flex flex-col px-[1.25rem] gap-[0.2rem]">
                   <p className="text-[0.75rem] text-[#6B7280]">
                     {q.hostNickname}
                   </p>
@@ -315,7 +335,7 @@ export default function MyPageScrapScreen() {
                   </p>
                 </div>
 
-                {/* 인원 + 상태 + 태그 (SearchResult 스타일) */}
+                {/* 인원 + 상태 + 태그 */}
                 <div className="flex flex-wrap items-center px-[1.5rem] gap-2 mt-3">
                   <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-[#F2F4F8] text-[#3B3D40] text-[0.75rem]">
                     <img src="/icons/people.svg" className="w-4 h-4" />
@@ -342,7 +362,7 @@ export default function MyPageScrapScreen() {
                   ))}
                 </div>
 
-                {/* 하트 + 참여하기/대화보기 버튼 (SearchResult와 동일 패턴) */}
+                {/* 하트 + 참여/대화 버튼 */}
                 <div className="flex items-center justify-between px-[1.5rem] mt-4 mb-[1.5rem]">
                   <button
                     className="flex items-center gap-1"
@@ -362,18 +382,35 @@ export default function MyPageScrapScreen() {
                     </span>
                   </button>
 
-                  {showJoinButton ? (
+                  {/* 🔥 SearchResult와 동일한 참여/취소/대화보기 로직 */}
+                  {myStatus === "JOINED" ? (
+                    // 이미 참여 중 → 대화 보기
                     <button
-                      onClick={() => toggleParticipate(q.id)}
+                      onClick={() =>
+                        navigate("/detail", {
+                          state: { questionId: q.id, item: q },
+                        })
+                      }
+                      className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+                    >
+                      대화 보기
+                    </button>
+                  ) : canParticipate ? (
+                    // 참여 가능일 때 → NONE: 참여하기 / WAITING: 참여 취소
+                    <button
+                      onClick={() =>
+                        handleToggleParticipate(q.id, myStatus)
+                      }
                       className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-                        isParticipating
+                        myStatus === "WAITING"
                           ? "bg-[#B5BBC1] text-white"
                           : "bg-[#FA502E] text-white"
                       }`}
                     >
-                      {isParticipating ? "참여 취소" : "참여하기"}
+                      {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
                     </button>
                   ) : (
+                    // 모집 중이 아니면 → 대화 보기
                     <button
                       onClick={() =>
                         navigate("/detail", {

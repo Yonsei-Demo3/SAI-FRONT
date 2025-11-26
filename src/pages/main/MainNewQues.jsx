@@ -1,5 +1,3 @@
-// src/screens/main/SearchResult.jsx (예시 경로)
-
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
@@ -15,15 +13,12 @@ import {
   unlikeQuestion,
 } from "../../lib/likeService";
 
-/* ================= 공통 함수들 ================= */
-
 // 백엔드 상태값 → 화면에 보여줄 한글 라벨로 변환
 function getStatusLabel(status, current, max) {
   if (!status) return null;
 
   switch (status) {
     case "RECRUITING":
-      // 모집 중인데 인원이 다 찼으면 진행중처럼 보이게 하고 싶으면 이 if 유지
       if (max && current >= max) return "진행중";
       return "참여 가능";
     case "PROGRESS":
@@ -40,18 +35,15 @@ function getStatusLabel(status, current, max) {
 // 상태칩 스타일 결정
 function getStatusChipClass(label) {
   if (label === "진행중") {
-    // 연두색 배경 + 초록 글자
     return "bg-[#F3FFE1] text-[#6BB600]";
   }
   if (label === "종료") {
-    // 연회색 배경 + 진회색 글자
     return "bg-[#F3F4F6] text-[#4B5563]";
   }
   // 참여 가능
-  return "bg-[#E3F2FF] text-[#1D72FF]"; // 연파랑 배경 + 파랑 글자
+  return "bg-[#E3F2FF] text-[#1D72FF]";
 }
 
-/* ================= 메인 컴포넌트 ================= */
 
 export default function SearchResult() {
   const navigate = useNavigate();
@@ -65,7 +57,6 @@ export default function SearchResult() {
 
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [participate, setParticipate] = useState({});
   const [popup, setPopup] = useState(null);
 
   const tabs = [
@@ -84,7 +75,7 @@ export default function SearchResult() {
           categories: [],
           tags: [],
           page: 0,
-          size: 20,
+          size: 50,
           sortType: "최신순",
         });
 
@@ -164,22 +155,43 @@ export default function SearchResult() {
     }
   };
 
-  // 참여 토글
-  const toggleParticipate = async (questionId) => {
-    const now = !participate[questionId];
+  // 참여 / 취소 (NONE / WAITING 전환만 담당)
+  const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
-      if (now) {
-        const res = await participateQuestion(questionId);
-        console.log("참여 성공:", res);
-      } else {
+      if (currentMyStatus === "NONE") {
+        // 참여 신청
+        await participateQuestion(questionId);
+
+        setResults((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "WAITING" }
+              : item
+          )
+        );
+
+        setPopup("participate");
+      } else if (currentMyStatus === "WAITING") {
+        // 대기 중 취소
         await cancelParticipateQuestion(questionId);
+
+        setResults((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "NONE" }
+              : item
+          )
+        );
+
+        setPopup("cancel");
+      } else {
+        // JOINED면 여기서 아무 것도 안 함
+        return;
       }
-      setParticipate((prev) => ({ ...prev, [questionId]: now }));
-      setPopup(now ? "participate" : "cancel");
-      setTimeout(() => setPopup(null), 2000);
     } catch (e) {
       console.error("참여 API 실패", e);
       setPopup("error");
+    } finally {
       setTimeout(() => setPopup(null), 2000);
     }
   };
@@ -189,6 +201,26 @@ export default function SearchResult() {
     const updated = tags.filter((t) => t !== tag);
     setTags(updated);
     if (updated.length === 0) setQuery("");
+  };
+
+  const handleProfileClick = (e, item) => {
+    e.stopPropagation();
+
+    const hostId = item.hostId;
+
+    if (!hostId && hostId !== 0) {
+      console.log("[SearchResult] item without hostId:", item);
+      alert("질문 작성자 ID 정보를 찾을 수 없어요.");
+      return;
+    }
+
+    navigate(`/friend/profile/${hostId}`, {
+      state: {
+        memberId: hostId,
+        nickname: item.hostNickname || "익명",
+        profileImage: item.imageUrl || "/icons/profile-avatar.svg",
+      },
+    });
   };
 
   return (
@@ -238,14 +270,22 @@ export default function SearchResult() {
                 <p className="text-[0.875rem] font-bold text-[#3B3D40] leading-[1.4rem]">
                   {popup === "participate"
                     ? "질문 참여가 등록되었습니다"
-                    : "참여가 취소되었어요"}
+                    : popup === "cancel"
+                    ? "참여가 취소되었어요"
+                    : "참여 처리 중 오류가 발생했어요"}
                 </p>
 
-                <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
-                  {popup === "participate"
-                    ? "대화 인원이 모두 모이면 알려드릴게요.\n알림을 받으면 30초 안에 ‘준비 완료’를 눌러 참여할 수 있습니다."
-                    : "다시 참여하려면 ‘참여하기’를 눌러주세요."}
-                </p>
+                {popup === "participate" && (
+                  <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
+                    {"대화 인원이 모두 모이면 알려드릴게요.\n알림을 받으면 30초 안에 ‘준비 완료’를 눌러 참여할 수 있습니다."}
+                  </p>
+                )}
+
+                {popup === "cancel" && (
+                  <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
+                    {"다시 참여하려면 ‘참여하기’를 눌러주세요."}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -261,13 +301,17 @@ export default function SearchResult() {
 
           {!loading &&
             results.map((item) => {
+              const current = item.currentParticipants ?? 0;
+              const max = item.maxParticipants ?? 0;
+
               const statusLabel = getStatusLabel(
                 item.questionStatus,
-                item.currentParticipants ?? 0,
-                item.maxParticipants ?? 0
+                current,
+                max
               );
               const canParticipate = statusLabel === "참여 가능";
-              const isParticipating = !!participate[item.questionId];
+
+              const myStatus = item.myParticipationStatus || "NONE";
 
               return (
                 <div
@@ -306,16 +350,20 @@ export default function SearchResult() {
                     alt=""
                   />
 
-                  <div className="flex items-center gap-[0.5rem]">
+                  <button
+                    type="button"
+                    onClick={(e) => handleProfileClick(e, item)}
+                    className="flex items-center gap-[0.5rem]"
+                  >
                     <img
-                      src="/icons/profile-gray.svg"
-                      className="w-[1.5rem] h-[1.5rem]"
+                      src={"/icons/profile-gray.svg"}
+                      className="w-[1.5rem] h-[1.5rem] rounded-full object-cover"
                       alt=""
                     />
                     <span className="text-[#9CA3AF] text-[0.85rem]">
                       {item.hostNickname || "익명"}
                     </span>
-                  </div>
+                  </button>
 
                   <p className="font-semibold text-[0.9rem] mt-[0.4rem]">
                     {item.contentName}
@@ -328,17 +376,15 @@ export default function SearchResult() {
 
                   {/* 인원 + 상태 + 태그 */}
                   <div className="flex items-center flex-wrap gap-[0.38rem] mt-[0.75rem]">
-                    {/* 인원 */}
                     <div className="flex items-center text-[0.75rem] bg-[#F2F4F8] rounded-md px-[0.4rem] py-[0.2rem]">
                       <img
                         src="/icons/people.svg"
                         className="w-[1rem] h-[1rem] mr-[0.25rem]"
                         alt=""
                       />
-                      {`${item.currentParticipants ?? 0}/${item.maxParticipants}`}
+                      {`${current}/${max}`}
                     </div>
 
-                    {/* 상태칩 */}
                     {statusLabel && (
                       <span
                         className={`px-[0.5rem] py-[0.25rem] text-[0.75rem] rounded-md ${getStatusChipClass(
@@ -349,7 +395,6 @@ export default function SearchResult() {
                       </span>
                     )}
 
-                    {/* 태그들 */}
                     {item.tagNames?.map((tag, idx) => (
                       <span
                         key={idx}
@@ -384,22 +429,37 @@ export default function SearchResult() {
                       </span>
                     </button>
 
-                    {/* 참여 가능 → 참여하기 / 나머지 → 대화 보기 */}
-                    {canParticipate ? (
+                    {/* 참여/취소/대화 버튼 */}
+                    {myStatus === "JOINED" ? (
+                      // 참여 중 → 항상 대화 보기
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          toggleParticipate(item.questionId);
+                          navigate("/detail", {
+                            state: { questionId: item.questionId, item },
+                          });
+                        }}
+                        className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+                      >
+                        대화 보기
+                      </button>
+                    ) : canParticipate ? (
+                      // 참여 가능 상태 → NONE: 참여하기 / WAITING: 참여 취소
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleParticipate(item.questionId, myStatus);
                         }}
                         className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-                          isParticipating
+                          myStatus === "WAITING"
                             ? "bg-[#B5BBC1] text-white"
                             : "bg-[#FA502E] text-white"
                         }`}
                       >
-                        {isParticipating ? "참여 취소" : "참여하기"}
+                        {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
                       </button>
                     ) : (
+                      // 모집 중이 아니면 → 대화 보기
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

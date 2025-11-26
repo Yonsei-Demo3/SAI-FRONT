@@ -186,12 +186,15 @@ export default function DetailScreen() {
         <p className="text-[1.25rem] font-bold leading-[1.6rem]">
           {item.contentName}
         </p>
+        <p className="text-[0.75rem] text-[#9CA3AF] mt-[0.5rem]">
+            {item.mainCategory} &gt; {item.subCategory}
+        </p>
         <div className="w-full h-[0.05rem] bg-[#E5E5E5] my-4"></div>
       </div>
 
       {/* 참여 인원 */}
       <div className="px-6">
-        <p className="text-[1rem] font-semibold">현재 참여한 인원</p>
+        <p className="text-[1rem] font-bold">현재 참여한 인원</p>
 
         <div className="flex items-center gap-3 mt-3">
           <div className="flex items-center bg-[#F2F4F8] px-2 py-1 rounded-md">

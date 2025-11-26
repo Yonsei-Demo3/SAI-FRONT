@@ -23,6 +23,7 @@ export default function MyPageSaves() {
         const mapped = list.map((item) => ({
           scrapId: item.scrapId,
           messageId: item.messageId,
+          messageContent: item.messageContent,
           roomId: item.roomId,
           highlight: item.content,
           contentTitle: item.contentTitle || "콘텐츠 제목",
@@ -148,15 +149,25 @@ export default function MyPageSaves() {
                   {item.contentTitle}
                 </p>
                 <p className="text-[0.75rem] font-bold text-[#111827] leading-[1.4rem]">
-                  {item.questionTitle}
+                  {item.messageContent}
                 </p>
               </div>
 
               {/* 날짜 + 아이콘들 */}
               <div className="flex items-center justify-between mt-[1rem] mb-[0.5rem]">
                 <p className="text-[0.75rem] text-[#9CA3AF]">
-                  {item.savedAt}
+                  {(() => {
+                    const d = new Date(item.savedAt);
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, "0");
+                    const day = String(d.getDate()).padStart(2, "0");
+                    const hour = String(d.getHours()).padStart(2, "0");
+                    const minute = String(d.getMinutes()).padStart(2, "0");
+
+                    return `${year}.${month}.${day} ${hour}:${minute}`;
+                  })()}
                 </p>
+
                 <div className="flex items-center gap-[1rem]">
                   <button
                     type="button"

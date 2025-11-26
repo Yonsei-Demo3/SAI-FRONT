@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import {
   getBlocksList,
   blockFriends,
@@ -9,16 +9,17 @@ import {
 export default function FriendProfileScreen() {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const { memberId: memberIdParam } = useParams();
 
-  // 이전 화면에서 넘겨준 값 사용
-  const memberId = state?.memberId;
+  // 1) URL 파라미터가 우선, 없으면 state에서
+  const memberId = memberIdParam || state?.memberId;
   const nickname = state?.nickname ?? "익명";
   const profileImage = state?.profileImage ?? "/icons/profile-avatar.svg";
 
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
 
-  // memberId 없으면 잘못 들어온 경우
+  // memberId 정말 아예 없을 때만 잘못된 접근 처리
   if (!memberId) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -27,13 +28,12 @@ export default function FriendProfileScreen() {
     );
   }
 
-  // 처음 들어올 때, 이 사람이 이미 차단된 사람인지 확인
   useEffect(() => {
     const checkBlocked = async () => {
       try {
-        const list = await getBlocksList(); // [{blockedMemberId, nickname, email}, ...]
+        const list = await getBlocksList();
         const found = list.some(
-          (item) => item.blockedMemberId === memberId
+          (item) => String(item.blockedMemberId) === String(memberId)
         );
         setIsBlocked(found);
       } catch (e) {
@@ -97,8 +97,8 @@ export default function FriendProfileScreen() {
       </div>
 
       {/* 가운데 프로필 */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="w-[6.5rem] h-[6.5rem] rounded-full bg-[#E5E7EB] overflow-hidden mb-4">
+      <div className="flex-1 flex flex-col mt-[28rem] items-center justify-center">
+        <div className="w-[4.75rem] h-[4.75rem] overflow-hidden mb-4">
           <img
             src={profileImage}
             alt="프로필"
@@ -115,7 +115,7 @@ export default function FriendProfileScreen() {
       <div className="pb-10 pt-6 flex justify-center">
         {!isBlocked ? (
           // 차단 전 : 친구 추가 + 차단
-          <div className="flex w-full max-w-[320px] justify-around">
+          <div className="flex w-full max-w-[320px] gap-[4rem] items-center justify-center">
             <button
               className="flex flex-col items-center"
               onClick={goToAddFriend}
@@ -123,10 +123,10 @@ export default function FriendProfileScreen() {
               <img
                 src="/icons/friend-plus.svg" // 아이콘 없으면 그냥 지워도 됨
                 onError={(e) => (e.target.style.display = "none")}
-                className="w-7 h-7 mb-1"
+                className="w-[1.75rem] h-[1.75rem] mb-1"
                 alt=""
               />
-              <span className="text-[0.95rem]">친구 추가</span>
+              <span className="text-[0.75rem]">친구 추가</span>
             </button>
 
             <button
@@ -136,10 +136,10 @@ export default function FriendProfileScreen() {
               <img
                 src="/icons/block.svg"
                 onError={(e) => (e.target.style.display = "none")}
-                className="w-7 h-7 mb-1"
+                className="w-[1.75rem] h-[1.75rem] mb-1"
                 alt=""
               />
-              <span className="text-[0.95rem]">차단</span>
+              <span className="text-[0.75rem]">차단</span>
             </button>
           </div>
         ) : (
@@ -168,8 +168,8 @@ export default function FriendProfileScreen() {
             onClick={handleCloseBlockConfirm}
           />
           {/* 팝업 카드 */}
-          <div className="relative bg-white rounded-[1.5rem] w-[18rem] max-w-[80%] text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
-            <p className="px-6 pt-6 pb-4 text-[0.95rem] text-[#111827]">
+          <div className="relative bg-white rounded-[0.5rem] w-[18rem] max-w-[80%] text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+            <p className="px-6 pt-6 pb-4 text-[0.875rem] text-[#111827]">
               {nickname}님을 차단할까요?
             </p>
             <div className="h-[1px] bg-[#E5E7EB]" />

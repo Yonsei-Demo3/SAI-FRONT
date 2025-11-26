@@ -189,7 +189,7 @@ export default function FriendsScreen() {
                   key={item.id}
                   className="flex items-center px-[1.5rem] py-[0.75rem]"
                 >
-                  <div className="w-[2.75rem] h-[2.75rem] rounded-full bg-[#E5E7EB] flex items-center justify-center overflow-hidden">
+                  <div className="w-[2.75rem] h-[2.75rem] flex items-center justify-center overflow-hidden">
                     <img
                       src={item.profileImage || "/icons/profile-avatar.svg"}
                       alt="프로필"

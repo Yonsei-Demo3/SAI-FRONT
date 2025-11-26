@@ -1,4 +1,3 @@
-// src/screens/main/MainScreen.jsx
 import Navbar from "../../components/main/Navbar.jsx";
 import BottomNav from "../../components/main/BottomNav.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -256,24 +255,62 @@ export default function MainScreen() {
     }
   };
 
-  const toggleParticipate = async (questionId) => {
-    const now = !participate[questionId];
+  // 참여 / 취소 (myParticipationStatus: NONE ↔ WAITING)
+  const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
-      if (now) {
-        const res = await participateQuestion(questionId);
-        console.log("참여 성공:", res);
-      } else {
+      if (currentMyStatus === "NONE") {
+        // 참여 신청
+        await participateQuestion(questionId);
+
+        // 인기 질문/최신 질문 둘 다에 반영
+        setPopularQuestions((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "WAITING" }
+              : item
+          )
+        );
+        setLatestQuestions((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "WAITING" }
+              : item
+          )
+        );
+
+        setPopup("participate");
+      } else if (currentMyStatus === "WAITING") {
+        // 대기 중 취소
         await cancelParticipateQuestion(questionId);
+
+        setPopularQuestions((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "NONE" }
+              : item
+          )
+        );
+        setLatestQuestions((prev) =>
+          prev.map((item) =>
+            item.questionId === questionId
+              ? { ...item, myParticipationStatus: "NONE" }
+              : item
+          )
+        );
+
+        setPopup("cancel");
+      } else {
+        // JOINED는 여기서 아무것도 안 함 (대화 보기에서 처리)
+        return;
       }
-      setParticipate((prev) => ({ ...prev, [questionId]: now }));
-      setPopup(now ? "participate" : "cancel");
-      setTimeout(() => setPopup(null), 2000);
     } catch (e) {
       console.error("참여 API 실패", e);
       setPopup("error");
+    } finally {
       setTimeout(() => setPopup(null), 2000);
     }
   };
+
 
   const renderQuestionCard = (item) => {
     const statusLabel = getStatusLabel(
@@ -281,8 +318,10 @@ export default function MainScreen() {
       item.currentParticipants,
       item.maxParticipants
     );
+
     const isJoinable = statusLabel === "참여 가능";
-    const isParticipating = !!participate[item.questionId];
+
+    const myStatus = item.myParticipationStatus || "NONE";
 
     return (
       <div
@@ -376,34 +415,50 @@ export default function MainScreen() {
             </span>
           </button>
 
-          {/* 상태에 따라 버튼 변경 */}
-          {isJoinable ? (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleParticipate(item.questionId);
-              }}
-              className={`px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-                isParticipating
-                  ? "bg-[#B5BBC1] text-white"
-                  : "bg-[#FA502E] text-white"
-              }`}
-            >
-              {isParticipating ? "참여 취소" : "참여하기"}
-            </button>
-          ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate("/detail", {
-                  state: { questionId: item.questionId, item },
-                });
-              }}
-              className="px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
-            >
-              대화 보기
-            </button>
-          )}
+            {/* 상태에 따라 버튼 변경 */}
+            {myStatus === "JOINED" ? (
+              // 1) 이미 참여 중이면 → 항상 대화 보기
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/detail", {
+                    state: { questionId: item.questionId, item },
+                  });
+                }}
+                className="px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+              >
+                대화 보기
+              </button>
+            ) : isJoinable ? (
+              // 2) 참여 가능 상태 → NONE: 참여하기 / WAITING: 참여 취소
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleParticipate(item.questionId, myStatus);
+                }}
+                className={`px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
+                  myStatus === "WAITING"
+                    ? "bg-[#B5BBC1] text-white" // 대기 중: 참여 취소(회색)
+                    : "bg-[#FA502E] text-white" // 신청 안 함: 참여하기(주황)
+                }`}
+              >
+                {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
+              </button>
+            ) : (
+              // 3) 모집 중이 아니면 → 대화 보기
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/detail", {
+                    state: { questionId: item.questionId, item },
+                  });
+                }}
+                className="px-4 py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+              >
+                대화 보기
+              </button>
+            )}
+
         </div>
       </div>
     );
@@ -418,13 +473,13 @@ export default function MainScreen() {
       item.content ||
       item.messageContent ||
       "하이라이트 문장이 여기에 들어가요.";
-    const createdAt = item.scrappedAt || item.createdAt;
+    const createdAt = item.latestScrappedAt || item.createdAt;
     const timeLabel = formatTimeAgo(createdAt);
 
     return (
         <div
         key={item.messageId ?? index}
-        className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]"
+        className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 my-[1rem]"
       >
         
         <div className="relative w-full flex items-start">
@@ -435,7 +490,7 @@ export default function MainScreen() {
                 alt="프로필"
                 className="w-[2rem] h-[2rem]"
               />
-              <div className="flex flex-col">
+              <div className="flex flex-col ml-[0.5rem]">
                 <p className="text-[#3B3D40] text-[0.75rem]">{nickname}</p>
                 <p className="text-[#3B3D40] text-[0.625rem]">
                   하이라이트{timeLabel ? ` • ${timeLabel}` : ""}
@@ -590,7 +645,7 @@ export default function MainScreen() {
             className="w-full mt-4 overflow-x-auto overflow-y-visible no-scrollbar relative z-10"
             style={{ overflowY: "visible" }}
           >
-            <div className="flex gap-4 w-max">
+            <div className="flex gap-[1rem] w-max px-[1.5rem] pr-6">
               {scrapLoading && popularScraps.length === 0 && (
                 <div className="pl-[1.5rem] text-sm text-gray-500">
                   하이라이트 불러오는 중...
