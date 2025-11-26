@@ -299,7 +299,20 @@ export default function ContentSearchResultPage() {
         <div className="w-full pb-[2rem] pt-[1rem] pl-[1.5rem] pr-[1.5rem] flex items-center">
           <button
             type="button"      
-            onClick={()=>navigate("/question", {state: { contentId: selectedItem, imageUrl: results.find((it) => it.id === selectedItem)?.imageUrl || ""}})} 
+            onClick={() => {
+              const selectedContent = results.find(
+                (it) => it.id === selectedItem
+              );
+              if (!selectedContent) return;
+
+              navigate("/question", {
+                state: {
+                  content: selectedContent,                
+                  contentId: selectedContent.id,          
+                  imageUrl: selectedContent.imageUrl || "", 
+                },
+              });
+            }}
             className="w-full h-[2.5rem] rounded-[0.5rem] text-center bg-[#FA502E]"
           >
             <span className="text-[1rem] text-white font-bold">
