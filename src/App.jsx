@@ -65,7 +65,7 @@ export default function App() {
               <Route path="/mypage/chat/:id" element={<ConversationDetailScreen />} />
               <Route path="/settings" element={<SettingScreen />} />
               <Route path="/settings/friends" element={<FriendsScreen />} />
-              <Route path="/friend/profile" element={<FriendProfileScreen />} />
+              <Route path="/friend/profile/:memberId" element={<FriendProfileScreen />} />
               <Route path="/friend/add" element={<FriendRequestScreen />} />
             </Routes>
           </Router>

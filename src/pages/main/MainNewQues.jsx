@@ -1,5 +1,3 @@
-// src/screens/main/SearchResult.jsx (예시 경로)
-
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
@@ -15,7 +13,6 @@ import {
   unlikeQuestion,
 } from "../../lib/likeService";
 
-/* ================= 공통 함수들 ================= */
 
 // 백엔드 상태값 → 화면에 보여줄 한글 라벨로 변환
 function getStatusLabel(status, current, max) {
@@ -73,6 +70,7 @@ export default function SearchResult() {
     { name: "최신 질문", path: "/main/new" },
     { name: "인기 질문", path: "/main/pop" },
   ];
+  
 
   // 최신 질문 불러오기
   useEffect(() => {
@@ -191,6 +189,26 @@ export default function SearchResult() {
     if (updated.length === 0) setQuery("");
   };
 
+  const handleProfileClick = (e, item) => {
+    e.stopPropagation();
+
+    const hostId = item.hostId;
+
+    if (!hostId && hostId !== 0) {
+      console.log("[SearchResult] item without hostId:", item);
+      alert("질문 작성자 ID 정보를 찾을 수 없어요.");
+      return;
+    }
+
+    navigate(`/friend/profile/${hostId}`, {
+      state: {
+        memberId: hostId,
+        nickname: item.hostNickname || "익명",
+        profileImage: item.imageUrl || "/icons/profile-avatar.svg",
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
       <Navbar />
@@ -306,16 +324,22 @@ export default function SearchResult() {
                     alt=""
                   />
 
-                  <div className="flex items-center gap-[0.5rem]">
+
+                  <button
+                    type="button"
+                    onClick={(e) => handleProfileClick(e, item)}
+                    className="flex items-center gap-[0.5rem]"
+                  >
                     <img
-                      src="/icons/profile-gray.svg"
-                      className="w-[1.5rem] h-[1.5rem]"
+                      src={"/icons/profile-gray.svg"}
+                      className="w-[1.5rem] h-[1.5rem] rounded-full object-cover"
                       alt=""
                     />
                     <span className="text-[#9CA3AF] text-[0.85rem]">
                       {item.hostNickname || "익명"}
                     </span>
-                  </div>
+                  </button>
+
 
                   <p className="font-semibold text-[0.9rem] mt-[0.4rem]">
                     {item.contentName}

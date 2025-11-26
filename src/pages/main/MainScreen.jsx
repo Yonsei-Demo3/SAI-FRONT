@@ -1,4 +1,3 @@
-// src/screens/main/MainScreen.jsx
 import Navbar from "../../components/main/Navbar.jsx";
 import BottomNav from "../../components/main/BottomNav.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -418,13 +417,13 @@ export default function MainScreen() {
       item.content ||
       item.messageContent ||
       "하이라이트 문장이 여기에 들어가요.";
-    const createdAt = item.scrappedAt || item.createdAt;
+    const createdAt = item.latestScrappedAt || item.createdAt;
     const timeLabel = formatTimeAgo(createdAt);
 
     return (
         <div
         key={item.messageId ?? index}
-        className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 mx-[1.5rem] my-[1rem]"
+        className="w-[20.4375rem] bg-white rounded-[1rem] shadow-[0px_2px_19px_rgba(0,0,0,0.10)] p-5 border border-gray-100 my-[1rem]"
       >
         
         <div className="relative w-full flex items-start">
@@ -435,7 +434,7 @@ export default function MainScreen() {
                 alt="프로필"
                 className="w-[2rem] h-[2rem]"
               />
-              <div className="flex flex-col">
+              <div className="flex flex-col ml-[0.5rem]">
                 <p className="text-[#3B3D40] text-[0.75rem]">{nickname}</p>
                 <p className="text-[#3B3D40] text-[0.625rem]">
                   하이라이트{timeLabel ? ` • ${timeLabel}` : ""}
@@ -590,7 +589,7 @@ export default function MainScreen() {
             className="w-full mt-4 overflow-x-auto overflow-y-visible no-scrollbar relative z-10"
             style={{ overflowY: "visible" }}
           >
-            <div className="flex gap-4 w-max">
+            <div className="flex gap-[1rem] w-max px-[1.5rem] pr-6">
               {scrapLoading && popularScraps.length === 0 && (
                 <div className="pl-[1.5rem] text-sm text-gray-500">
                   하이라이트 불러오는 중...
