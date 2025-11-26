@@ -13,6 +13,21 @@ export default function LoginScreen() {
   const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
 
+  const extractToken = (authHeader) => {
+    if (!authHeader) return null;
+
+    let token = authHeader;
+
+    if (typeof token === "string") {
+      const parts = token.split(" ");
+      if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
+        token = parts[1];
+      }
+    }
+
+    return token;
+  };
+
   // 카카오 로그인 리다이렉트
   const handleKakaoLogin = () => {
     const KAKAO_AUTH_URL =
@@ -24,6 +39,7 @@ export default function LoginScreen() {
     window.location.href = KAKAO_AUTH_URL; // 카카오 로그인 화면으로 이동
   };
 
+  {/* 카카오 로그인 */}
   useEffect(() => {
 
     if (!kakaoCode) return;
@@ -38,8 +54,11 @@ export default function LoginScreen() {
           response.headers["Authorization"] ||
           response.headers["access-token"];
 
-        if(authHeader) {
-          localStorage.setItem("accessToken", authHeader);
+        const token = extractToken(authHeader);
+
+        if(token) {
+          localStorage.setItem("accessToken", token);
+          initSocket();
         }
 
         navigate("/main", { replace: true });
@@ -86,21 +105,11 @@ export default function LoginScreen() {
         response.headers["Authorization"] ||
         response.headers["access-token"];
 
-      if(authHeader) {
+      const token = extractToken(authHeader);
 
-        let token = authHeader;
-        
-        if (typeof token === "string") {
-          const parts = token.split(" "); // ["Bearer", "eyJhbGciOi..."]
-          if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
-            token = parts[1];
-          }
-        }
-
+      if (token) {
         localStorage.setItem("accessToken", token);
-
         initSocket();
-
       }
 
       navigate("/main", { replace: true });

@@ -7,7 +7,7 @@ export default function Notification() {
   const { notifications, markAllAsRead } = useNotification(); // ✅ 전역 연결
 
   return (
-    <div className="flex flex-col h-screen bg-white font-[Pretendard]">
+    <div className="flex flex-col h-screen bg-white font-[Pretendard] z-[150]">
       {/* ✅ 상단 헤더 */}
       <div className="flex items-center justify-between px-[1.5rem] py-[1rem] border-b border-[#E5E7EB]">
         <div className="flex items-center gap-[0.75rem]">
