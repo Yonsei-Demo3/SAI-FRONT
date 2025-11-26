@@ -24,7 +24,7 @@ export default function MyPageScrapScreen() {
   const [loadingLike, setLoadingLike] = useState(false);
   const [error, setError] = useState(null);
 
-  // 참여 팝업
+  // 참여/취소 팝업
   const [popup, setPopup] = useState(null);
 
   // ===========================
@@ -89,7 +89,7 @@ export default function MyPageScrapScreen() {
               likeCount: item.likeCount,
               likedByMe: item.likedByMe,
               createdAt: q.createdAt,
-              // 🔹 백엔드에서 내려주는 내 참여 상태
+              // 🔸 서버에서 내려주는 내 참여 상태 (없으면 NONE)
               myParticipationStatus: q.myParticipationStatus || "NONE",
             };
           })
@@ -154,7 +154,7 @@ export default function MyPageScrapScreen() {
   };
 
   // ===========================
-  // 참여하기 / 취소 (NONE ↔ WAITING)  ← SearchResult와 동일 패턴
+  // 참여하기 / 취소 (NONE ↔ WAITING)
   // ===========================
   const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
@@ -162,7 +162,6 @@ export default function MyPageScrapScreen() {
         // 참여 신청
         await participateQuestion(questionId);
 
-        // 내 참여 상태를 WAITING으로 변경
         setFavoriteQuestions((prev) =>
           prev.map((q) =>
             q.id === questionId
@@ -184,7 +183,7 @@ export default function MyPageScrapScreen() {
 
         setPopup("cancel");
       } else {
-        // JOINED는 여기서 처리 안 함 (대화 보기만)
+        // JOINED는 여기서 버튼 안 바꿈 (대화 보기만)
         return;
       }
     } catch (e) {
@@ -382,7 +381,7 @@ export default function MyPageScrapScreen() {
                     </span>
                   </button>
 
-                  {/* 🔥 SearchResult와 동일한 참여/취소/대화보기 로직 */}
+                  {/* 참여/취소/대화 버튼 (SearchResult 패턴) */}
                   {myStatus === "JOINED" ? (
                     // 이미 참여 중 → 대화 보기
                     <button

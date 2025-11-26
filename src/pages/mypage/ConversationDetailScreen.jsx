@@ -29,7 +29,6 @@ export default function ConversationDetailScreen() {
     },
   ];
 
-  // 나중에 API 연결하면 여기로 제목/이미지 내려받아서 쓰면 됨
   const coverTitle = "상실 이후에도 일상은 계속돼야 할까요?";
   const coverImage = "/icons/book1.svg";
 
