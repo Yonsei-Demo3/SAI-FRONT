@@ -420,7 +420,7 @@ export default function ChatPage() {
             onScroll={handleScroll}
             className="h-full overflow-y-auto flex flex-col items-stretch"
           >
-            <div className="flex justify-center items-center pl-[1.5rem] pr-[1.5rem] pb-[0.5rem]">
+            <div className="flex justify-center items-center pl-[1.5rem] pr-[1.5rem] pb-[0.625rem]">
               <div className="w-full flex justify-center items-center bg-[#F2F4F8] pt-[0.63rem] pb-[0.63rem] pl-[0.5rem] pr-[0.5rem]">
                 <span className="text-[0.75rem] text-[#191D1F]">
                   {questionTitle}
@@ -428,11 +428,31 @@ export default function ChatPage() {
               </div>
             </div>
 
-            <div className="flex justify-center items-center pt-[0.1rem] pb-[1rem]">
-              <span className="text-[#3B3D40] text-[0.625rem] text-center">
-                질문에 대한 대화가 시작되었습니다.<br></br>
-                지금부터 42분 동안 집중해서 대화를 나눠보세요.
-              </span>
+            <div className="flex flex-col pl-[1.5rem] pr-[1.5rem] mb-[1rem]">
+
+              <div className="flex justify-center items-center pt-[0.1rem] pb-[1rem]">
+                <span className="text-[#3B3D40] text-[0.625rem] text-center">
+                  질문에 대한 대화가 시작되었습니다.<br></br>
+                  지금부터 42분 동안 집중해서 대화를 나눠보세요.
+                </span>
+              </div>
+
+              <div className="flex justify-center items-center">
+                <span className="text-[#3B3D40] text-[0.625rem] text-center font-semibold">
+                  대화 전 이용 가이드를 확인해주세요.
+                </span>
+              </div>
+              <div className="flex justify-center items-center bg-[#F1F8FF] pl-[0.5rem] pr-[0.5rem] pt-[0.625rem] pb-[0.625rem] rounded-[0.5rem]">
+                <span className="text-[#3B3D40] text-[0.625rem] text-center">
+                  • SAI는 하나의 질문에만 집중하는 공간입니다.<br/>
+                  • 서로를 존중하며 예의 있게 대화해주세요.<br/>
+                  • 개인정보 공유, 비하·공격적 발언은 금지됩니다.<br/>
+                  • 대화방을 나가면 다시 입장할 수 없습니다.<br/>
+                  • 신고 접수 시 운영정책에 따라 조치됩니다.
+                </span>
+              </div>
+              
+
             </div>
             
             <div className="flex w-full flex-col justify-start items-stretch">
