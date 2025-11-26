@@ -78,7 +78,7 @@ export default function SettingScreen() {
         </div>
 
         {/* SAI 계정 / 친구 섹션 */}
-        <div className="mt-[2rem] border-t border-b border-[#E5E7EB]">
+        <div className="mt-[1rem] border-t border-b border-[#E5E7EB]">
           {/* SAI 계정 + 이메일 */}
           <div className="w-full px-[1.5rem] py-[1rem]">
             <p className="text-[1rem] font-medium">SAI 계정</p>
@@ -174,7 +174,7 @@ export default function SettingScreen() {
         {/* 로그아웃 */}
         <div className="mt-[2rem] border-t border-[#E5E7EB]">
           <button
-            className="w-full px-[1.5rem] py-[1rem] text-left text-[#EF4444] text-[1rem] font-medium"
+            className="w-full px-[1.5rem] py-[1rem] text-left text-[1rem] font-medium"
             onClick={handleLogout}
           >
             로그아웃
