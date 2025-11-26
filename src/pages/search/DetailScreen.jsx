@@ -186,6 +186,12 @@ export default function DetailScreen() {
         <p className="text-[1.25rem] font-bold leading-[1.6rem]">
           {item.contentName}
         </p>
+        <p className="text-[0.75rem] text-[#9CA3AF]">
+            {q.mainCategory} &gt; {q.subCategory}
+        </p>
+        <p className="text-[0.9rem] font-bold text-[#3B3D40] mt-[0.1rem]">
+            {q.contentName}
+        </p>
         <div className="w-full h-[0.05rem] bg-[#E5E5E5] my-4"></div>
       </div>
 

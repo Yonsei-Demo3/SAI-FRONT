@@ -122,7 +122,7 @@ export default function FriendRequestScreen() {
             className="absolute inset-0 bg-black/10"
             onClick={handleCloseDoneModal}
           />
-          <div className="relative bg-white rounded-[1.5rem] w-[18rem] max-w-[80%] text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+          <div className="relative bg-white rounded-[0.5rem] w-[18rem] max-w-[80%] text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
             <p className="px-6 pt-6 pb-4 text-[0.95rem] text-[#111827]">
               친구 신청을 보냈어요!
             </p>

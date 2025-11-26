@@ -85,7 +85,7 @@ export default function MyPageScrapScreen() {
               subCategory: q.subCategory,
               participantCount: q.currentParticipants,
               maxParticipants: q.maxParticipants,
-              questionStatus: q.questionStatus, // 상태 그대로 저장
+              questionStatus: q.questionStatus,
               tags: q.tagNames || [],
               likeCount: item.likeCount,
               likedByMe: item.likedByMe,
@@ -279,17 +279,17 @@ export default function MyPageScrapScreen() {
             return (
               <div
                 key={q.id}
-                className="bg-white rounded-[1rem] shadow-[0px_4px_20px_rgba(0,0,0,0.06)] mb-[1rem] px-[1.25rem] py-[0.25rem]"
+                className="bg-white mb-[1rem] px-[1.25rem] py-[0.25rem]"
               >
                 {/* 질문 문장 + 따옴표 */}
-                <div className="relative w-full flex px-[1.5rem] items-start">
+                <div className="relative w-full flex px-[1.25rem] items-start">
                   <img
                     src="/icons/quote.svg"
                     alt="quote"
                     className="w-[1rem] h-[1rem] opacity-70 mt-[0.5rem] flex-shrink-0"
                   />
                 </div>
-                <div className="relative text-left mt-[0.5rem] leading-[1.5] px-[1.5rem]">
+                <div className="relative text-left mt-[0.5rem] leading-[1.5] px-[1.25rem]">
                   <p className="text-[1rem] font-medium text-[#191D1F]">
                     {q.questionTitle}
                   </p>
@@ -303,7 +303,7 @@ export default function MyPageScrapScreen() {
                 <div className="w-full h-[1px] px-[1.5rem] bg-[#E7EBEF] my-4" />
 
                 {/* 닉네임 + 콘텐츠명 */}
-                <div className="flex flex-col px-[1.5rem] gap-[0.2rem]">
+                <div className="flex flex-col px-[1.25rem] gap-[0.2rem]">
                   <p className="text-[0.75rem] text-[#6B7280]">
                     {q.hostNickname}
                   </p>
