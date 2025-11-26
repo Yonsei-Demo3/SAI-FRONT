@@ -92,9 +92,6 @@ export default function ContentSearchResultPage() {
 
         setResults(mapped);
         setTotalCount(data.totalCount || data.length || 0);
-
-        console.log(mapped)
-        console.log("총 검색 결과 수:", data.totalCount || 0);
       } catch (error) {
         console.error("콘텐츠 검색 실패:", error);
           setResults([]);

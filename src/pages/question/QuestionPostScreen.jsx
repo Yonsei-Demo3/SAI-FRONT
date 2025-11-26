@@ -93,15 +93,6 @@ export default function QuestionFormScreen() {
 
     const tags = parseTags(tagInput);
 
-    console.log({ 
-      contentId: contentId,
-      imageUrl: content?.imageUrl || "",
-      question, 
-      desc, 
-      participants, 
-      tags 
-    });
-
     const payload = {
       question: question.trim(),
       description: desc.trim(),
@@ -113,7 +104,6 @@ export default function QuestionFormScreen() {
 
     try {
       const response = await createQuestion(payload);
-      console.log("서버 응답:", response.data);
     } catch (error) {
       console.error("등록 실패:", error);
     }
