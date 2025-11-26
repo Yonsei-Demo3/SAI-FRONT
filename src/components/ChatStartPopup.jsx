@@ -15,7 +15,7 @@ export default function ChatStartPopup() {
     
     const [showFloating, setShowFloating] = useState(false);
     const [floatingPos, setFloatingPos] = useState(() => {
-        const PADDING = 0;          // 화면 오른쪽에서 띄울 여백(px)
+        const PADDING = 0;        
         const BOX_WIDTH = 45;        
         const TOP_OFFSET = 120;       
 
@@ -213,7 +213,7 @@ export default function ChatStartPopup() {
             <div
                 className="fixed top-[4.5rem] left-1/2 -translate-x-1/2 
                             w-full max-w-[500px]
-                            px-4 z-[200]
+                            px-4 z-[500]
                             animate-slide-down"
                 >
                 
@@ -287,7 +287,7 @@ export default function ChatStartPopup() {
 
         {showFloating && timerActive &&(
             <div
-                className="fixed z-[210] cursor-move select-none"
+                className="fixed z-[550] cursor-move select-none"
                 style={{
                     top: floatingPos.y,
                     left: floatingPos.x,

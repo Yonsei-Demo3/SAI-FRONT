@@ -12,8 +12,6 @@ export const createQuestion = async (payload) => {
     tags: payload.tags
   };
   
-  console.log("Request Body:", body); 
-
   return axiosInstance.post("api/v1/questions", body);
 };
 

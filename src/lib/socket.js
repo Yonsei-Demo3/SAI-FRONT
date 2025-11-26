@@ -8,12 +8,14 @@ export function initSocket() {
     
     const token = localStorage.getItem("accessToken");
 
-    if (socket) {
-        socket.disconnect();
-        socket = null;
+    if (!token) {
+        console.warn("[socket] no token, skip init");
+        return null;
     }
 
-      socket = io(SOCKET_URL, {
+    if (socket) return socket;
+
+    socket = io(SOCKET_URL, {
         transports: ["websocket"],
         auth: {
             token : `Bearer ${token}`
@@ -47,6 +49,11 @@ export function getSocket() {
 export function subscribeToAlarm(handler) {
   
     const socket = getSocket();
+
+    if (!socket) {
+        console.warn("[socket] socket is null");
+        return () => {};
+    }
 
     const listener = (payload) => {
         console.log("[socket] new notification:", payload);
@@ -102,12 +109,4 @@ export function joinRoomSocket({roomId}) {
 
     socket.emit("join room", {"roomId": roomId});
 
-}
-
-export function disconnectSocket() {
-
-    if (socket) {
-        socket.disconnect();
-        socket = null;
-    }
 }
