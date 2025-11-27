@@ -1,3 +1,4 @@
+// src/screens/search/CategorySearchScreen.jsx
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
@@ -5,28 +6,25 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "../../components/common/SearchBar";
 import { popular } from "../../lib/searchService";
 
-
 export default function CategorySearchScreen() {
-  const [selected, setSelected] = useState([]); // 선택된 카테고리 저장
-  const [showPopular, setShowPopular] = useState(false); // 인기 검색어 표시 여부
-  const [popularKeywords, setPopularKeywords] = useState([]); // 인기 검색어 상태
+  const [selected, setSelected] = useState([]); // 선택된 서브카테고리
+  const [showPopular, setShowPopular] = useState(false);
+  const [popularKeywords, setPopularKeywords] = useState([]);
   const navigate = useNavigate();
   const [snapshotAt, setSnapshotAt] = useState("");
-
 
   useEffect(() => {
     fetchPopularSearches();
   }, []);
 
   const fetchPopularSearches = async () => {
-    try {      
+    try {
       const list = await popular();
       console.log("응답", list);
-    
-      setPopularKeywords(list); 
+      setPopularKeywords(list);
       if (list.length > 0) {
-      setSnapshotAt(list[0].snapshotAt);
-    }
+        setSnapshotAt(list[0].snapshotAt);
+      }
     } catch (error) {
       console.error("Error fetching popular searches:", error);
     }
@@ -34,17 +32,32 @@ export default function CategorySearchScreen() {
 
   const categories = {
     책: [
-      "소설", "에세이", "논픽션", "시/문학", "역사/인문",
-      "과학/기술", "만화/그래픽노블",
+      "소설",
+      "에세이",
+      "논픽션",
+      "시·문학",
+      "역사·인문",
+      "과학·기술",
+      "만화·그래픽노블",
     ],
-    
-    "영화/TV": [
-      "영화", "드라마", "다큐", "애니메이션",
-      "예능/리얼리티", "OTT 오리지널",
+    "영화·TV": [
+      "영화",
+      "드라마",
+      "다큐",
+      "애니메이션",
+      "예능·리얼리티",
+      "OTT 오리지널",
     ],
     "기타 콘텐츠": [
-      "음악", "유튜브", "팟캐스트", "웹툰/웹소설", "게임",
-      "전시/공연", "SNS/밈", "뉴스/시사", "기타",
+      "음악",
+      "유튜브",
+      "팟캐스트",
+      "웹툰·웹소설",
+      "게임",
+      "전시·공연",
+      "SNS·밈",
+      "뉴스·시사",
+      "기타",
     ],
   };
 
@@ -92,6 +105,30 @@ export default function CategorySearchScreen() {
     );
   };
 
+  // 선택된 서브카테고리 → [{ main, sub }] 형태로 변환
+  const buildCategoryFilters = () => {
+    const normalizeMainForBackend = (main) => {
+    if (main === "영화/TV") return "영화 TV";
+    // 필요하면 여기 더 추가
+    // if (main === "기타 콘텐츠") return "기타콘텐츠";
+    return main;
+  };
+
+    const mainBySub = {};
+
+  Object.entries(categories).forEach(([main, subs]) => {
+    const backendMain = normalizeMainForBackend(main); // ← 여기서 변환
+    subs.forEach((sub) => {
+      mainBySub[sub] = backendMain;
+    });
+  });
+
+
+    return selected.map((sub) => ({
+      main: mainBySub[sub] || "",
+      sub,
+    }));
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
@@ -100,13 +137,16 @@ export default function CategorySearchScreen() {
       <div className="flex-1 overflow-hidden flex flex-col">
         <SearchBar onFocus={() => navigate("/search")} value="" />
 
+        {/* 인기 검색어 영역 */}
         <div className="w-full max-w-[500px] mx-auto pl-[1.5rem] pr-6 mt-[1rem] bg-white relative z-20">
           {!showPopular ? (
             <div className="flex justify-between items-center mb-2">
               {popularKeywords.length > 0 && (
                 <p className="text-[1rem] font-refular flex items-center">
                   1
-                  <span className="ml-[0.5rem]">{popularKeywords[0].keyword}</span>
+                  <span className="ml-[0.5rem]">
+                    {popularKeywords[0].keyword}
+                  </span>
                   {renderTrendIcon(popularKeywords[0].movement)}
                 </p>
               )}
@@ -150,15 +190,10 @@ export default function CategorySearchScreen() {
                       className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                       onClick={() => toggleSelect(item.keyword)}
                     >
-                  <span className="w-[1.5rem] text-left">
-                    {i + 1}
-                  </span>
-
-                    <span
-                      className="max-w-[6rem] truncate inline-block"
-                    >
-                      {item.keyword}
-                    </span>
+                      <span className="w-[1.5rem] text-left">{i + 1}</span>
+                      <span className="max-w-[6rem] truncate inline-block">
+                        {item.keyword}
+                      </span>
                       <span>{renderTrendIcon(item.movement)}</span>
                     </div>
                   ))}
@@ -171,12 +206,8 @@ export default function CategorySearchScreen() {
                       className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
                       onClick={() => toggleSelect(item.keyword)}
                     >
-                    <span className="w-[1.5rem] text-left">
-                      {i + 6}
-                    </span>
-                      <span
-                        className="max-w-[6rem] truncate inline-block"
-                      >
+                      <span className="w-[1.5rem] text-left">{i + 6}</span>
+                      <span className="max-w-[6rem] truncate inline-block">
                         {item.keyword}
                       </span>
                       <span>{renderTrendIcon(item.movement)}</span>
@@ -188,19 +219,19 @@ export default function CategorySearchScreen() {
           )}
         </div>
 
-        <div className="w-full h-[0.5rem] bg-[#F2F4F8] mt-[0.5rem]"></div>
+        {/* 카테고리 타이틀 */}
+        <div className="w-full h-[0.5rem] bg-[#F2F4F8] mt-[0.5rem]" />
         <div className="w-full max-w-[500px] h-[3.25rem] mx-auto pl-[1.5rem] pr-6 mt-3">
           <h2 className="text-[1.125rem] font-semibold text-[#000000]">
             카테고리
           </h2>
         </div>
-        <div className="w-full h-[0.00625rem] mt-[-0.75rem] bg-[#CCD2D8]"></div>
+        <div className="w-full h-[0.00625rem] mt-[-0.75rem] bg-[#CCD2D8]" />
+
+        {/* 카테고리 리스트 */}
         <div
           className="overflow-y-auto flex-1 w-full max-w-[500px] mx-auto pl-[1.5rem] pr-6 pb-[15rem] scrollbar-hide relative z-0"
-          style={{
-            msOverflowStyle: "none",
-            scrollbarWidth: "none",
-          }}
+          style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
         >
           <style>{`
             .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -224,9 +255,11 @@ export default function CategorySearchScreen() {
                         key={j}
                         onClick={() => toggleSelect(item)}
                         className={`px-[0.5rem] py-[0.25rem] rounded-[0.5rem] inline-flex items-center justify-center text-[0.875rem] border transition-all
-                          ${isSelected
+                          ${
+                            isSelected
                               ? "bg-[#FFF2EE] border-[#FA502E] text-[#FA502E]"
-                              : "bg-[#F2F4F8] border-transparent text-gray-700"}`}
+                              : "bg-[#F2F4F8] border-transparent text-gray-700"
+                          }`}
                       >
                         <span className="truncate">{item}</span>
                         {isSelected && (
@@ -242,6 +275,7 @@ export default function CategorySearchScreen() {
         </div>
       </div>
 
+      {/* 하단 선택 바 */}
       {selected.length === 0 ? (
         <BottomNav />
       ) : (
@@ -264,10 +298,10 @@ export default function CategorySearchScreen() {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-[0.7rem] mb-3 mt-[1rem] max-h-[4rem] overflow-y-auto"
-              style={{
-              maxHeight: "4.5rem",
-              }}>
+            <div
+              className="flex flex-wrap gap-[0.7rem] mb-3 mt-[1rem] max-h-[4rem] overflow-y-auto"
+              style={{ maxHeight: "4.5rem" }}
+            >
               {selected.map((item, i) => (
                 <span
                   key={i}
@@ -287,14 +321,17 @@ export default function CategorySearchScreen() {
             <div className="flex justify-center">
               <button
                 className="w-full h-[3rem] mx-[0.5rem] bg-[#FA502E] text-[#FFFFFF] text-[0.875rem] font-medium rounded-[0.5rem] border-none outline-none"
-                onClick={() =>
+                onClick={() => {
+                  const categoryFilters = buildCategoryFilters();
+
                   navigate("/search-result", {
                     state: {
-                      tags: selected,
                       query: selected.join(", "),
+                      tags: selected,          // 칩 표시용
+                      categories: categoryFilters, // 실제 API 필터용
                     },
-                  })
-                }
+                  });
+                }}
               >
                 검색하기
               </button>

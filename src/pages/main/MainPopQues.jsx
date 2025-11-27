@@ -22,10 +22,10 @@ function getStatusLabel(status, current, max) {
       // 모집 중인데 인원이 다 찼으면 진행중으로 보여주고 싶으면 이 if 유지
       if (max && current >= max) return "진행중";
       return "참여 가능";
-    case "PROGRESS":
-    case "IN_PROGRESS":
+    case "ACTIVE":
+    case "READY_CHECK":
       return "진행중";
-    case "COMPLETED":
+    case "FINISHED":
     case "DONE":
       return "종료";
     default:
@@ -235,6 +235,34 @@ export default function SearchResult() {
       },
     });
   };
+
+  // 질문에 따라 바로 채팅으로 갈지, 디테일로 갈지 결정
+const goToChatOrDetail = (item) => {
+  const status = item.questionStatus;
+  const myStatus = item.myParticipationStatus || "NONE";
+
+  const isFinished =
+    status === "FINISHED" || status === "COMPLETED" || status === "DONE";
+  const canWatchChat = isFinished || myStatus === "JOINED";
+
+  // 채팅방 id 없으면 일단 디테일로 이동해서 다시 가져오게
+  if (!canWatchChat || !item.roomId) {
+    navigate("/detail", {
+      state: { questionId: item.questionId, item },
+    });
+    return;
+  }
+
+  navigate("/chat", {
+    state: {
+      questionId: item.questionId,
+      roomId: item.roomId,
+      questionTitle: item.questionTitle,
+      status: item.questionStatus,
+    },
+  });
+};
+
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">

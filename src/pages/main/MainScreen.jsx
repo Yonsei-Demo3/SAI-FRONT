@@ -51,24 +51,34 @@ export default function MainScreen() {
     return `${diffDays}일 전`;
   };
 
-  const getStatusLabel = (status, current, max) => {
-    if (!status) return null;
+function getStatusLabel(status, current, max) {
+  if (!status) return null;
 
-    switch (status) {
-      case "RECRUITING":
-        // 인원 다 찼으면 진행중으로 처리
-        if (max && current >= max) return "진행중";
-        return "참여 가능";
-      case "PROGRESS":
-      case "IN_PROGRESS":
-        return "진행중";
-      case "COMPLETED":
-      case "DONE":
-        return "종료";
-      default:
-        return null;
-    }
-  };
+  // 상태 실제 값 찍어보기 (한 번만 써보고 나중에 지워도 됨)
+  // console.log("questionStatus:", status, "current/max:", current, max);
+
+  switch (status) {
+    case "RECRUITING":
+      // 모집 중인데 인원이 다 찼으면 진행중으로 처리
+      if (max && current >= max) return "진행중";
+      return "참여 가능";
+
+    case "ACTIVE":
+    case "READY_CHECK":
+      return "진행중";
+
+    case "COMPLETED":
+    case "DONE":
+    case "FINISHED":    // 🔥 DetailScreen 에서 쓰던 값
+      return "종료";
+
+    default:
+      // 최소한 뭐라도 보이게 하려면 임시로 이렇게:
+      // return status;
+      return null;
+  }
+}
+
 
   // 상태 뱃지 색
   const getStatusChipClass = (label) => {
@@ -515,6 +525,34 @@ export default function MainScreen() {
       </div>
     );
   };
+
+  // 질문에 따라 바로 채팅으로 갈지, 디테일로 갈지 결정
+const goToChatOrDetail = (item) => {
+  const status = item.questionStatus;
+  const myStatus = item.myParticipationStatus || "NONE";
+
+  const isFinished =
+    status === "FINISHED" || status === "COMPLETED" || status === "DONE";
+  const canWatchChat = isFinished || myStatus === "JOINED";
+
+  // 채팅방 id 없으면 일단 디테일로 이동해서 다시 가져오게
+  if (!canWatchChat || !item.roomId) {
+    navigate("/detail", {
+      state: { questionId: item.questionId, item },
+    });
+    return;
+  }
+
+  navigate("/chat", {
+    state: {
+      questionId: item.questionId,
+      roomId: item.roomId,
+      questionTitle: item.questionTitle,
+      status: item.questionStatus,
+    },
+  });
+};
+
 
   return (
     <div className="flex flex-col w-full h-full bg-[#FAFAFA] font-[Pretendard]">

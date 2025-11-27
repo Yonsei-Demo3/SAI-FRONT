@@ -1,4 +1,3 @@
-// src/pages/mypage/MyPageliked.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../../components/main/BottomNav";
@@ -37,10 +36,10 @@ export default function MyPageScrapScreen() {
       case "RECRUITING":
         if (max && current >= max) return "진행중"; // 다 찼으면 진행중 취급
         return "참여 가능";
-      case "PROGRESS":
-      case "IN_PROGRESS":
+      case "ACTIVE":
+      case "READY_CHECK":
         return "진행중";
-      case "COMPLETED":
+      case "FINISHED":
       case "DONE":
         return "종료";
       default:
@@ -89,7 +88,6 @@ export default function MyPageScrapScreen() {
               likeCount: item.likeCount,
               likedByMe: item.likedByMe,
               createdAt: q.createdAt,
-              // 🔸 서버에서 내려주는 내 참여 상태 (없으면 NONE)
               myParticipationStatus: q.myParticipationStatus || "NONE",
             };
           })
@@ -129,11 +127,9 @@ export default function MyPageScrapScreen() {
 
     try {
       if (target.likedByMe) {
-        // 이미 좋아요 → 취소 + 목록에서 제거
         await unlikeQuestion(questionId);
         setFavoriteQuestions((prev) => prev.filter((q) => q.id !== questionId));
       } else {
-        // 아직 좋아요 아님 → 좋아요 등록
         const res = await likeQuestion(questionId);
         setFavoriteQuestions((prev) =>
           prev.map((q) =>
@@ -159,9 +155,7 @@ export default function MyPageScrapScreen() {
   const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
       if (currentMyStatus === "NONE") {
-        // 참여 신청
         await participateQuestion(questionId);
-
         setFavoriteQuestions((prev) =>
           prev.map((q) =>
             q.id === questionId
@@ -169,21 +163,16 @@ export default function MyPageScrapScreen() {
               : q
           )
         );
-
         setPopup("participate");
       } else if (currentMyStatus === "WAITING") {
-        // 대기 중 취소
         await cancelParticipateQuestion(questionId);
-
         setFavoriteQuestions((prev) =>
           prev.map((q) =>
             q.id === questionId ? { ...q, myParticipationStatus: "NONE" } : q
           )
         );
-
         setPopup("cancel");
       } else {
-        // JOINED는 여기서 버튼 안 바꿈 (대화 보기만)
         return;
       }
     } catch (e) {
@@ -240,6 +229,7 @@ export default function MyPageScrapScreen() {
               <img
                 src="/icons/arrow-down.svg"
                 className="w-[1rem] h-[1rem] ml-[0.25rem]"
+                alt=""
               />
             </button>
 
@@ -298,7 +288,12 @@ export default function MyPageScrapScreen() {
             return (
               <div
                 key={q.id}
-                className="bg-white mb-[1rem] py-[0.25rem]"
+                className="bg-white mb-[1rem] py-[0.25rem] cursor-pointer"
+                onClick={() =>
+                  navigate("/detail", {
+                    state: { questionId: q.id, item: q },
+                  })
+                }
               >
                 {/* 질문 문장 + 따옴표 */}
                 <div className="relative w-full flex px-[1.25rem] items-start">
@@ -337,7 +332,7 @@ export default function MyPageScrapScreen() {
                 {/* 인원 + 상태 + 태그 */}
                 <div className="flex flex-wrap items-center px-[1.5rem] gap-2 mt-3">
                   <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-[#F2F4F8] text-[#3B3D40] text-[0.75rem]">
-                    <img src="/icons/people.svg" className="w-4 h-4" />
+                    <img src="/icons/people.svg" className="w-4 h-4" alt="" />
                     {current}/{max}
                   </div>
 
@@ -365,7 +360,10 @@ export default function MyPageScrapScreen() {
                 <div className="flex items-center justify-between px-[1.5rem] mt-4 mb-[1.5rem]">
                   <button
                     className="flex items-center gap-1"
-                    onClick={() => handleToggleLikeQuestion(q.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleLikeQuestion(q.id);
+                    }}
                   >
                     <img
                       src={
@@ -381,25 +379,25 @@ export default function MyPageScrapScreen() {
                     </span>
                   </button>
 
-                  {/* 참여/취소/대화 버튼 (SearchResult 패턴) */}
+                  {/* 참여/취소/대화 버튼 */}
                   {myStatus === "JOINED" ? (
-                    // 이미 참여 중 → 대화 보기
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         navigate("/detail", {
                           state: { questionId: q.id, item: q },
-                        })
-                      }
+                        });
+                      }}
                       className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
                     >
                       대화 보기
                     </button>
                   ) : canParticipate ? (
-                    // 참여 가능일 때 → NONE: 참여하기 / WAITING: 참여 취소
                     <button
-                      onClick={() =>
-                        handleToggleParticipate(q.id, myStatus)
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleParticipate(q.id, myStatus);
+                      }}
                       className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
                         myStatus === "WAITING"
                           ? "bg-[#B5BBC1] text-white"
@@ -409,13 +407,13 @@ export default function MyPageScrapScreen() {
                       {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
                     </button>
                   ) : (
-                    // 모집 중이 아니면 → 대화 보기
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         navigate("/detail", {
                           state: { questionId: q.id, item: q },
-                        })
-                      }
+                        });
+                      }}
                       className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
                     >
                       대화 보기

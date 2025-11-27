@@ -19,18 +19,26 @@ function getStatusLabel(status, current, max) {
 
   switch (status) {
     case "RECRUITING":
+      // 모집 중인데 인원이 다 찼으면 진행중으로 처리
       if (max && current >= max) return "진행중";
       return "참여 가능";
-    case "PROGRESS":
-    case "IN_PROGRESS":
+
+    case "ACTIVE":
+    case "READY_CHECK":
       return "진행중";
+
     case "COMPLETED":
     case "DONE":
+    case "FINISHED":    // 🔥 DetailScreen 에서 쓰던 값
       return "종료";
+
     default:
+      // 최소한 뭐라도 보이게 하려면 임시로 이렇게:
+      // return status;
       return null;
   }
 }
+
 
 // 상태칩 스타일 결정
 function getStatusChipClass(label) {
@@ -223,6 +231,34 @@ export default function SearchResult() {
     });
   };
 
+  // 질문에 따라 바로 채팅으로 갈지, 디테일로 갈지 결정
+const goToChatOrDetail = (item) => {
+  const status = item.questionStatus;
+  const myStatus = item.myParticipationStatus || "NONE";
+
+  const isFinished =
+    status === "FINISHED" || status === "COMPLETED" || status === "DONE";
+  const canWatchChat = isFinished || myStatus === "JOINED";
+
+  // 채팅방 id 없으면 일단 디테일로 이동해서 다시 가져오게
+  if (!canWatchChat || !item.roomId) {
+    navigate("/detail", {
+      state: { questionId: item.questionId, item },
+    });
+    return;
+  }
+
+  navigate("/chat", {
+    state: {
+      questionId: item.questionId,
+      roomId: item.roomId,
+      questionTitle: item.questionTitle,
+      status: item.questionStatus,
+    },
+  });
+};
+
+
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
       <Navbar />
@@ -409,73 +445,70 @@ export default function SearchResult() {
                   </div>
 
                   {/* 좋아요 + 참여/대화 버튼 */}
-                  <div className="flex justify-between items-center mt-[0.8rem]">
-                    {/* 좋아요 */}
+                <div className="flex justify-between items-center mt-[0.8rem]">
+                  {/* 좋아요 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleLike(item.questionId);
+                    }}
+                    className="flex items-center gap-[0.25rem]"
+                  >
+                    <img
+                      src={
+                        item.likedByMe
+                          ? "/icons/heart-filled.svg"
+                          : "/icons/heart.svg"
+                      }
+                      className="w-[1rem] h-[1rem]"
+                      alt=""
+                    />
+                    <span className="text-[0.875rem] text-[#6B7280]">
+                      {item.likeCount ?? 0}
+                    </span>
+                  </button>
+
+                  {/* 참여/취소/대화 버튼 */}
+                  {myStatus === "JOINED" ? (
+                    // 🔥 참여 중 → 항상 대화 보기(바로 채팅 or 디테일)
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleLike(item.questionId);
+                        goToChatOrDetail(item);
                       }}
-                      className="flex items-center gap-[0.25rem]"
+                      className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
                     >
-                      <img
-                        src={
-                          item.likedByMe
-                            ? "/icons/heart-filled.svg"
-                            : "/icons/heart.svg"
-                        }
-                        className="w-[1rem] h-[1rem]"
-                        alt=""
-                      />
-                      <span className="text-[0.875rem] text-[#6B7280]">
-                        {item.likeCount ?? 0}
-                      </span>
+                      대화 보기
                     </button>
+                  ) : canParticipate ? (
+                    // 참여 가능 상태 → NONE: 참여하기 / WAITING: 참여 취소
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleParticipate(item.questionId, myStatus);
+                      }}
+                      className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
+                        myStatus === "WAITING"
+                          ? "bg-[#B5BBC1] text-white"
+                          : "bg-[#FA502E] text-white"
+                      }`}
+                    >
+                      {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
+                    </button>
+                  ) : (
+                    // 모집 중이 아니면 → 종료된 경우에는 채팅, 진행중이면 디테일
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        goToChatOrDetail(item);
+                      }}
+                      className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+                    >
+                      대화 보기
+                    </button>
+                  )}
+                </div>
 
-                    {/* 참여/취소/대화 버튼 */}
-                    {myStatus === "JOINED" ? (
-                      // 참여 중 → 항상 대화 보기
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/detail", {
-                            state: { questionId: item.questionId, item },
-                          });
-                        }}
-                        className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
-                      >
-                        대화 보기
-                      </button>
-                    ) : canParticipate ? (
-                      // 참여 가능 상태 → NONE: 참여하기 / WAITING: 참여 취소
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleParticipate(item.questionId, myStatus);
-                        }}
-                        className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-                          myStatus === "WAITING"
-                            ? "bg-[#B5BBC1] text-white"
-                            : "bg-[#FA502E] text-white"
-                        }`}
-                      >
-                        {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
-                      </button>
-                    ) : (
-                      // 모집 중이 아니면 → 대화 보기
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/detail", {
-                            state: { questionId: item.questionId, item },
-                          });
-                        }}
-                        className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
-                      >
-                        대화 보기
-                      </button>
-                    )}
-                  </div>
 
                   <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />
                 </div>
