@@ -1,3 +1,4 @@
+// src/screens/search/SearchResult.jsx
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
@@ -14,51 +15,70 @@ export default function SearchResult() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 전달받은 값 (state 없을 수도 있으니까 안전하게 옵셔널 체이닝)
   const initialQuery = location.state?.query || "";
   const initialTags = location.state?.tags || [];
+  const initialCategories = location.state?.categories || [];
 
   const [inputQuery, setInputQuery] = useState(initialQuery);
   const [query, setQuery] = useState(initialQuery);
-  const [tags, setTags] = useState(initialTags);
+  const [tags, setTags] = useState(initialTags);               // 칩 표시용
+  const [categories, setCategories] = useState(initialCategories); // API용
 
-  // 상태
   const [likeState, setLikeState] = useState({});
   const [results, setResults] = useState([]);
   const [popup, setPopup] = useState(null);
   const [openSort, setOpenSort] = useState(false);
   const [sortType, setSortType] = useState("인기순");
 
-  // 검색 결과 불러오기
+  // ================= 검색 호출 =================
   const fetchResults = async () => {
     try {
-      if (!query && tags.length === 0) {
+      const hasCategories = categories && categories.length > 0;
+      const hasTextOrTags =
+        (query && query.trim().length > 0) || (tags && tags.length > 0);
+
+      if (!hasCategories && !hasTextOrTags) {
         setResults([]);
         return;
       }
 
+      let keywordToUse = "";
+      let categoriesToSend = [];
+      let tagsToSend = [];
+
+      if (hasCategories) {
+        // 🔥 카테고리 검색: main/sub 기준 필터만 사용
+        categoriesToSend = categories;
+        keywordToUse = "";
+        tagsToSend = []; // 태그 조건은 사용 안 함
+      } else {
+        // 일반 검색 (키워드 + 태그)
+        keywordToUse = (query || "").trim();
+        categoriesToSend = [];
+        tagsToSend = tags;
+      }
+
       const data = await searchQuestions({
-        keyword: query,
-        tags,
+        keyword: keywordToUse,
+        categories: categoriesToSend,
+        tags: tagsToSend,
         page: 0,
         size: 10,
         sortType,
       });
 
-      // 여기서 이미 각 item에 myParticipationStatus 가 들어온다고 가정
       setResults(data.content || []);
     } catch (error) {
       console.error("Error fetching results:", error);
     }
   };
 
-  // query / tags / sortType 바뀔 때만 검색
   useEffect(() => {
     fetchResults();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, tags, sortType]);
+    // categories도 의존성에 포함
+  }, [query, tags, sortType, categories]);
 
-  // ❤️ 좋아요 토글
+  // ================= 좋아요 =================
   const handleToggleLike = async (questionId) => {
     const base = results.find((r) => r.questionId === questionId) || {};
     const current = likeState[questionId] || {
@@ -86,13 +106,11 @@ export default function SearchResult() {
     }
   };
 
-  // 참여 / 참여취소 토글 (myParticipationStatus 기반)
+  // ================= 참여/취소 =================
   const handleToggleParticipate = async (questionId, currentMyStatus) => {
     try {
       if (currentMyStatus === "NONE") {
-        // 참여 신청
         await participateQuestion(questionId);
-
         setResults((prev) =>
           prev.map((item) =>
             item.questionId === questionId
@@ -100,12 +118,9 @@ export default function SearchResult() {
               : item
           )
         );
-
         setPopup("participate");
       } else if (currentMyStatus === "WAITING") {
-        // 대기 중인 상태만 취소 가능
         await cancelParticipateQuestion(questionId);
-
         setResults((prev) =>
           prev.map((item) =>
             item.questionId === questionId
@@ -113,10 +128,8 @@ export default function SearchResult() {
               : item
           )
         );
-
         setPopup("cancel");
       } else {
-        // JOINED에서는 여기 안 들어오는 게 정상. 들어오면 그냥 무시
         return;
       }
     } catch (e) {
@@ -127,11 +140,9 @@ export default function SearchResult() {
     }
   };
 
-
-  // 상태 라벨 매핑 함수
+  // ================= 상태 라벨/칩 =================
   const getStatusLabel = (status, current, max) => {
     if (!status) return null;
-
     switch (status) {
       case "RECRUITING":
         if (max && current >= max) return "진행중";
@@ -148,27 +159,29 @@ export default function SearchResult() {
   };
 
   const getStatusChipClass = (label) => {
-    if (label === "진행중") {
-      return "bg-[#F3FFE1] text-[#6BB600]";
-    }
-    if (label === "종료") {
-      return "bg-[#F3F4F6] text-[#4B5563]";
-    }
-    // 참여 가능
+    if (label === "진행중") return "bg-[#F3FFE1] text-[#6BB600]";
+    if (label === "종료") return "bg-[#F3F4F6] text-[#4B5563]";
     return "bg-[#E3F2FF] text-[#1D72FF]";
   };
 
-  // 태그 삭제
+  // 칩 X 눌렀을 때
   const handleRemoveTag = (tag) => {
-    const updated = tags.filter((t) => t !== tag);
-    setTags(updated);
-    if (updated.length === 0) {
+    const updatedTags = tags.filter((t) => t !== tag);
+    setTags(updatedTags);
+
+    // 카테고리 검색 중이면 categories에서도 제거
+    if (categories && categories.length > 0) {
+      setCategories((prev) => prev.filter((c) => c.sub !== tag));
+    }
+
+    // 카테고리까지 다 지워지면 키워드도 같이 리셋
+    if (updatedTags.length === 0 && (!categories || categories.length === 0)) {
       setQuery("");
       setInputQuery("");
     }
   };
 
-    const handleProfileClick = (e, item) => {
+  const handleProfileClick = (e, item) => {
     e.stopPropagation();
 
     const hostId = item.hostId;
@@ -188,6 +201,7 @@ export default function SearchResult() {
     });
   };
 
+  // ================= 렌더 =================
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
       <Navbar />
@@ -212,7 +226,9 @@ export default function SearchResult() {
                 </p>
                 {popup === "participate" && (
                   <p className="text-[0.75rem] text-[#3B3D40] leading-[1.3rem] mt-[0.25rem] whitespace-pre-line">
-                    {"대화 인원이 모두 모이면 알려드릴게요.\n알림을 받으면 30초 안에 ‘준비 완료’를 눌러 참여할 수 있습니다."}
+                    {
+                      "대화 인원이 모두 모이면 알려드릴게요.\n알림을 받으면 30초 안에 ‘준비 완료’를 눌러 참여할 수 있습니다."
+                    }
                   </p>
                 )}
                 {popup === "cancel" && (
@@ -226,7 +242,7 @@ export default function SearchResult() {
         </div>
       )}
 
-      {/* 검색 영역 */}
+      {/* 검색 + 결과 */}
       <div className="flex-1 flex flex-col overflow-hidden w-full max-w-[500px] mx-auto">
         <SearchBar
           value={inputQuery}
@@ -236,7 +252,7 @@ export default function SearchResult() {
           onEnter={() => setQuery(inputQuery)}
         />
 
-        {/* 결과 상단 */}
+        {/* 상단 정보 */}
         <div className="flex justify-between items-center px-[2.5rem] mt-[1.5rem]">
           <p className="text-[1rem] font-semibold">검색결과 {results.length}</p>
 
@@ -249,6 +265,7 @@ export default function SearchResult() {
               <img
                 src="/icons/arrow-down.svg"
                 className="w-[1rem] h-[1rem] ml-[0.25rem]"
+                alt=""
               />
             </button>
 
@@ -308,7 +325,6 @@ export default function SearchResult() {
                 max
               );
               const showJoinButton = statusLabel === "참여 가능";
-
               const myStatus = item.myParticipationStatus || "NONE";
 
               return (
@@ -324,6 +340,7 @@ export default function SearchResult() {
                   <img
                     src="/icons/quote.svg"
                     className="w-[1rem] h-[1rem] mt-[0.75rem] opacity-70"
+                    alt=""
                   />
                   <p className="text-[1rem] font-medium leading-[1.6rem] mt-[0.5rem]">
                     {item.questionTitle}
@@ -341,6 +358,7 @@ export default function SearchResult() {
                   <img
                     src="/icons/line.svg"
                     className="w-full mt-[0.8rem] mb-[0.5rem]"
+                    alt=""
                   />
 
                   <button
@@ -365,12 +383,12 @@ export default function SearchResult() {
                     {item.mainCategory} &gt; {item.subCategory}
                   </p>
 
-                  {/* 인원수 + 상태 + 태그 */}
                   <div className="flex items-center flex-wrap gap-[0.38rem] mt-[0.75rem]">
                     <div className="flex items-center text-[0.75rem] bg-[#F2F4F8] rounded-md px-[0.4rem] py-[0.2rem]">
                       <img
                         src="/icons/people.svg"
                         className="w-[1rem] h-[1rem] mr-[0.25rem]"
+                        alt=""
                       />
                       {current}/{max}
                     </div>
@@ -396,7 +414,6 @@ export default function SearchResult() {
                   </div>
 
                   <div className="flex justify-between items-center mt-[0.8rem]">
-                    {/* 좋아요 버튼 */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -411,56 +428,52 @@ export default function SearchResult() {
                             : "/icons/heart.svg"
                         }
                         className="w-[1rem] h-[1rem]"
+                        alt=""
                       />
                       <span className="text-[0.875rem] text-[#6B7280]">
                         {likeInfo.count}
                       </span>
                     </button>
 
-                    {/* 참여 / 대화 보기 버튼 */}
-                      {myStatus === "JOINED" ? (
-                        // 1) 참여 중인 상태 → 항상 대화 보기 버튼
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/detail", {
-                              state: { questionId: item.questionId, item },
-                            });
-                          }}
-                          className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
-                        >
-                          대화 보기
-                        </button>
-                      ) : showJoinButton ? (
-                        // 2) 모집 중(참여 가능)일 때 → NONE: 참여하기 / WAITING: 참여 취소
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleParticipate(item.questionId, myStatus);
-                          }}
-                          className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
-                            myStatus === "WAITING"
-                              ? "bg-[#B5BBC1] text-white" // 대기 중일 때: 참여 취소(회색)
-                              : "bg-[#FA502E] text-white" // 신청 안 함일 때: 참여하기(주황)
-                          }`}
-                        >
-                          {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
-                        </button>
-                      ) : (
-                        // 3) 모집 중이 아닐 때 → 그냥 대화 보기 (NONE / WAITING 둘 다)
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/detail", {
-                              state: { questionId: item.questionId, item },
-                            });
-                          }}
-                          className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
-                        >
-                          대화 보기
-                        </button>
-                      )}
-
+                    {myStatus === "JOINED" ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/detail", {
+                            state: { questionId: item.questionId, item },
+                          });
+                        }}
+                        className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+                      >
+                        대화 보기
+                      </button>
+                    ) : showJoinButton ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleParticipate(item.questionId, myStatus);
+                        }}
+                        className={`px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium ${
+                          myStatus === "WAITING"
+                            ? "bg-[#B5BBC1] text-white"
+                            : "bg-[#FA502E] text-white"
+                        }`}
+                      >
+                        {myStatus === "WAITING" ? "참여 취소" : "참여하기"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/detail", {
+                            state: { questionId: item.questionId, item },
+                          });
+                        }}
+                        className="px-[1rem] py-[0.4rem] rounded-md text-[0.875rem] font-medium bg-[#54575C] text-white"
+                      >
+                        대화 보기
+                      </button>
+                    )}
                   </div>
 
                   <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />

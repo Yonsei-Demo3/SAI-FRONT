@@ -299,6 +299,7 @@ export default function MyPageScrapScreen() {
               <div
                 key={q.id}
                 className="bg-white mb-[1rem] py-[0.25rem]"
+                
               >
                 {/* 질문 문장 + 따옴표 */}
                 <div className="relative w-full flex px-[1.25rem] items-start">
