@@ -383,11 +383,8 @@ const goToChatOrDetail = (item) => {
                     {item.questionDescription}
                   </p>
 
-                  <img
-                    src="/icons/line.svg"
-                    className="w-full mt-[0.8rem] mb-[0.5rem]"
-                    alt=""
-                  />
+                  <div className="w-full h-[1px] bg-[#E7EBEF] mx-auto mt-[0.8rem] mb-[0.75rem]" />
+
 
                   <button
                     type="button"

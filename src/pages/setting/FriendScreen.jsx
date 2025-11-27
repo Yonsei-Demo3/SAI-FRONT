@@ -115,6 +115,25 @@ export default function FriendsScreen() {
     }
   };
 
+    const handleProfileClick = (e, item) => {
+    e.stopPropagation();
+
+    const hostId = item.hostId;
+    if (!hostId && hostId !== 0) {
+      console.log("[SearchResult] item without hostId:", item);
+      alert("질문 작성자 ID 정보를 찾을 수 없어요.");
+      return;
+    }
+
+    navigate(`/friend/profile/${hostId}`, {
+      state: {
+        memberId: hostId,
+        nickname: item.hostNickname || "익명",
+        profileImage: item.imageUrl || "/icons/profile-avatar.svg",
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
       {/* 상단바 */}
@@ -194,6 +213,7 @@ export default function FriendsScreen() {
                       src={item.profileImage || "/icons/profile-avatar.svg"}
                       alt="프로필"
                       className="w-[2.5rem] h-[2.5rem] object-cover"
+                      onClick={(e) => handleProfileClick(e, item)}
                     />
                   </div>
                   <p className="ml-[0.75rem] text-[1rem] text-[#111827]">

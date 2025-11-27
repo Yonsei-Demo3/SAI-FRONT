@@ -237,13 +237,13 @@ export default function DetailScreen() {
       <div className="relative w-full px-[1.5rem] mt-6">
         <div className="relative w-full h-[22rem] rounded-2xl overflow-hidden">
           <img
-            src={item.imageUrl}
+            src={item.imageUrl ?? "icons/image1.png"}
             className="absolute inset-0 w-full h-full object-cover blur-sm scale-110"
           />
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="absolute inset-0 flex justify-center items-center">
             <img
-              src={item.imageUrl}
+              src={item.imageUrl ?? "icons/image1.png"}
               className="w-[10rem] h-[13rem] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] object-cover"
             />
           </div>

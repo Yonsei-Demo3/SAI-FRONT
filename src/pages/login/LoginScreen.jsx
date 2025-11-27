@@ -5,19 +5,19 @@ import { login, kakaoLogin } from "../../lib/loginService";
 import { initSocket } from "../../lib/socket";
 import AuthContext from "../../context/AuthContext";
 
-
 export default function LoginScreen() {
-  
-  const navigate = useNavigate(); 
-  const [error, setError] = useState(""); 
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
   const [searchParams] = useSearchParams(); // query parameters
-  
+
   const { setIsLoggedIn } = useContext(AuthContext);
 
   const kakaoCode = searchParams.get("code"); // kakao 인가코드
   const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
 
+  // ✅ ID/PW 찾기 팝업용 상태
+  const [showIdPwModal, setShowIdPwModal] = useState(false);
 
   const extractToken = (authHeader) => {
     if (!authHeader) return null;
@@ -47,12 +47,10 @@ export default function LoginScreen() {
 
   {/* 카카오 로그인 */}
   useEffect(() => {
-
     if (!kakaoCode) return;
 
     const fetchKakaoLogin = async () => {
       try {
-
         const response = await kakaoLogin(kakaoCode, KAKAO_REDIRECT_URI);
 
         const authHeader =
@@ -62,24 +60,20 @@ export default function LoginScreen() {
 
         const token = extractToken(authHeader);
 
-        if(token) {
+        if (token) {
           localStorage.setItem("accessToken", token);
           initSocket();
           setIsLoggedIn(true);
         }
 
         navigate("/main", { replace: true });
-
-    } catch (err) {
-
-      console.error("카카오 로그인 실패:", err);
-      setError("다시 시도해 주세요.");
-    
-    }
+      } catch (err) {
+        console.error("카카오 로그인 실패:", err);
+        setError("다시 시도해 주세요.");
+      }
     };
 
     fetchKakaoLogin();
-
   }, [kakaoCode]);
 
   // 일반 로그인
@@ -121,12 +115,9 @@ export default function LoginScreen() {
       }
 
       navigate("/main", { replace: true });
-      
     } catch (err) {
-
       console.error("일반 로그인 실패:", err);
       setError("아이디 또는 비밀번호가 잘못되었습니다.");
-    
     }
   };
 
@@ -173,16 +164,16 @@ export default function LoginScreen() {
 
         {/* 로그인 버튼 */}
         <button
-          onClick={handleSubmit} // 로그인 버튼 클릭 시 handleSubmit 호출
-          className="h-[3.25rem] bg-[#FA502E] text-[#FFFFFF] text-[1rem] leading-[2.25rem] rounded-[0.5rem] px-[1rem] py-[0.5rem] mt-[0.5rem] hover:opacity-90 focus:outline-none focus:ring-none border-none"
+          onClick={handleSubmit}
+          className="h-[3.25rem] bg-[#FA502E] text-[#FFFFFF] text-[1rem] leading-[2.25rem] rounded-[0.5rem] px-[1rem] py-[0.5rem] mt-[0.5rem] hover:opacity-90 focus:outline-none border-none"
         >
-          <span>
-            로그인
-          </span>
+          <span>로그인</span>
         </button>
 
         {/* 오류 메시지 */}
-        {error && <p className="text-[0.875rem] text-red-500 mt-2">{error}</p>}
+        {error && (
+          <p className="text-[0.875rem] text-red-500 mt-2">{error}</p>
+        )}
       </div>
 
       {/* 하단 링크 */}
@@ -191,9 +182,15 @@ export default function LoginScreen() {
           회원가입
         </a>
         <span className="text-[#B5BBC1]">|</span>
-        <a href="/find-id-pw" className=" text-[#B5BBC1] hover:text-[#FA502E] no-underline">
+
+        {/* ✅ ID/PW 찾기 → 모달 열기 */}
+        <button
+          type="button"
+          className="text-[#B5BBC1] hover:text-[#FA502E] no-underline bg-transparent border-none outline-none"
+          onClick={() => setShowIdPwModal(true)}
+        >
           ID/PW 찾기
-        </a>
+        </button>
       </div>
 
       {/* SNS 로그인 구분선 및 버튼 */}
@@ -215,21 +212,51 @@ export default function LoginScreen() {
         </div>
 
         <div className="flex w-full justify-center">
-          <button 
+          <button
             className="rounded-[0.5rem] bg-[#FEE500] w-full h-[3.25rem] flex justify-center items-center gap-[0.5rem]"
             onClick={handleKakaoLogin}
           >
-            
-            <svg xmlns="http://www.w3.org/2000/svg" width="23" height="21" viewBox="0 0 23 21" fill="none">
-              <path d="M11.2405 0C5.01808 0 0 4.01442 0 8.88798C0 12.0514 2.08752 14.8213 5.2188 16.403L4.15898 20.3613C4.139 20.4207 4.13593 20.4843 4.15011 20.5453C4.16429 20.6063 4.19516 20.6621 4.23927 20.7065C4.30359 20.7633 4.38635 20.7946 4.47211 20.7948C4.54322 20.7891 4.61068 20.761 4.6648 20.7146L9.22524 17.6395C9.89841 17.7324 10.577 17.7807 11.2566 17.784C17.4709 17.784 22.4971 13.7696 22.4971 8.88798C22.4971 4.00639 17.4549 0 11.2405 0Z" fill="#392020"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="23"
+              height="21"
+              viewBox="0 0 23 21"
+              fill="none"
+            >
+              <path
+                d="M11.2405 0C5.01808 0 0 4.01442 0 8.88798C0 12.0514 2.08752 14.8213 5.2188 16.403L4.15898 20.3613C4.139 20.4207 4.13593 20.4843 4.15011 20.5453C4.16429 20.6063 4.19516 20.6621 4.23927 20.7065C4.30359 20.7633 4.38635 20.7946 4.47211 20.7948C4.54322 20.7891 4.61068 20.761 4.6648 20.7146L9.22524 17.6395C9.89841 17.7324 10.577 17.7807 11.2566 17.784C17.4709 17.784 22.4971 13.7696 22.4971 8.88798C22.4971 4.00639 17.4549 0 11.2405 0Z"
+                fill="#392020"
+              />
             </svg>
-            
-            <span className="font-bold">
-              카카오 로그인
-            </span>
+
+            <span className="font-bold">카카오 로그인</span>
           </button>
         </div>
       </div>
+
+      {/* ✅ ID/PW 찾기 안내 모달 */}
+      {showIdPwModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* 반투명 배경 */}
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setShowIdPwModal(false)}
+          />
+          {/* 팝업 카드 */}
+          <div className="relative bg-white rounded-[0.75rem] w-[18rem] max-w-[80%] text-center shadow-[0_10px_30px_rgba(0,0,0,0.15)]">
+            <p className="px-6 pt-6 pb-4 text-[0.875rem] text-[#111827]">
+              베타 버전에서는 <br/>ID/PW 찾기를 지원하지 않아요.
+            </p>
+            <div className="h-[1px] bg-[#E5E7EB]" />
+            <button
+              className="w-full py-3 text-[#FA502E] text-[1rem] font-semibold"
+              onClick={() => setShowIdPwModal(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

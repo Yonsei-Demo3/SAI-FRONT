@@ -101,7 +101,7 @@ function getStatusLabel(status, current, max) {
           categories: [],
           tags: [],
           page: 0,
-          size: 10,
+          size: 50,
           sortType: "인기순",
         });
 
@@ -128,8 +128,10 @@ function getStatusLabel(status, current, max) {
           })
         );
 
-        listWithLike.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
-        const top3 = listWithLike.slice(0, 3);
+        const sortedByLike = [...listWithLike].sort(
+          (a, b) => (b.likeCount || 0) - (a.likeCount || 0)
+        );
+        const top3 = sortedByLike.slice(0, 3);
 
         setPopularQuestions(top3);
       } catch (e) {
@@ -351,14 +353,14 @@ function getStatusLabel(status, current, max) {
             />
 
             <div className="relative max-w-[14rem] text-center mt-[0.5rem] leading-[1.5]">
-              <p className="text-[1rem] font-medium ml-[0.5rem] text-gray-800 line-clamp-3">
+              <p className="text-[1rem] font-medium text-gray-800 line-clamp-3">
                 {item.questionTitle}
               </p>
 
               <img
                 src="/icons/quote-down.svg"
                 alt="quote close"
-                className="w-[1rem] h-[1rem] mr-[-2rem] opacity-70 absolute right-0 bottom-0 translate-y-[20%]"
+                className="w-[1rem] h-[1rem] mr-[-1.5rem] opacity-70 absolute right-0 bottom-0 translate-y-[20%]"
               />
             </div>
           </div>
@@ -508,10 +510,10 @@ function getStatusLabel(status, current, max) {
               </div>
             </div>
 
-            <p className="text-[0.75rem] mt-[0.75rem] font-regular text-[#3B3D40]">
+            <p className="text-[0.75rem] mt-[0.75rem] font-regular text-[#3B3D40] line-clamp-1">
               {contentTitle}
             </p>
-            <p className="text-[0.875rem] font-bold text-[#3B3D40]">
+            <p className="text-[0.875rem] font-bold mt-[0.25rem] text-[#3B3D40] line-clamp-2">
               {questionTitle}
             </p>
             </div>
@@ -519,7 +521,7 @@ function getStatusLabel(status, current, max) {
             <div>
             <div className="w-full h-[0.0625rem] bg-[#E7EBEF] mt-[0.75rem] pr-[2rem]" />
 
-            <p className="text-[0.875rem] text-[#3B3D40] mt-[1rem] px-[0.5rem]">
+            <p className="text-[0.875rem] text-[#3B3D40] mt-[1rem] px-[0.5rem] line-clamp-2">
               {messageContent}
             </p>
           </div>
@@ -528,31 +530,31 @@ function getStatusLabel(status, current, max) {
   };
 
   // 질문에 따라 바로 채팅으로 갈지, 디테일로 갈지 결정
-const goToChatOrDetail = (item) => {
-  const status = item.questionStatus;
-  const myStatus = item.myParticipationStatus || "NONE";
+  const goToChatOrDetail = (item) => {
+    const status = item.questionStatus;
+    const myStatus = item.myParticipationStatus || "NONE";
 
-  const isFinished =
-    status === "FINISHED" || status === "COMPLETED" || status === "DONE";
-  const canWatchChat = isFinished || myStatus === "JOINED";
+    const isFinished =
+      status === "FINISHED" || status === "COMPLETED" || status === "DONE";
+    const canWatchChat = isFinished || myStatus === "JOINED";
 
-  // 채팅방 id 없으면 일단 디테일로 이동해서 다시 가져오게
-  if (!canWatchChat || !item.roomId) {
-    navigate("/detail", {
-      state: { questionId: item.questionId, item },
+    // 채팅방 id 없으면 일단 디테일로 이동해서 다시 가져오게
+    if (!canWatchChat || !item.roomId) {
+      navigate("/detail", {
+        state: { questionId: item.questionId, item },
+      });
+      return;
+    }
+
+    navigate("/chat", {
+      state: {
+        questionId: item.questionId,
+        roomId: item.roomId,
+        questionTitle: item.questionTitle,
+        status: item.questionStatus,
+      },
     });
-    return;
-  }
-
-  navigate("/chat", {
-    state: {
-      questionId: item.questionId,
-      roomId: item.roomId,
-      questionTitle: item.questionTitle,
-      status: item.questionStatus,
-    },
-  });
-};
+  };
 
 
   return (

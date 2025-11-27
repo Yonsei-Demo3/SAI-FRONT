@@ -28,6 +28,7 @@ import ProfileEditScreen from "./pages/mypage/ProfileEditScreen";
 import ChatStartPopup from "./components/ChatStartPopup";
 import FriendProfileScreen from "./pages/friend/FriendProfileScreen";
 import FriendRequestScreen from "./pages/friend/FriendRequestScreen";
+import CommunityRulesScreen from "./pages/setting/CommunityRulesScreen";
 import AuthContext from "./context/AuthContext";
 
 export default function App() {
@@ -73,6 +74,7 @@ export default function App() {
               <Route path="/settings/friends" element={<FriendsScreen />} />
               <Route path="/friend/profile/:memberId" element={<FriendProfileScreen />} />
               <Route path="/friend/add" element={<FriendRequestScreen />} />
+              <Route path="/community-rules" element={<CommunityRulesScreen />} />
             </Routes>
           </Router>
         </div>

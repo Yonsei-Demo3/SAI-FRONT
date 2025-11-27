@@ -99,7 +99,7 @@ export default function SearchResult() {
         categories: categoriesToSend,
         tags: tagsToSend,
         page: 0,
-        size: 10,
+        size: 50,
         sortType,
       });
 
@@ -149,6 +149,8 @@ export default function SearchResult() {
     try {
       if (currentMyStatus === "NONE") {
         await participateQuestion(questionId);
+        await fetchResults();
+
         setResults((prev) =>
           prev.map((item) =>
             item.questionId === questionId
@@ -381,7 +383,7 @@ export default function SearchResult() {
               return (
                 <div
                   key={item.questionId}
-                  className="pb-[1.25rem] mb-[1.25rem] cursor-pointer"
+                  className="mb-[1.25rem] cursor-pointer"
                   onClick={() =>
                     navigate("/detail", {
                       state: { questionId: item.questionId, item },
@@ -406,11 +408,7 @@ export default function SearchResult() {
                   >
                     {item.questionDescription}
                   </p>
-                  <img
-                    src="/icons/line.svg"
-                    className="w-full mt-[0.8rem] mb-[0.5rem]"
-                    alt=""
-                  />
+                  <div className="w-full h-[1px] bg-[#E7EBEF] mx-auto mt-[0.8rem] mb-[0.75rem]" />
 
                   {/* 작성자/콘텐츠 정보 */}
                   <button

@@ -160,6 +160,7 @@ export default function SettingScreen() {
 
           {/* 커뮤니티 이용 규칙 */}
           <button
+            onClick={() => navigate("/community-rules")}
             className="w-full px-[1.5rem] py-[1rem] flex items-center justify-between border-t border-[#E5E7EB]"
           >
             <span className="text-[1rem]">커뮤니티 이용 규칙</span>

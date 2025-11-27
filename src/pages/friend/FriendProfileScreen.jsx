@@ -1,3 +1,4 @@
+// src/screens/friend/FriendProfileScreen.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import {
@@ -5,6 +6,7 @@ import {
   blockFriends,
   unblockFriends,
 } from "../../lib/friendService";
+import { getMyInfo } from "../../lib/memberService";   // ✅ 추가
 
 export default function FriendProfileScreen() {
   const navigate = useNavigate();
@@ -14,12 +16,15 @@ export default function FriendProfileScreen() {
   // 1) URL 파라미터가 우선, 없으면 state에서
   const memberId = memberIdParam || state?.memberId;
   const nickname = state?.nickname ?? "익명";
-  const profileImage = state?.profileImage ?? "/icons/profile-avatar.svg";
+  const profileImage = "/icons/profile-avatar.svg";
 
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockConfirmOpen, setBlockConfirmOpen] = useState(false);
 
-  // memberId 정말 아예 없을 때만 잘못된 접근 처리
+  // ✅ 내 정보
+  const [myMemberId, setMyMemberId] = useState(null);
+  const [meLoading, setMeLoading] = useState(true);
+
   if (!memberId) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -28,7 +33,32 @@ export default function FriendProfileScreen() {
     );
   }
 
+  // ✅ 내 정보 조회
   useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const me = await getMyInfo();
+        setMyMemberId(me.memberId); // 백에서 내려주는 memberId
+      } catch (e) {
+        console.error("내 정보 조회 실패", e);
+      } finally {
+        setMeLoading(false);
+      }
+    };
+
+    fetchMe();
+  }, []);
+
+  // ✅ 내 프로필인지 여부
+  const isMe =
+    !meLoading &&
+    myMemberId != null &&
+    String(myMemberId) === String(memberId);
+
+  // 차단 여부는 “내 프로필이 아닐 때만” 조회
+  useEffect(() => {
+    if (!memberId || meLoading || isMe) return;
+
     const checkBlocked = async () => {
       try {
         const list = await getBlocksList();
@@ -42,7 +72,7 @@ export default function FriendProfileScreen() {
     };
 
     checkBlocked();
-  }, [memberId]);
+  }, [memberId, meLoading, isMe]);
 
   const handleOpenBlockConfirm = () => {
     setBlockConfirmOpen(true);
@@ -87,6 +117,15 @@ export default function FriendProfileScreen() {
     });
   };
 
+  // 아직 내 정보 로딩 중이면 간단한 로딩만
+  if (meLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#B74023] text-white">
+        로딩 중...
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-[#B74023] text-white font-[Pretendard]">
       {/* 상단 닫기 버튼 */}
@@ -108,56 +147,61 @@ export default function FriendProfileScreen() {
         <p className="text-[1.25rem] font-semibold">{nickname}</p>
       </div>
 
-      {/* 하단 구분선 */}
-      <div className="h-[1px] w-full bg-white/40" />
+      {/* ✅ 내 프로필이면 하단 버튼 안 보이게 */}
+      {!isMe && (
+        <>
+          {/* 하단 구분선 */}
+          <div className="h-[1px] w-full bg-white/40" />
 
-      {/* 하단 버튼 영역 */}
-      <div className="pb-10 pt-6 flex justify-center">
-        {!isBlocked ? (
-          // 차단 전 : 친구 추가 + 차단
-          <div className="flex w-full max-w-[320px] gap-[4rem] items-center justify-center">
-            <button
-              className="flex flex-col items-center"
-              onClick={goToAddFriend}
-            >
-              <img
-                src="/icons/friend-plus.svg" // 아이콘 없으면 그냥 지워도 됨
-                onError={(e) => (e.target.style.display = "none")}
-                className="w-[1.75rem] h-[1.75rem] mb-1"
-                alt=""
-              />
-              <span className="text-[0.75rem]">친구 추가</span>
-            </button>
+          {/* 하단 버튼 영역 */}
+          <div className="pb-10 pt-6 flex justify-center">
+            {!isBlocked ? (
+              // 차단 전 : 친구 추가 + 차단
+              <div className="flex w-full max-w-[320px] gap-[4rem] items-center justify-center">
+                <button
+                  className="flex flex-col items-center"
+                  onClick={goToAddFriend}
+                >
+                  <img
+                    src="/icons/friend-plus.svg"
+                    onError={(e) => (e.target.style.display = "none")}
+                    className="w-[1.75rem] h-[1.75rem] mb-1"
+                    alt=""
+                  />
+                  <span className="text-[0.75rem]">친구 추가</span>
+                </button>
 
-            <button
-              className="flex flex-col items-center"
-              onClick={handleOpenBlockConfirm}
-            >
-              <img
-                src="/icons/block.svg"
-                onError={(e) => (e.target.style.display = "none")}
-                className="w-[1.75rem] h-[1.75rem] mb-1"
-                alt=""
-              />
-              <span className="text-[0.75rem]">차단</span>
-            </button>
+                <button
+                  className="flex flex-col items-center"
+                  onClick={handleOpenBlockConfirm}
+                >
+                  <img
+                    src="/icons/block.svg"
+                    onError={(e) => (e.target.style.display = "none")}
+                    className="w-[1.75rem] h-[1.75rem] mb-1"
+                    alt=""
+                  />
+                  <span className="text-[0.75rem]">차단</span>
+                </button>
+              </div>
+            ) : (
+              // 이미 차단된 상태 : 차단 해제만
+              <button
+                className="flex flex-col items-center"
+                onClick={handleUnblock}
+              >
+                <img
+                  src="/icons/block.svg"
+                  onError={(e) => (e.target.style.display = "none")}
+                  className="w-7 h-7 mb-1"
+                  alt=""
+                />
+                <span className="text-[0.95rem]">차단 해제</span>
+              </button>
+            )}
           </div>
-        ) : (
-          // 이미 차단된 상태 : 차단 해제만
-          <button
-            className="flex flex-col items-center"
-            onClick={handleUnblock}
-          >
-            <img
-              src="/icons/block.svg"
-              onError={(e) => (e.target.style.display = "none")}
-              className="w-7 h-7 mb-1"
-              alt=""
-            />
-            <span className="text-[0.95rem]">차단 해제</span>
-          </button>
-        )}
-      </div>
+        </>
+      )}
 
       {/* 차단 확인 팝업 */}
       {blockConfirmOpen && (
