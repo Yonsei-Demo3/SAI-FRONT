@@ -1,17 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { login, kakaoLogin } from "../../lib/loginService";
 import { initSocket } from "../../lib/socket";
+import AuthContext from "../../context/AuthContext";
+
 
 export default function LoginScreen() {
   
   const navigate = useNavigate(); 
   const [error, setError] = useState(""); 
   const [searchParams] = useSearchParams(); // query parameters
+  
+  const { setIsLoggedIn } = useContext(AuthContext);
+
   const kakaoCode = searchParams.get("code"); // kakao 인가코드
   const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
   const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+
 
   const extractToken = (authHeader) => {
     if (!authHeader) return null;
@@ -59,6 +65,7 @@ export default function LoginScreen() {
         if(token) {
           localStorage.setItem("accessToken", token);
           initSocket();
+          setIsLoggedIn(true);
         }
 
         navigate("/main", { replace: true });
@@ -110,6 +117,7 @@ export default function LoginScreen() {
       if (token) {
         localStorage.setItem("accessToken", token);
         initSocket();
+        setIsLoggedIn(true);
       }
 
       navigate("/main", { replace: true });

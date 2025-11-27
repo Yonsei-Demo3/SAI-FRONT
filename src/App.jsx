@@ -1,6 +1,6 @@
-import React from "react";
 import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useState } from "react";
 import ContentSearchResultPage from "./pages/content/ContentSearchResultPage";
 import ContentSearchPage from "./pages/content/ContentSearchPage";
 import ContentRegisterPage from "./pages/content/ContentRegisterPage"
@@ -28,14 +28,18 @@ import ProfileEditScreen from "./pages/mypage/ProfileEditScreen";
 import ChatStartPopup from "./components/ChatStartPopup";
 import FriendProfileScreen from "./pages/friend/FriendProfileScreen";
 import FriendRequestScreen from "./pages/friend/FriendRequestScreen";
+import AuthContext from "./context/AuthContext";
 
 export default function App() {
   
   const height = window.innerHeight;
-  const isLoggedIn = !!localStorage.getItem("accessToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("accessToken")
+  );
 
   return (
     <>
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
     <NotificationProvider> {/* ✅ 전역 알림 상태 감싸기 */}
       <div className="flex justify-center items-center bg-white">
         <div className="min-w-[350px] max-w-[500px] w-full h-[100vh] bg-white shadow-md border border-gray-200">
@@ -74,6 +78,7 @@ export default function App() {
         </div>
       </div>
     </NotificationProvider>
+    </AuthContext.Provider>
     </>
   );
 }
