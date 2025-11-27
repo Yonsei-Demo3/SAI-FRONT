@@ -54,3 +54,8 @@ export async function getBlocksList() {
   const res = await axiosInstance.get(`/api/v1/blocks`);
   return res.data;
 }
+
+export async function getOutgoingFriendRequests() {
+  const res = await axiosInstance.get("/api/v1/friend-requests/outgoing");
+  return res.data; // [{ requestId, fromMemberId, toMemberId, message, status }, ...]
+}

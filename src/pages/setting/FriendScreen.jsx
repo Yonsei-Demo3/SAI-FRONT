@@ -53,10 +53,12 @@ export default function FriendsScreen() {
         // 친구 목록 매핑 (swagger: memberId, nickname, email, profileImage)
         const friendMapped = friendsRes.map((f) => ({
           id: f.memberId,
+          memberId: f.memberId,        // 🔹 추가
           name: f.nickname,
           profileImage: f.profileImage,
         }));
         setFriends(friendMapped);
+
 
         // 차단 목록 매핑 (swagger: blockedMemberId, nickname, email)
         const blockMapped = blocksRes.map((b) => ({
@@ -115,24 +117,29 @@ export default function FriendsScreen() {
     }
   };
 
-    const handleProfileClick = (e, item) => {
+  const handleProfileClick = (e, item) => {
     e.stopPropagation();
 
-    const hostId = item.hostId;
-    if (!hostId && hostId !== 0) {
-      console.log("[SearchResult] item without hostId:", item);
-      alert("질문 작성자 ID 정보를 찾을 수 없어요.");
+    // friends 에서는 id / memberId 둘 중 아무거나 있어도 되게
+    const memberId = item.memberId ?? item.id;
+
+    if (memberId === undefined || memberId === null) {
+      console.log("[FriendsScreen] item without memberId:", item);
+      alert("친구 ID 정보를 찾을 수 없어요.");
       return;
     }
 
-    navigate(`/friend/profile/${hostId}`, {
+    navigate(`/friend/profile/${memberId}`, {
       state: {
-        memberId: hostId,
-        nickname: item.hostNickname || "익명",
-        profileImage: item.imageUrl || "/icons/profile-avatar.svg",
+        memberId,                                      // ✅ 실제 memberId 넘기기
+        nickname: item.name || "익명",                 // ✅ friends 의 name 사용
+        profileImage:
+        item.profileImage || "/icons/profile-avatar.svg", // ✅ profileImage 필드 사용
+        fromFriends: true,
       },
     });
   };
+
 
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard]">
@@ -207,7 +214,9 @@ export default function FriendsScreen() {
                 <div
                   key={item.id}
                   className="flex items-center px-[1.5rem] py-[0.75rem]"
-                >
+                  onClick={(e) => handleProfileClick(e, item)}
+
+                  >
                   <div className="w-[2.75rem] h-[2.75rem] flex items-center justify-center overflow-hidden">
                     <img
                       src={item.profileImage || "/icons/profile-avatar.svg"}
