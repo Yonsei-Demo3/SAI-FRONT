@@ -41,6 +41,31 @@ export default function DetailScreen() {
   const [popup, setPopup] = useState(null);
 
   useEffect(() => {
+  if (!questionId) return;
+
+  const fetchDetail = async () => {
+    try {
+      setLoading(true);
+      const detailRes = await getQuestionDetail(questionId);
+      console.log("createdAt 원본:", detailRes.createdAt);
+      console.log(
+        "JS가 해석한 UTC:",
+        new Date(detailRes.createdAt).toISOString()
+      );
+      setData(detailRes);
+    } catch (e) {
+      console.error(e);
+      setError("질문 정보를 불러오지 못했어요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDetail();
+}, [questionId]);
+
+
+  useEffect(() => {
     if (!questionId) return;
 
     const fetchDetail = async () => {
@@ -164,6 +189,46 @@ export default function DetailScreen() {
     }
   };
 
+  // 💡 createdAt: "2025-11-27 13:00:10"  (UTC라고 가정)
+  const formatKoreanTime = (raw) => {
+    if (!raw) return "";
+
+    let s = String(raw).trim();
+
+    // "2025-11-27 13:00:10" 형태면 → "2025-11-27T13:00:10Z" 로 바꿔서
+    // **UTC 기준** 으로 해석하게 만들기
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) {
+      s = s.replace(" ", "T") + "Z";
+    }
+
+    const date = new Date(s); // 이제 이 date는 2025-11-27T13:00:10.000Z (UTC)
+
+    const formatter = new Intl.DateTimeFormat("ko-KR", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(date);
+    const get = (type) => parts.find((p) => p.type === type)?.value || "";
+
+    const year = get("year");
+    const month = get("month");
+    const day = get("day");
+    const hour = get("hour");
+    const minute = get("minute");
+
+    return `${year}.${month}.${day} ${hour}:${minute}`;
+  };
+
+
+  
+
+
   return (
     <div className="flex flex-col min-h-screen bg-white font-[Pretendard]">
       {/* 참여/취소 팝업 */}
@@ -227,7 +292,7 @@ export default function DetailScreen() {
               {item.hostNickname}
             </span>
             <span className="text-[#3B3D40] text-[0.625rem]">
-              {item.createdAt ?? "방금"}
+              {formatKoreanTime(item.createdAt)}
             </span>
           </div>
         </div>

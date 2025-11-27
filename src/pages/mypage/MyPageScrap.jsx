@@ -12,23 +12,51 @@ export default function MyPageSaves() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 서울 시간 포맷 함수
-  const formatKoreanTime = (isoString) => {
-    if (!isoString) return "";
-    const d = new Date(isoString);
-    // 브라우저 로컬 타임존과 상관없이 서울 시간대로 변환
-    const seoul = new Date(
-      d.toLocaleString("en-US", { timeZone: "Asia/Seoul" })
-    );
+    // UTC 비슷한 문자열을 Date로 변환
+    const parseUtcLike = (raw) => {
+      if (!raw) return null;
 
-    const year = seoul.getFullYear();
-    const month = String(seoul.getMonth() + 1).padStart(2, "0");
-    const day = String(seoul.getDate()).padStart(2, "0");
-    const hour = String(seoul.getHours()).padStart(2, "0");
-    const minute = String(seoul.getMinutes()).padStart(2, "0");
+      let s = String(raw).trim();
+
+      // 공백이 있으면 일단 T로 바꿔줌
+      s = s.replace(" ", "T");
+
+      // 끝에 Z나 +09:00 같은 타임존이 **없으면** UTC 로 간주해서 Z 붙이기
+      // 예) 2025-11-27T13:00:10  ->  2025-11-27T13:00:10Z
+      if (!/[zZ]$/.test(s) && !/[+-]\d{2}:\d{2}$/.test(s)) {
+        s = s + "Z";
+      }
+
+      return new Date(s); // 여기서는 항상 "UTC" 로 처리됨
+    };
+
+
+    const formatKoreanTime = (raw) => {
+    const date = parseUtcLike(raw);
+    if (!date || isNaN(date.getTime())) return "";
+
+    const formatter = new Intl.DateTimeFormat("ko-KR", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(date);
+    const get = (type) => parts.find((p) => p.type === type)?.value || "";
+
+    const year = get("year");
+    const month = get("month");
+    const day = get("day");
+    const hour = get("hour");
+    const minute = get("minute");
 
     return `${year}.${month}.${day} ${hour}:${minute}`;
   };
+
 
   useEffect(() => {
     const fetchSaves = async () => {
@@ -61,18 +89,20 @@ export default function MyPageSaves() {
   }, []);
 
   const sortedSaves = useMemo(() => {
-    const arr = [...saves];
-    arr.sort((a, b) => {
-      const da = new Date(a.savedAt);
-      const db = new Date(b.savedAt);
-      if (sortType === "최신순") {
-        return db - da;
-      }
-      // 오래된순
-      return da - db;
-    });
-    return arr;
-  }, [saves, sortType]);
+  const arr = [...saves];
+  arr.sort((a, b) => {
+    const da = parseUtcLike(a.savedAt);
+    const db = parseUtcLike(b.savedAt);
+    if (!da || !db) return 0;
+
+    if (sortType === "최신순") {
+      return db - da;
+    }
+    return da - db;
+  });
+  return arr;
+}, [saves, sortType]);
+
 
   const handleDelete = async (messageId) => {
     try {
@@ -179,7 +209,7 @@ export default function MyPageSaves() {
           !error &&
           sortedSaves.map((item) => (
             <div
-              key={item.scrapId}
+              key={item.messageId}
               className="w-full bg-white rounded-[1rem] border border-[#E7EBEF] p-5 mb-[1rem]"
             >
               {/* 상단: 따옴표 + 메시지 컨텐트 */}
