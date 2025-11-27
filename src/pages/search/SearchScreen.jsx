@@ -4,7 +4,12 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/main/Navbar";
 import BottomNav from "../../components/main/BottomNav";
 import SearchBar from "../../components/common/SearchBar";
-import { popular, recentSearch, deleteRecentSearch, clearAllRecentSearch} from "../../lib/searchService";
+import {
+  popular,
+  recentSearch,
+  deleteRecentSearch,
+  clearAllRecentSearch,
+} from "../../lib/searchService";
 
 export default function SearchScreen() {
   const navigate = useNavigate();
@@ -12,6 +17,7 @@ export default function SearchScreen() {
   const [recentSearches, setRecentSearches] = useState([]);
   const [popularSearches, setPopularSearches] = useState([]);
   const [snapshotAt, setSnapshotAt] = useState("");
+
   const handleSearch = () => {
     if (!query.trim()) return;
     navigate("/search-result", { state: { query } });
@@ -23,13 +29,25 @@ export default function SearchScreen() {
     navigate("/search-result", { state: { query: term } });
   };
 
-  
+  // ✅ 인기 검색어 클릭 시 바로 검색
+  const handleClickPopularKeyword = (keyword) => {
+    if (!keyword.trim()) return;
+    setQuery(keyword);
+    navigate("/search-result", {
+      state: {
+        query: keyword,
+        tags: [],
+        categories: [],
+      },
+    });
+  };
+
   const fetchPopularSearches = async () => {
-    try {      
+    try {
       const list = await popular();
-      setPopularSearches(list); 
+      setPopularSearches(list);
       if (list.length > 0) {
-      setSnapshotAt(list[0].snapshotAt);
+        setSnapshotAt(list[0].snapshotAt);
       }
     } catch (error) {
       console.error("Error fetching popular searches:", error);
@@ -41,16 +59,14 @@ export default function SearchScreen() {
       const list = await recentSearch();
       console.log("최근검색어 list:", list, list.length);
       setRecentSearches(list);
-      
     } catch (error) {
       console.error("Error fetching recent searches:", error);
     }
   };
 
-
   const deleteRecent = async (term) => {
     try {
-      await deleteRecentSearch(term); 
+      await deleteRecentSearch(term);
       setRecentSearches((prev) => prev.filter((x) => x !== term));
     } catch (e) {
       console.error(e);
@@ -97,7 +113,6 @@ export default function SearchScreen() {
     );
   };
 
-
   return (
     <div className="flex flex-col h-screen bg-white font-[Pretendard] relative">
       <Navbar />
@@ -107,50 +122,54 @@ export default function SearchScreen() {
         <SearchBar
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-           onEnter={handleSearch}
+          onEnter={handleSearch}
         />
 
         {/* 최근 검색어 */}
         <div className="mt-[1.5rem] px-[1.5rem]">
           <div className="flex justify-between items-center mb-[0.5rem]">
-            <h2 className="text-[1rem] font-semibold text-[#000000]">최근 검색어</h2>
-            <button onClick={clearAllRecent} className="text-[#9CA3AF] text-[0.875rem] bg-transparent border-none outline-none">
+            <h2 className="text-[1rem] font-semibold text-[#000000]">
+              최근 검색어
+            </h2>
+            <button
+              onClick={clearAllRecent}
+              className="text-[#9CA3AF] text-[0.875rem] bg-transparent border-none outline-none"
+            >
               전체 삭제
             </button>
           </div>
 
           <div className="flex flex-col mt-[0.75rem] gap-[1rem]">
             {recentSearches.map((term, i) => (
-            <div
-              key={i}
-              className="flex justify-between items-center text-[0.95rem] text-[#000000] cursor-pointer"
-              onClick={() => handleSearchWithTerm(term)}  // ✅ 박스 전체 클릭 시 검색
-            >
-              <div className="flex items-center gap-[0.5rem]">
-                <img
-                  src="/icons/history.svg"
-                  alt="최근"
-                  className="w-[1rem] h-[1rem]"
-                />
-                <span>{term}</span>
-              </div>
-
-              <button
-                className="bg-transparent border-none outline-none"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteRecent(term);
-                }}
+              <div
+                key={i}
+                className="flex justify-between items-center text-[0.95rem] text-[#000000] cursor-pointer"
+                onClick={() => handleSearchWithTerm(term)}
               >
-                <img
-                  src="/icons/close.svg"
-                  alt="삭제"
-                  className="w-[1rem] h-[1rem] opacity-60"
-                />
-              </button>
-            </div>
-          ))}
+                <div className="flex items-center gap-[0.5rem]">
+                  <img
+                    src="/icons/history.svg"
+                    alt="최근"
+                    className="w-[1rem] h-[1rem]"
+                  />
+                  <span>{term}</span>
+                </div>
 
+                <button
+                  className="bg-transparent border-none outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteRecent(term);
+                  }}
+                >
+                  <img
+                    src="/icons/close.svg"
+                    alt="삭제"
+                    className="w-[1rem] h-[1rem] opacity-60"
+                  />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -158,10 +177,10 @@ export default function SearchScreen() {
         <div className="mt-[1.75rem] px-[1.5rem]">
           <div className="flex justify-between items-center mb-[0.5rem]">
             <p className="text-[1rem] font-bold text-[#000000]">
-                  인기 검색어{" "}
-                  <span className="text-[#B5BBC1] text-[0.75rem] font-normal ml-[0.25rem]">
-                    {snapshotAt} 기준
-                  </span>
+              인기 검색어{" "}
+              <span className="text-[#B5BBC1] text-[0.75rem] font-normal ml-[0.25rem]">
+                {snapshotAt} 기준
+              </span>
             </p>
           </div>
 
@@ -171,18 +190,13 @@ export default function SearchScreen() {
               {popularSearches.slice(0, 5).map((item, i) => (
                 <div
                   key={item.keyword + "-left"}
-                  className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
+                  className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem] cursor-pointer"
                   onClick={() => handleClickPopularKeyword(item.keyword)}
                 >
-                  <span className="w-[1.5rem] text-left">
-                    {i + 1}
+                  <span className="w-[1.5rem] text-left">{i + 1}</span>
+                  <span className="max-w-[6rem] truncate inline-block">
+                    {item.keyword}
                   </span>
-                    <span
-                      className="max-w-[6rem] truncate inline-block"
-                    >
-                      {item.keyword}
-                    </span>
-
                   <span className="ml-[0.44rem]">
                     {renderTrendIcon(item.movement)}
                   </span>
@@ -195,17 +209,13 @@ export default function SearchScreen() {
               {popularSearches.slice(5, 10).map((item, i) => (
                 <div
                   key={item.keyword + "-right"}
-                  className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
+                  className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem] cursor-pointer"
                   onClick={() => handleClickPopularKeyword(item.keyword)}
                 >
-                  <span className="w-[1.5rem] text-left">
-                    {i + 6}
+                  <span className="w-[1.5rem] text-left">{i + 6}</span>
+                  <span className="max-w-[6rem] truncate inline-block">
+                    {item.keyword}
                   </span>
-                    <span
-                      className="max-w-[6rem] truncate inline-block"
-                    >
-                      {item.keyword}
-                    </span>
                   <span className="ml-[0.44rem]">
                     {renderTrendIcon(item.movement)}
                   </span>
@@ -213,7 +223,6 @@ export default function SearchScreen() {
               ))}
             </div>
           </div>
-
         </div>
       </div>
 

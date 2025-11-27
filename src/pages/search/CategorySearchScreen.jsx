@@ -183,12 +183,20 @@ export default function CategorySearchScreen() {
               </div>
 
               <div className="flex gap-[3.5rem] mt-[0rem]">
+                {/* 인기 검색어 1~5위 */}
                 <div className="flex flex-col gap-[0.75rem]">
                   {popularKeywords.slice(0, 5).map((item, i) => (
                     <div
                       key={i}
-                      className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
-                      onClick={() => toggleSelect(item.keyword)}
+                      className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem] cursor-pointer"
+                      onClick={() =>
+                        navigate("/search-result", {
+                          state: {
+                            query: item.keyword,      // 검색어
+                            categories: [],           // 카테고리 필터는 없음
+                          },
+                        })
+                      }
                     >
                       <span className="w-[1.5rem] text-left">{i + 1}</span>
                       <span className="max-w-[6rem] truncate inline-block">
@@ -199,12 +207,20 @@ export default function CategorySearchScreen() {
                   ))}
                 </div>
 
+                {/* 인기 검색어 6~10위 */}
                 <div className="flex flex-col gap-[0.75rem]">
                   {popularKeywords.slice(5, 10).map((item, i) => (
                     <div
                       key={i}
-                      className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem]"
-                      onClick={() => toggleSelect(item.keyword)}
+                      className="flex items-center text-[1rem] text-[#000000] leading-[1.5rem] cursor-pointer"
+                      onClick={() =>
+                        navigate("/search-result", {
+                          state: {
+                            query: item.keyword,
+                            categories: [],
+                          },
+                        })
+                      }
                     >
                       <span className="w-[1.5rem] text-left">{i + 6}</span>
                       <span className="max-w-[6rem] truncate inline-block">
@@ -214,6 +230,7 @@ export default function CategorySearchScreen() {
                     </div>
                   ))}
                 </div>
+
               </div>
             </div>
           )}
@@ -230,7 +247,7 @@ export default function CategorySearchScreen() {
 
         {/* 카테고리 리스트 */}
         <div
-          className="overflow-y-auto flex-1 w-full max-w-[500px] mx-auto pl-[1.5rem] pr-6 pb-[15rem] scrollbar-hide relative z-0"
+          className="overflow-y-auto flex-1 w-full max-w-[500px] mx-auto pl-[1.5rem] pr-6 pb-[6.5rem] scrollbar-hide relative z-0"
           style={{ msOverflowStyle: "none", scrollbarWidth: "none" }}
         >
           <style>{`

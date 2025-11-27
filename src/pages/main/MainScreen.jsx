@@ -514,15 +514,16 @@ function getStatusLabel(status, current, max) {
             <p className="text-[0.875rem] font-bold text-[#3B3D40]">
               {questionTitle}
             </p>
+            </div>
+            </div>
+            <div>
+            <div className="w-full h-[0.0625rem] bg-[#E7EBEF] mt-[0.75rem] pr-[2rem]" />
 
-            <div className="w-full h-[0.0625rem] bg-[#E7EBEF] mt-[0.75rem]" />
-
-            <p className="text-[0.875rem] text-[#3B3D40] mt-[1.5rem]">
+            <p className="text-[0.875rem] text-[#3B3D40] mt-[1rem] px-[0.5rem]">
               {messageContent}
             </p>
           </div>
         </div>
-      </div>
     );
   };
 

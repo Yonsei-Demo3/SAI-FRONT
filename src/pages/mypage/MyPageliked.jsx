@@ -314,10 +314,10 @@ export default function MyPageScrapScreen() {
                 </div>
 
                 {/* 구분선 */}
-                <div className="w-full h-[1px] px-[1.5rem] bg-[#E7EBEF] my-4" />
 
                 {/* 닉네임 + 콘텐츠명 */}
                 <div className="flex flex-col px-[1.25rem] gap-[0.2rem]">
+                  <div className="w-full h-[1px] px-[1.5rem] bg-[#E7EBEF] my-4" />
                   <p className="text-[0.75rem] text-[#6B7280]">
                     {q.hostNickname}
                   </p>
