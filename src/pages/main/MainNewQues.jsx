@@ -487,7 +487,7 @@ export default function SearchResult() {
                     )}
                   </div>
 
-                  <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />
+                  <div className="h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />
                 </div>
               );
             })}
