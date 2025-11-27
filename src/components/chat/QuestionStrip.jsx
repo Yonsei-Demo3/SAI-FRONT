@@ -7,7 +7,7 @@ export default function QuestionStrip({ title = "" }) {
   return (
     
     <div className={
-          "w-full bg-[#FFEEEA] min-h-[2.5625rem] flex items-start justify-center pl-[1rem] pr-[1rem] pt-[0.625rem] pb-[0.625rem] fixed left-0 right-0 z-10" 
+          "w-full max-w-[500px] bg-[#FFEEEA] min-h-[2.5625rem] flex items-center justify-center pl-[1rem] pr-[1rem] pt-[0.625rem] pb-[0.625rem] fixed-top-0 left-0 right-0 z-10" 
         }>
       
       <div className="flex self-start items-center justify-center w-[2.0625rem] h-[1.3125rem] rounded-[0.25rem] bg-[#FA502E]">

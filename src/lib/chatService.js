@@ -34,3 +34,7 @@ export async function unscrapMessage(messageId) {
 export async function finishChat(questionId) {
   return axiosInstance.post(`/api/v1/questions/finish/${questionId}`);
 }
+
+export async function getChatMembers(questionId) {
+  return axiosInstance.get(`/api/v1/questions/${questionId}/members`);
+}

@@ -406,11 +406,14 @@ export default function ChatPage() {
           onExpire={handleTimerExpire}
           onSearchChange={setSearchText}
           title={questionTitle}
+          roomId={roomId}
+          questionId={questionId}
+          status={status}
         />
       </header>
 
 
-    <main className="flex-1 min-h-0 w-full flex flex-col pt-[3.5625rem]">
+    <main className="flex-1 min-h-0 w-full flex flex-col mt-[1rem]">
 
 
         <div className="flex-1 min-h-0 overflow-y-auto">
@@ -420,7 +423,7 @@ export default function ChatPage() {
             onScroll={handleScroll}
             className="h-full overflow-y-auto flex flex-col items-stretch"
           >
-            <div className="flex justify-center items-center pl-[1.5rem] pr-[1.5rem] pb-[0.5rem]">
+            <div className="flex justify-center items-center pl-[1.5rem] pr-[1.5rem]">
               <div className="w-full flex justify-center items-center bg-[#F2F4F8] pt-[0.63rem] pb-[0.63rem] pl-[0.5rem] pr-[0.5rem]">
                 <span className="text-[0.75rem] text-[#191D1F]">
                   {questionTitle}
@@ -428,11 +431,30 @@ export default function ChatPage() {
               </div>
             </div>
 
-            <div className="flex justify-center items-center pt-[0.1rem] pb-[1rem]">
-              <span className="text-[#3B3D40] text-[0.625rem] text-center">
-                질문에 대한 대화가 시작되었습니다.<br></br>
-                지금부터 42분 동안 집중해서 대화를 나눠보세요.
-              </span>
+            <div className="flex flex-col pl-[1.5rem] pr-[1.5rem] pt-[0.625rem] pb-[0.625rem]">
+              <div className="flex justify-center items-center pt-[0.1rem] pb-[0.625rem]">
+                <span className="text-[#3B3D40] text-[0.625rem] text-center">
+                  질문에 대한 대화가 시작되었습니다.<br></br>
+                  지금부터 42분 동안 집중해서 대화를 나눠보세요.
+                </span>
+              </div>
+
+              <div className="flex flex-col justify-center items-center bg-[#F1F8FF] pl-[0.5rem] pr-[0.5rem] pt-[0.625rem] pb-[0.625rem] rounded-[0.5rem]">
+                <div className="flex justify-center items-center">
+                  <span className="text-[#3B3D40] text-[0.625rem] text-center font-semibold">
+                    대화 전 이용 가이드를 확인해주세요.
+                  </span>
+                </div>
+                <span className="text-[#3B3D40] text-[0.625rem] text-center">
+                  • SAI는 하나의 질문에만 집중하는 공간입니다.<br/>
+                  • 서로를 존중하며 예의 있게 대화해주세요.<br/>
+                  • 개인정보 공유, 비하·공격적 발언은 금지됩니다.<br/>
+                  • 대화방을 나가면 다시 입장할 수 없습니다.<br/>
+                  • 신고 접수 시 운영정책에 따라 조치됩니다.
+                </span>
+              </div>
+              
+
             </div>
             
             <div className="flex w-full flex-col justify-start items-stretch">
@@ -487,9 +509,11 @@ export default function ChatPage() {
         </div>
       )}
 
-      <footer className="bg-white justify-center items-center">
-        <ChatInput onSend={handleSend} status={status} />
-      </footer>
+      <div className="bg-white justify-center items-center">
+        <div className="flex flex-col w-full h-[5rem] bg-white select-none sticky-0">
+          <ChatInput onSend={handleSend} status={status} />
+        </div>
+      </div>
     </div>
   );
 }

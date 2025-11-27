@@ -2,9 +2,16 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";  // axios import 추가
 import { signup } from "../../lib/signupService";
+import { login } from "../../lib/loginService";
+import { initSocket } from "../../lib/socket";
+import AuthContext from "../../context/AuthContext";
+import { useContext } from "react";
 
 export default function SignupScreen() {
   const navigate = useNavigate();
+
+  const { setIsLoggedIn } = useContext(AuthContext);
+
 
   const [formData, setFormData] = useState({
     email: "",
@@ -13,6 +20,21 @@ export default function SignupScreen() {
     nickname: "",
     phone: ""    
   });
+
+  const extractToken = (authHeader) => {
+    if (!authHeader) return null;
+
+    let token = authHeader;
+
+    if (typeof token === "string") {
+      const parts = token.split(" ");
+      if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
+        token = parts[1];
+      }
+    }
+
+  return token;
+};
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,9 +53,25 @@ export default function SignupScreen() {
 
     try {
       // 회원가입 API 호출
-      const response = await signup(payload);
-      console.log("회원가입 성공:", response);
-      navigate("/login");  // 회원가입 성공 후 로그인 화면으로 이동
+      const signupResponse = await signup(payload);
+      const loginResponse = await login({
+        user_id: formData.email,
+        password: formData.password,
+      });
+
+      const authHeader =
+        loginResponse.headers["authorization"] ||
+        loginResponse.headers["Authorization"] ||
+        loginResponse.headers["access-token"];
+      const token = extractToken(authHeader);
+
+      if (token) {
+        localStorage.setItem("accessToken", token);
+        initSocket();
+        setIsLoggedIn(true);
+      }
+
+      navigate("/main", { replace: true });      
     } catch (error) {
       console.error("회원가입 실패:", error);
       alert("회원가입에 실패했습니다. 다시 시도해주세요.");
