@@ -77,9 +77,9 @@ export default function ChatPage() {
     {/* 대화 종료 API 호출 */}
     async function finish() {
       try {
-        if (roomId) {
+        if (questionId) {
 
-          await finishChat(roomId);
+          await finishChat(questionId);
           console.log("[chat] 대화 종료");
         
         } else {

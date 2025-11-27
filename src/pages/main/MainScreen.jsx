@@ -534,7 +534,9 @@ export default function MainScreen() {
                   active ? "text-black font-bold" : "text-black"
                 }`}
               >
-                {tab.name}
+                <span className={`${active ? "font-bold" : ""}`}>
+                  {tab.name}
+                </span>
 
                 {active && (
                   <span className="absolute mt-[2rem] ml-[0rem] left-0 w-full h-[2px] bg-[#FA502E] rounded-full" />

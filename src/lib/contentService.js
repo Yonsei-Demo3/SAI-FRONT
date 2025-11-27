@@ -30,3 +30,8 @@ export async function fetchContentList({ keyword, page = 0, size = 10, sort }) {
   const response = await axiosInstance.get("/api/v1/contents/search", { params });
   return response.data;
 }
+
+export async function fetchAllContentList() {
+  const response = await axiosInstance.get("/api/v1/contents/all");
+  return response.data;
+}

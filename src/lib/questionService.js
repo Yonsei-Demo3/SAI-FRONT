@@ -12,8 +12,6 @@ export const createQuestion = async (payload) => {
     tags: payload.tags
   };
   
-  console.log("Request Body:", body); 
-
   return axiosInstance.post("api/v1/questions", body);
 };
 
@@ -21,6 +19,7 @@ function getAuthConfig() {
   const token = localStorage.getItem("accessToken");
   return token ? { headers: { Authorization: token } } : {};
 }
+
 
 export async function searchQuestions({
   keyword = "",
@@ -36,18 +35,12 @@ export async function searchQuestions({
     가나다순: "title,ASC",
   };
 
-  let finalCategories = categories;
-  if (finalCategories.length === 0 && tags.length > 0 && typeof tags[0] === "string") {
-    finalCategories = tags.map((tag) => ({
-      main: tag,
-      sub: tag,
-    }));
-  }
+  // 🔥 여기 있던 finalCategories / 태그→카테고리 매핑 로직 싹 제거
 
   const body = {
     keyword,
-    categories: finalCategories,
-    tags,
+    categories,  // 프론트에서 직접 넘길 때만 사용
+    tags,        // 서브카테고리 필터는 이걸로
   };
 
   const config = {
@@ -62,6 +55,7 @@ export async function searchQuestions({
   const res = await axiosInstance.post("/api/v1/questions/search", body, config);
   return res.data;
 }
+
 
 export async function getQuestionDetail(questionId) {
   const res = await axiosInstance.get(

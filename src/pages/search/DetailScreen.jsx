@@ -7,13 +7,12 @@ import {
   cancelParticipateQuestion,
 } from "../../lib/questionService";
 
-// 상태값 → 라벨 변환 (참여 가능 / 진행중 / 종료)
+// (필요하면 상태 라벨로 써먹을 수 있는 함수 - 지금은 버튼 분기에만 status 직접 씀)
 const getStatusLabel = (status, current, max) => {
   if (!status) return null;
 
   switch (status) {
     case "RECRUITING":
-      // 자리가 다 찼으면 진행중으로 본다
       if (max && current >= max) return "진행중";
       return "참여 가능";
     case "PROGRESS":
@@ -21,6 +20,7 @@ const getStatusLabel = (status, current, max) => {
       return "진행중";
     case "COMPLETED":
     case "DONE":
+    case "FINISHED":
       return "종료";
     default:
       return null;
@@ -37,7 +37,7 @@ export default function DetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 참여/취소 팝업 상태: "participate" | "cancel" | "error" | null
+  // 참여/취소 팝업 상태 ("participate" | "cancel" | "error" | null)
   const [popup, setPopup] = useState(null);
 
   useEffect(() => {
@@ -46,8 +46,9 @@ export default function DetailScreen() {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const res = await getQuestionDetail(questionId);
-        setData(res);
+        const detailRes = await getQuestionDetail(questionId);
+        setData(detailRes);
+        console.log("질문 상세 정보:", detailRes);
       } catch (e) {
         console.error(e);
         setError("질문 정보를 불러오지 못했어요.");
@@ -73,7 +74,13 @@ export default function DetailScreen() {
 
   const item = data;
 
-  // 상세 정보 기준 상태 라벨
+  // 시작 모드
+  const isWithReady = item.startMode === "WITH_READY";
+  const isAllReady = item.startMode === "ALL_READY";
+
+  // 백엔드에서 내려주는 내 참여 상태 (없으면 NONE)
+  const myStatus = item.myParticipationStatus || "NONE";
+
   const statusLabel = getStatusLabel(
     item.questionStatus,
     item.currentParticipants,
@@ -81,22 +88,57 @@ export default function DetailScreen() {
   );
   const isJoinable = statusLabel === "참여 가능";
 
-  const isWithReady = item.startMode === "WITH_READY";
-  const isAllReady = item.startMode === "ALL_READY";
+  // 대화 내역 보기 버튼
+  const handleWatchChatClick = () => {
+    navigate("/chat", {
+      state: {
+        questionId: item.questionId,
+        roomId: item.roomId,
+        questionTitle: item.questionTitle,
+        status: item.questionStatus,
+      },
+    });
+  };
 
-  // 백엔드에서 내려주는 내 참여 상태 (없으면 NONE)
-  const myStatus = item.myParticipationStatus || "NONE";
+  // 참여하기 / 참여 취소 버튼
+  const handleToggleParticipate = async () => {
+    try {
+      if (myStatus === "NONE") {
+        // 참여 신청
+        await participateQuestion(questionId);
+        setData((prev) =>
+          prev ? { ...prev, myParticipationStatus: "WAITING" } : prev
+        );
+        setPopup("participate");
+      } else if (myStatus === "WAITING") {
+        // 대기 중 취소
+        await cancelParticipateQuestion(questionId);
+        setData((prev) =>
+          prev ? { ...prev, myParticipationStatus: "NONE" } : prev
+        );
+        setPopup("cancel");
+      } else {
+        // JOINED 등은 여기서 처리 안 함 (아래에서 대화보기 버튼으로만 이동)
+        return;
+      }
+    } catch (e) {
+      console.error("참여 API 실패", e);
+      setPopup("error");
+    } finally {
+      setTimeout(() => setPopup(null), 2000);
+    }
+  };
 
-  // 버튼 레이블 / 색 결정
-  let bottomLabel = "대화 내역 보기";
-  let bottomClass = "bg-[#191D1F] text-white";
+  // 하단 버튼에서 쓸 라벨/스타일 결정
+  let bottomLabel = "";
+  let bottomClass = "";
 
-  if (myStatus === "JOINED") {
-    // 이미 참여 중이면 무조건 대화 보기
+  if (item.questionStatus === "FINISHED" || myStatus === "JOINED") {
+    // 끝났거나, 내가 이미 참여해서 방이 있는 경우 → 대화 내역 보기
     bottomLabel = "대화 내역 보기";
-    bottomClass = "bg-[#54575C] text-white";
+    bottomClass = "bg-[#191D1F] text-white";
   } else if (isJoinable) {
-    // 참여 가능일 때만 참여/취소 버튼
+    // 참여 가능 상태일 때만 참여/취소 버튼
     if (myStatus === "WAITING") {
       bottomLabel = "참여 취소";
       bottomClass = "bg-[#B5BBC1] text-white";
@@ -105,52 +147,20 @@ export default function DetailScreen() {
       bottomClass = "bg-[#FA502E] text-white";
     }
   } else {
-    // 모집 중이 아니면 대화 보기
-    bottomLabel = "대화 내역 보기";
-    bottomClass = "bg-[#191D1F] text-white";
+    // 진행중인데 나는 참여자가 아님 → 안내 문구만
+    bottomLabel = "";
+    bottomClass = "";
   }
 
-  // 하단 버튼 클릭 처리
-  const handleBottomButtonClick = async () => {
-    // 1) 이미 참여 중이거나, 모집 중이 아니면 → 대화 내역 보기
-    if (myStatus === "JOINED" || !isJoinable) {
-      // TODO: 실제 대화 내역 페이지로 이동
-      // 예시: navigate("/conversation-detail", { state: { questionId } });
-      alert("대화 내역 화면으로 이동시켜 주세요.");
-      return;
-    }
+  const handleBottomButtonClick = () => {
+    if (!bottomLabel) return;
 
-    // 2) 참여 가능 + 내 상태에 따라 참여 / 취소
-    try {
-      if (myStatus === "NONE") {
-        // 참여 신청
-        await participateQuestion(questionId);
-
-        setData((prev) =>
-          prev
-            ? { ...prev, myParticipationStatus: "WAITING" }
-            : prev
-        );
-        setPopup("participate");
-      } else if (myStatus === "WAITING") {
-        // 대기 중 취소
-        await cancelParticipateQuestion(questionId);
-
-        setData((prev) =>
-          prev
-            ? { ...prev, myParticipationStatus: "NONE" }
-            : prev
-        );
-        setPopup("cancel");
-      } else {
-        // 그 외 상태는 여기서 처리 안 함
-        return;
-      }
-    } catch (e) {
-      console.error("참여 API 실패", e);
-      setPopup("error");
-    } finally {
-      setTimeout(() => setPopup(null), 2000);
+    // 대화 내역 보기
+    if (bottomLabel === "대화 내역 보기") {
+      handleWatchChatClick();
+    } else {
+      // 참여하기 / 참여 취소
+      handleToggleParticipate();
     }
   };
 
@@ -230,9 +240,7 @@ export default function DetailScreen() {
             src={item.imageUrl}
             className="absolute inset-0 w-full h-full object-cover blur-sm scale-110"
           />
-          {/* 반투명 레이어 */}
           <div className="absolute inset-0 bg-black/20"></div>
-          {/* 가운데 원본 이미지 */}
           <div className="absolute inset-0 flex justify-center items-center">
             <img
               src={item.imageUrl}
@@ -295,14 +303,23 @@ export default function DetailScreen() {
         ))}
       </div>
 
-      {/* 하단 버튼 : 참여하기 / 참여 취소 / 대화 내역 보기 */}
+      {/* 하단 버튼 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white p-6 shadow-[0_-2px_10px_rgba(0,0,0,0.07)]">
-        <button
-          onClick={handleBottomButtonClick}
-          className={`w-full h-[3.2rem] text-[1rem] rounded-xl font-semibold ${bottomClass}`}
-        >
-          {bottomLabel}
-        </button>
+        {bottomLabel ? (
+          <button
+            onClick={handleBottomButtonClick}
+            className={`w-full h-[3.2rem] text-[1rem] rounded-xl font-semibold ${bottomClass}`}
+          >
+            {bottomLabel}
+          </button>
+        ) : (
+          <div className="w-full flex items-center justify-center">
+            <span className="text-[0.875rem] text-[#3B3D40] text-center">
+              이 질문에 대한 대화가 진행중이에요. <br />
+              대화 내역은 질문이 종료된 후에 열람이 가능합니다.
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="pb-[6rem]"></div>

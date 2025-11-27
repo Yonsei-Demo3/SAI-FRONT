@@ -1,33 +1,34 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ContentTopBar from "../../components/contents/contentTopBar";
-import { fetchContentList } from "../../lib/contentService";
+import { fetchContentList, fetchAllContentList } from "../../lib/contentService";
 
-
-// 빈 응답일 때 보여줄 기본 데이터
-// const SAMPLE = {
-//   id: 1,
-//   title: "서사의 위기",
-//   category: "대분류 / 소분류",
-//   imageUrl:
-//     "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
-// };
+function shuffleArray(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
 function mapApiItemToResult(item) {
+
+  const firstCategory = item.categories?.[0] || {};
+  const mainCategory = firstCategory.mainCategory || null;
+  const subCategory = firstCategory.subCategory || null;
+
   return {
     id: item.contentId,
     title: item.name,
-    category: item.categoryText || "",
+    category: item.categoryText || null,
+    mainCategory: mainCategory,
+    subCategory: subCategory,
+    creator: item.creator || "",
     imageUrl: item.thumbnailUrl || "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=600&auto=format&fit=crop",
   };
 }
 
-
-// const API_RESULTS = Array.from({ length: 10 }, (_, i) => ({
-//   ...SAMPLE,
-//   id: i + 1,
-//   title: `${SAMPLE.title} ${i + 1}`,
-// }));
 
 const SORT_OPTIONS = [
   { value: "popular", label: "인기순" },
@@ -53,29 +54,44 @@ export default function ContentSearchResultPage() {
   const [sortBy, setSortBy] = useState("popular");
 
   
-   useEffect(() => {
+  const sortedResults = useMemo(() => {
+    if (sortBy === "title") {
+      return [...results].sort((a, b) =>
+        (a.title || "").localeCompare(b.title || "", "ko-KR", {
+          sensitivity: "base",
+        })
+      );
+    }
+    return results;
+  }, [results, sortBy]);
 
-    if (!navigatedQuery) return;
+  
+   useEffect(() => {
 
     async function loadContents() {
 
       try {
 
-        const data = await fetchContentList({
-          keyword: navigatedQuery,
-          page: 2,     
-          size: 10,
-          sort: "popular"
-        });
+        let data
 
+        if(navigatedQuery){
 
-        const items = data.items || [];
+          data = await fetchContentList({
+            keyword: navigatedQuery,
+            page: 2,     
+            size: 10,
+            sort: "popular"
+          });
+
+        } else {
+          data = await fetchAllContentList();
+        }
+
+        const items = data.items || data;
         const mapped = items.map(mapApiItemToResult);
 
         setResults(mapped);
-        setTotalCount(data.totalCount || 0);
-
-        console.log("총 검색 결과 수:", data.totalCount || 0);
+        setTotalCount(data.totalCount || data.length || 0);
       } catch (error) {
         console.error("콘텐츠 검색 실패:", error);
           setResults([]);
@@ -212,6 +228,7 @@ export default function ContentSearchResultPage() {
                         onClick={() => {
                           setSortBy(opt.value);
                           setSortOpen(false);
+                          setResults((prev) => shuffleArray(prev)); 
                         }}
                         className="
                           w-full text-right
@@ -240,7 +257,7 @@ export default function ContentSearchResultPage() {
         {/* 검색 결과 */}
         <div>
           <ul className="list-none w-full bg-white p-[0rem] m-[0rem]">
-              {results.map((item) => (
+              {sortedResults.map((item) => (
                 <li 
                   key={item.id}   
                   className={`pt-[1rem] pb-[1rem] pl-[1.5rem] pr-[1.5rem] ${selectedItem === item.id ? "bg-[#FFEEEA]" : "bg-[#FFFFFF]"}`}
@@ -255,8 +272,10 @@ export default function ContentSearchResultPage() {
                       className="w-[3.75rem] h-[5rem] rounded-[0.5rem] object-cover border-[0rem]"
                     />
                     <div className="pl-[0.75rem] flex flex-col justify-center">
-                      <p className="text-[0.625rem] text-left leading-none mb-[0.25rem]">
-                        {item.category}
+                      <p className="text-[0.625rem] text-[#B5BBC1] text-left leading-none mb-[0.25rem]">
+                        {item.category !== null 
+                          ? item.category : item.mainCategory + " / " + item.subCategory
+                        }
                       </p>
                       <p className="text-[0.875rem] text-left leading-none mt-[0.25rem]">
                         {item.title}
@@ -267,7 +286,7 @@ export default function ContentSearchResultPage() {
               ))}
             </ul>
         </div>
-        <div className="h-[5.5rem]" />
+        <div className="h-[8rem]" />
       </div>
 
 
@@ -277,7 +296,20 @@ export default function ContentSearchResultPage() {
         <div className="w-full pb-[2rem] pt-[1rem] pl-[1.5rem] pr-[1.5rem] flex items-center">
           <button
             type="button"      
-            onClick={()=>navigate("/question", {state: { contentId: selectedItem, imageUrl: results.find((it) => it.id === selectedItem)?.imageUrl || ""}})} 
+            onClick={() => {
+              const selectedContent = results.find(
+                (it) => it.id === selectedItem
+              );
+              if (!selectedContent) return;
+
+              navigate("/question", {
+                state: {
+                  content: selectedContent,                
+                  contentId: selectedContent.id,          
+                  imageUrl: selectedContent.imageUrl || "", 
+                },
+              });
+            }}
             className="w-full h-[2.5rem] rounded-[0.5rem] text-center bg-[#FA502E]"
           >
             <span className="text-[1rem] text-white font-bold">
