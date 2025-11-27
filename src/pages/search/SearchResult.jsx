@@ -58,8 +58,7 @@ function sortResults(list, sortType) {
   } else if (sortType === "최신순") {
     // createdAt 기준 내림차순
     copied.sort(
-      (a, b) =>
-        new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0)
+      (a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0)
     );
   }
 
@@ -79,7 +78,6 @@ export default function SearchResult() {
   const [tags, setTags] = useState(initialTags); // 칩 표시용(문자열)
   const [categories, setCategories] = useState(initialCategories); // {main, sub} 배열
 
-  const [likeState, setLikeState] = useState({});
   const [results, setResults] = useState([]);
   const [popup, setPopup] = useState(null);
   const [openSort, setOpenSort] = useState(false);
@@ -125,7 +123,15 @@ export default function SearchResult() {
       });
 
       const list = Array.isArray(data?.content) ? data.content : [];
-      setResults(sortResults(list, sortType));
+
+      // 백에서 내려오는 필드 이름 정규화
+      const normalized = list.map((q) => ({
+        ...q,
+        likeCount: q.likeCount ?? 0,
+        isLikedByMe: q.isLikedByMe ?? q.likedByMe ?? false,
+      }));
+
+      setResults(sortResults(normalized, sortType));
     } catch (error) {
       console.error("Error fetching results:", error);
     }
@@ -139,37 +145,32 @@ export default function SearchResult() {
   /* ================= 좋아요 ================= */
 
   const handleToggleLike = async (questionId) => {
-    const base = results.find((r) => r.questionId === questionId) || {};
-    const current = likeState[questionId] || {
-      liked: base.isLikedByMe ?? false, // 백에서 내려오는 필드 사용
-      count: base.likeCount ?? 0,
-    };
+    const base = results.find((r) => r.questionId === questionId);
+    if (!base) return;
+
+    const currentLiked = base.isLikedByMe ?? base.likedByMe ?? false;
 
     try {
       let res;
-      if (!current.liked) {
+      if (!currentLiked) {
         res = await likeQuestion(questionId);
       } else {
         res = await unlikeQuestion(questionId);
       }
 
-      // 개별 좋아요 상태 캐시
-      setLikeState((prev) => ({
-        ...prev,
-        [questionId]: {
-          liked: res.isLikedByMe,
-          count: res.likeCount,
-        },
-      }));
+      // 응답에서 새 상태 읽기 (isLikedByMe 또는 likedByMe 둘 다 대응)
+      const newLiked =
+        res.isLikedByMe ?? res.likedByMe ?? !currentLiked;
+      const newCount =
+        res.likeCount ?? (base.likeCount || 0) + (newLiked ? 1 : -1);
 
-      // 결과 리스트 내 해당 아이템 업데이트 + 정렬 반영
       setResults((prev) => {
         const updated = prev.map((item) =>
           item.questionId === questionId
             ? {
                 ...item,
-                isLikedByMe: res.isLikedByMe,
-                likeCount: res.likeCount,
+                isLikedByMe: newLiked,
+                likeCount: newCount,
               }
             : item
         );
@@ -186,7 +187,6 @@ export default function SearchResult() {
     try {
       if (currentMyStatus === "NONE") {
         await participateQuestion(questionId);
-        await fetchResults();
 
         setResults((prev) =>
           prev.map((item) =>
@@ -399,11 +399,6 @@ export default function SearchResult() {
             </div>
           ) : (
             results.map((item) => {
-              const likeInfo = likeState[item.questionId] || {
-                liked: item.isLikedByMe ?? false,
-                count: item.likeCount ?? 0,
-              };
-
               const current =
                 item.currentParticipants ?? item.participants ?? 0;
               const max =
@@ -416,6 +411,8 @@ export default function SearchResult() {
               );
               const myStatus = item.myParticipationStatus || "NONE";
               const canParticipate = statusLabel === "참여 가능";
+              const liked = item.isLikedByMe ?? item.likedByMe ?? false;
+              const likeCount = item.likeCount ?? 0;
 
               return (
                 <div
@@ -513,7 +510,7 @@ export default function SearchResult() {
                     >
                       <img
                         src={
-                          likeInfo.liked
+                          liked
                             ? "/icons/heart-filled.svg"
                             : "/icons/heart.svg"
                         }
@@ -521,7 +518,7 @@ export default function SearchResult() {
                         alt=""
                       />
                       <span className="text-[0.875rem] text-[#6B7280]">
-                        {likeInfo.count}
+                        {likeCount}
                       </span>
                     </button>
 
@@ -566,7 +563,8 @@ export default function SearchResult() {
                     )}
                   </div>
 
-                  <div className="w-[30rem] h-[0.5rem] bg-[#F2F4F8] ml-[-2.5rem] mt-[1.5rem]" />
+                  {/* 카드 아래 회색 바 – 화면 폭 넘치지 않게 수정 */}
+                  <div className="h-[0.5rem] bg-[#F2F4F8] mt-[1.5rem] -mx-[2.5rem]" />
                 </div>
               );
             })
