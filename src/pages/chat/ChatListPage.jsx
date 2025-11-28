@@ -27,7 +27,7 @@ function formatCreatedAtToDate(createdAt) {
 
 export default function ChatListPage() {
   
-  const [tab, setTab] = useState("ready");
+  const [tab, setTab] = useState("finish");
   const [chatLists, setChatLists] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -362,7 +362,16 @@ export default function ChatListPage() {
 
       {/* 선택 창 */}
       <div className="flex justify-start pl-[1.5rem] pr-[1.5rem] pt-[1rem] pb-[1rem] gap-[2.25rem]">
-
+        <div className={`pb-[0.75rem] border-b-2 ${tab === "finish" ? "border-[#FA502E]" : "border-transparent"}`}>
+          <button
+            onClick={() => setTab("finish")}
+            className={`${tab === "finish" ? "text-black" : "text-gray-400"}`}
+          >
+            <span className={`${tab === "finish" ? "font-bold" : "font-normal"}`}>
+              지난 대화
+            </span>
+          </button>
+        </div>
         <div className={`pb-[0.75rem] border-b-2 ${tab === "ready" ? "border-[#FA502E]" : "border-transparent"}`}>
           <button
             onClick={() => setTab("ready")}
@@ -380,16 +389,6 @@ export default function ChatListPage() {
           >
             <span className={`${tab === "participate" ? "font-bold" : "font-normal"}`}>
               신청 질문
-            </span>
-          </button>
-        </div>
-        <div className={`pb-[0.75rem] border-b-2 ${tab === "finish" ? "border-[#FA502E]" : "border-transparent"}`}>
-          <button
-            onClick={() => setTab("finish")}
-            className={`${tab === "finish" ? "text-black" : "text-gray-400"}`}
-          >
-            <span className={`${tab === "finish" ? "font-bold" : "font-normal"}`}>
-              지난 대화
             </span>
           </button>
         </div>

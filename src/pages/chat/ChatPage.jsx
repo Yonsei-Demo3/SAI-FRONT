@@ -34,6 +34,36 @@ const formatTimeFromISO = (isoString) => {
   }).format(date);
 };
 
+const formatToKoreanDateTime = (serverDateTimeString) => {
+  if (!serverDateTimeString) return "";
+
+  const [datePart, timePart] = serverDateTimeString.split(" ");
+  if (!datePart || !timePart) return "";
+
+  const [year, month, day] = datePart.split("-").map(Number);
+  const [hour, minute, second] = timePart.split(":").map(Number);
+
+  let date = new Date(
+    Date.UTC(year, month - 1, day, hour, minute, second || 0)
+  );
+
+  date.setUTCHours(date.getUTCHours() + 18);
+
+  const kYear = date.getUTCFullYear();
+  const kMonth = date.getUTCMonth() + 1;
+  const kDay = date.getUTCDate();
+  let kHour = date.getUTCHours();
+  const kMinute = date.getUTCMinutes();
+
+  let period = "";
+  if (kHour >= 0 && kHour < 12) period = "오전";
+  else period = "오후";
+
+  const displayHour = kHour % 12 || 12; // 0,12 → 12시
+  const minuteStr = String(kMinute).padStart(2, "0");
+
+  return `${period} ${displayHour}:${minuteStr}`;
+};
 
 
 export default function ChatPage() {
@@ -239,13 +269,13 @@ export default function ChatPage() {
           senderId: msg.senderId,
           senderNickname: msg.senderNickname,
           isMine: msg.isMine,
+          time: formatToKoreanDateTime(msg.createdAt) || "오후 4:20",
+          bookmarked: msg.isScrapped,
 
           // 더미 값
           type: "TEXT",          
-          time: msg.time || "오후 4:20",
           images: msg.images ?? [],
           files: msg.files ?? [],
-          bookmarked: false,
           imageColor: "bg-orange-400", 
         }));
 
@@ -457,7 +487,7 @@ export default function ChatPage() {
 
             </div>
             
-            <div className="flex w-full flex-col justify-start items-stretch">
+            <div className="flex w-full flex-col justify-start items-stretch pb-[0.8725rem]">
               {messages.map((m) => (
                 <ChatBubble key={m.messageId} msg={m} onToggleBookmark={toggleBookmark} onImageClick={handleImageClick} onFileClick={handleFileClick} />
               ))}
