@@ -78,11 +78,11 @@ export default function ChatBubble({ msg, onToggleBookmark, onImageClick, onFile
               {type === "TEXT" && (
                 <div
                   className={`relative max-w-[15rem] rounded-[1rem] pl-[1.25rem] pr-[1.25rem] pt-[0.875rem] pb-[0.875rem] 
-                              ${isMine ? "border border-[#DEE2E6] bg-[#FFFFFF]" : "bg-[#FA502E]"}`}
+                              ${!isMine ? "border border-[#DEE2E6] bg-[#FFFFFF]" : "bg-[#FA502E]"}`}
                 >
                 <span
                   className={`text-[0.875rem] ${
-                    isMine ? "text-[#191D1F]" : "text-[#FFFFFF]"
+                    !isMine ? "text-[#191D1F]" : "text-[#FFFFFF]"
                   }`}
                 >
                   {content}

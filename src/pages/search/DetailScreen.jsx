@@ -40,19 +40,36 @@ export default function DetailScreen() {
   // 참여/취소 팝업 상태 ("participate" | "cancel" | "error" | null)
   const [popup, setPopup] = useState(null);
 
-  useEffect(() => {
+//   useEffect(() => {
+//   if (!questionId) return;
+
+//   const fetchDetail = async () => {
+//     try {
+//       setLoading(true);
+//       const detailRes = await getQuestionDetail(questionId);
+//       setData(detailRes);
+//       console.log("질문 상세 정보:", detailRes);
+//     } catch (e) {
+//       console.error(e);
+//       setError("질문 정보를 불러오지 못했어요.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchDetail();
+// }, [questionId]);
+
+
+useEffect(() => {
   if (!questionId) return;
 
   const fetchDetail = async () => {
     try {
       setLoading(true);
       const detailRes = await getQuestionDetail(questionId);
-      console.log("createdAt 원본:", detailRes.createdAt);
-      console.log(
-        "JS가 해석한 UTC:",
-        new Date(detailRes.createdAt).toISOString()
-      );
       setData(detailRes);
+      console.log("질문 상세 정보:", detailRes);
     } catch (e) {
       console.error(e);
       setError("질문 정보를 불러오지 못했어요.");
@@ -63,27 +80,6 @@ export default function DetailScreen() {
 
   fetchDetail();
 }, [questionId]);
-
-
-  useEffect(() => {
-    if (!questionId) return;
-
-    const fetchDetail = async () => {
-      try {
-        setLoading(true);
-        const detailRes = await getQuestionDetail(questionId);
-        setData(detailRes);
-        console.log("질문 상세 정보:", detailRes);
-      } catch (e) {
-        console.error(e);
-        setError("질문 정보를 불러오지 못했어요.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDetail();
-  }, [questionId]);
 
   if (!questionId) {
     return <div>잘못된 접근입니다.</div>;
@@ -118,7 +114,7 @@ export default function DetailScreen() {
     navigate("/chat", {
       state: {
         questionId: item.questionId,
-        roomId: item.roomId,
+        roomId: item.roomId || item.questionId,
         questionTitle: item.questionTitle,
         status: item.questionStatus,
       },
@@ -268,9 +264,11 @@ export default function DetailScreen() {
       )}
 
       {/* 상단바 */}
-      <div className="flex items-center justify-between px-6 pt-10 pb-4">
-        <button onClick={() => navigate(-1)}>
-          <img src="/icons/arrow-left.svg" className="w-5 h-5" />
+      <div className="w-full flex items-center justify-between pl-[1.5rem] pr-[1.5rem] pt-[1.25rem] pb-[1.25rem] box-border shadow-[0_4px_5px_rgba(0,0,0,0.04)]">
+        <button type="button" className="bg-[#FFFFFF] border-0" onClick={() => navigate(-1)}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="9" height="15" viewBox="0 0 9 15" fill="none">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M0.341565 8.2495L6.9414 14.8493L8.59106 13.1997L2.81606 7.42467L8.59106 1.64967L6.9414 0L0.341565 6.59983C0.122849 6.81862 -1.90735e-05 7.11531 -1.90735e-05 7.42467C-1.90735e-05 7.73402 0.122849 8.03072 0.341565 8.2495Z" fill="#191D1F"/>
+          </svg>
         </button>
       </div>
 
